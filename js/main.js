@@ -45,9 +45,9 @@ function setDrawerState(open) {
 
   toggle.setAttribute("aria-expanded", String(open));
   toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
-  document.body.dataset.drawerOpen = String(open);
 
   if (open) {
+    document.body.dataset.drawerOpen = "true";
     overlay.hidden = false;
     drawer.hidden = false;
     main?.setAttribute("aria-hidden", "true");
@@ -84,6 +84,9 @@ export function closeDrawer() {
 function bindDrawerControls() {
   const { toggle, overlay, drawer } = drawerElements();
   if (!toggle || !overlay || !drawer || toggle.dataset.drawerBound === "true") return;
+
+  // The active navigation state is governed by aria-selected in navigation.js.
+  document.querySelectorAll(".drawer-item.active").forEach(item => item.classList.remove("active"));
 
   toggle.dataset.drawerBound = "true";
   toggle.addEventListener("click", toggleDrawer);
