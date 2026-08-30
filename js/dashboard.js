@@ -14,6 +14,12 @@ initSettings({
   }
 });
 
+document.addEventListener("click", event => {
+  const refresh = event.target.closest?.("[data-refresh-feed]");
+  const tab = refresh?.dataset.refreshFeed;
+  if (tab && tab !== "myfeed") feeds.invalidate("myfeed");
+});
+
 initNavigation({
   onPrimaryChange(tab) {
     if (tab !== "launchpad") {
