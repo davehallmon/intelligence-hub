@@ -198,7 +198,7 @@ export function parseXmlFeed(xmlText, fallbackTitle = "") {
 
       return {
         title: childText(node, ["title"]) || "Untitled",
-        link: atomLink(node),
+        link: atomLink(node) || childText(node, ["guid"]),
         date: childText(node, ["pubDate", "published", "updated", "dc:date"]),
         description: stripHtml(rawContent),
         rawContent,
