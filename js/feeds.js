@@ -6,7 +6,7 @@ import {
 } from "./feed-config.js";
 
 import { fetchPublicFeed, fetchPrivateFeed, fetchReadwiseExport } from "./feed-client.js";
-import { getSettings } from "./settings.js";
+import { getSettings, getSocialBridgeSources } from "./settings.js";
 import { normalizeFeedItem, normalizeHighlight } from "./normalize.js";
 import { renderTopicFiltered, resetTopicFilter } from "./feed-filters.js";
 import {
@@ -120,39 +120,49 @@ async function loadNews() {
 
 async function loadSocials() {
   renderLoading("socialsFeed", "Loading social, newsletter, and personal publishing feeds…");
-  setStatus("socialsStatus", "Loading direct profile outlets and configured social bridge…", "loading");
+  setStatus("socialsStatus", "Loading direct profile outlets and browser-local profile bridges…", "loading");
   const settings = getSettings();
+  const bridgeSources = getSocialBridgeSources(settings);
   const jobs = [];
 
-  if (settings.socialFeedUrl) {
+  bridgeSources.forEach(source => {
     jobs.push((async () => {
-      const feed = settings.socialFeedPrivate ? await fetchPrivateFeed(settings.socialFeedUrl) : await fetchPublicFeed(settings.socialFeedUrl);
-      return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
-        type: "social",
-        source: item.source || feed.title || "Unified Social Feed",
-        sourceUrl: item.sourceUrl || feed.link || "",
-        badges: ["Social bridge"]
-      }));
+      const feed = source.private ? await fetchPrivateFeed(source.url) : await fetchPublicFeed(source.url);
+      return feed.items.map(item => {
+        const normalized = normalizeFeedItem({ ...item, transport: feed.transport }, {
+          type: "social",
+          source: source.name,
+          sourceUrl: item.sourceUrl || feed.link || "",
+          profileIds: source.profileIds,
+          badges: source.badges
+        });
+        normalized.sourceKey = source.id;
+        return normalized;
+      });
     })());
-  }
+  });
 
   FEED_CONFIG.socials.publicSources.forEach(source => {
     jobs.push((async () => {
       const feed = await fetchPublicFeed(source.url);
-      return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
-        type: "social",
-        source: source.name,
-        sourceUrl: source.url,
-        profileIds: source.profileIds || [],
-        profiles: source.profiles || [],
-        topics: source.topics || [],
-        badges: ["Direct"]
-      }));
+      return feed.items.map(item => {
+        const normalized = normalizeFeedItem({ ...item, transport: feed.transport }, {
+          type: "social",
+          source: source.name,
+          sourceUrl: source.url,
+          profileIds: source.profileIds || [],
+          profiles: source.profiles || [],
+          topics: source.topics || [],
+          badges: ["Direct"]
+        });
+        normalized.sourceKey = source.id || source.url || source.name;
+        return normalized;
+      });
     })());
   });
 
   if (!jobs.length) {
-    renderEmpty("socialsFeed", "Add a unified Social RSS URL in Settings or public profile sources in js/source-registry.js.");
+    renderEmpty("socialsFeed", "No direct Social sources or profile-specific bridge feeds are configured.");
     setStatus("socialsStatus", "No Social feed sources configured.", "partial");
     return;
   }
@@ -163,13 +173,14 @@ async function loadSocials() {
   const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.socials.maxItems);
 
   if (merged.length) renderTopicFiltered("socials", merged, renderSocials);
-  else renderEmpty("socialsFeed", "Configured Social and direct profile feeds returned no items.");
+  else renderEmpty("socialsFeed", "Configured direct and profile-specific Social feeds returned no items.");
 
   const withImages = merged.filter(item => item.imageUrl).length;
   const state = failures.length && merged.length ? "partial" : failures.length ? "error" : "ok";
+  const bridgeLabel = `${bridgeSources.length} local bridge${bridgeSources.length === 1 ? "" : "s"}`;
   setStatus("socialsStatus", failures.length
-    ? `${merged.length} posts · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
-    : `${merged.length} posts · ${withImages} with media · direct outlets + bridge · topic + profile tagged`, state);
+    ? `${merged.length} posts · ${withImages} with media · ${bridgeLabel} · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
+    : `${merged.length} posts · ${withImages} with media · ${bridgeLabel} · direct + profile-attributed · topic + profile tagged`, state);
 }
 
 async function fetchAcademicSource(source) {

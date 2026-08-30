@@ -1,4 +1,4 @@
-// Intelligence Hub v8.4 — public source registry.
+// Intelligence Hub v8.5 — public source registry.
 // Profiles are identities; sources are publishing outlets attached to those identities.
 // Only public, repository-safe URLs belong here. Private social bridge URLs remain in localStorage.
 
@@ -39,14 +39,6 @@ export const PUBLIC_SOURCE_REGISTRY = Object.freeze([
   source({ id: "microsoft-research-youtube", name: "Microsoft Research", tab: "video", kind: "youtube", url: "https://www.youtube.com/channel/UCCb9_Kn8F_Opb3UCGm-lILQ", channelId: "UCCb9_Kn8F_Opb3UCGm-lILQ", profileIds: ["org-microsoft"], note: "Official Microsoft Research channel; intentionally narrower than the broader Microsoft profile." }),
   source({ id: "ai2-youtube", name: "Ai2", tab: "video", kind: "youtube", url: "https://www.youtube.com/channel/UCEqgmyWChwvt6MFGGlmUQCQ", channelId: "UCEqgmyWChwvt6MFGGlmUQCQ", profileIds: ["org-ai2"] }),
   source({ id: "ai-daily-brief-youtube", name: "The AI Daily Brief", tab: "video", kind: "youtube", url: "https://www.youtube.com/channel/UCKelCK4ZaO6HeEI1KQjqzWA", channelId: "UCKelCK4ZaO6HeEI1KQjqzWA", profileIds: ["person-nathaniel-whittemore"], note: "Show channel hosted by Nathaniel Whittemore and treated as his primary video outlet." })
-]);
-
-export const BRIDGE_ONLY_PROFILE_IDS = Object.freeze([
-  "person-aravind-srinivas",
-  "person-andrej-karpathy",
-  "person-satya-nadella",
-  "person-clem-delangue",
-  "person-cat-goetze"
 ]);
 
 export function publicSourcesFor(tab) {

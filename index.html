@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="tabs.css">
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="social-source-policy.css">
 </head>
 
 <body>
@@ -127,7 +128,7 @@
       </section>
 
       <section class="primary-panel feed-panel" id="panel-socials" data-primary-panel="socials" hidden>
-        <div class="feed-panel-header"><div><p class="panel-kicker">Profiles & newsletters</p><h2>Socials</h2><p>A unified profile RSS stream plus direct Substack feeds. No platform scraping.</p></div><div class="feed-actions"><button class="btn" type="button" data-open-settings>Configure</button><button class="btn" type="button" data-refresh-feed="socials">Refresh</button></div></div>
+        <div class="feed-panel-header"><div><p class="panel-kicker">Profiles & newsletters</p><h2>Socials</h2><p>Direct profile outlets plus optional profile-specific browser-local bridges. No platform scraping.</p></div><div class="feed-actions"><button class="btn" type="button" data-open-settings>Configure</button><button class="btn" type="button" data-refresh-feed="socials">Refresh</button></div></div>
         <div class="feed-health" id="socialsStatus" aria-live="polite">Open this tab to load.</div><div class="timeline-list" id="socialsFeed"></div>
       </section>
 
@@ -161,8 +162,17 @@
     <form method="dialog" class="settings-card" id="settingsForm">
       <div class="settings-heading"><div><p class="panel-kicker">Browser-only configuration</p><h2 id="settingsTitle">Settings</h2></div><button class="icon-btn" type="button" data-settings-close aria-label="Close settings">×</button></div>
       <p class="settings-note">Values below are saved only to this site's <code>localStorage</code>. They are not committed to GitHub. localStorage is origin-scoped but not encrypted, so use this only on devices you trust.</p>
-      <label class="field"><span>Unified Social RSS URL</span><input id="socialFeedUrl" name="socialFeedUrl" type="url" placeholder="https://…/your-unified-feed.xml" autocomplete="off"><small>Use an RSS.app / Feedbin-compatible output URL or another feed you control.</small></label>
-      <label class="check-field"><input id="socialFeedPrivate" name="socialFeedPrivate" type="checkbox" checked><span>Treat the Social feed as private.<small>Private feeds are fetched directly and are never sent through a public RSS proxy.</small></span></label>
+
+      <section class="settings-section" aria-labelledby="socialBridgeHeading">
+        <div class="settings-section-heading"><span id="socialBridgeHeading">Social profile bridges</span><small>Optional per-profile feeds for identities whose main publishing outlet does not expose a reliable public feed.</small></div>
+        <div class="policy-legend" aria-label="Social source policy states">
+          <span class="policy-chip">Direct</span><span class="policy-chip">Bridge-eligible</span><span class="policy-chip">Coverage-only</span><span class="policy-chip">Watchlist</span>
+        </div>
+        <p class="settings-note">Only Bridge-eligible profiles appear below. A configured URL is attributed only to that canonical profile; Intelligence Hub never treats general coverage or another organization's feed as that person's authored Social stream.</p>
+        <p class="settings-warning" id="legacySocialFeedNotice" hidden>A legacy unified Social RSS URL is stored from an earlier version. v8.5 does not load it because it cannot be attributed reliably to a canonical profile. Saving Settings will remove that legacy value.</p>
+        <div class="bridge-mappings" id="socialProfileMappings"></div>
+      </section>
+
       <label class="field"><span>Readwise API token</span><div class="secret-row"><input id="readwiseToken" name="readwiseToken" type="password" placeholder="Stored only in this browser" autocomplete="off"><button class="mini-btn" type="button" data-toggle-secret="readwiseToken">Show</button></div></label>
       <label class="field"><span>Readwise lookback window</span><select id="readwiseDays" name="readwiseDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option><option value="365">1 year</option></select></label>
       <label class="field"><span>Optional RSS2JSON API key</span><div class="secret-row"><input id="rss2jsonApiKey" name="rss2jsonApiKey" type="password" placeholder="Optional free-tier key" autocomplete="off"><button class="mini-btn" type="button" data-toggle-secret="rss2jsonApiKey">Show</button></div><small>Used only for public feeds when a source blocks cross-origin browser requests.</small></label>
