@@ -1,3 +1,5 @@
+import { initPhase3Interactions } from "./phase3.js";
+
 // Intelligence Hub v9.1 — UI foundation compatibility entry.
 // The existing dashboard modules remain intact while the new design system is layered in.
 
@@ -156,9 +158,10 @@ export function initUIFoundation() {
 }
 
 export function decorateUIFoundation() {
-  // This is intentionally added after my-feed.css / feed-intelligence.css so the
-  // v9.1 component and breakpoint rules are the final cascade layer.
+  // These are intentionally added after my-feed.css / feed-intelligence.css so
+  // the responsive foundation and Phase 3 interaction layer win the cascade.
   ensureStylesheet("css/style.css");
+  ensureStylesheet("css/phase3.css");
 
   const feedContainers = [
     "myFeedAttention",
@@ -194,5 +197,6 @@ export function decorateUIFoundation() {
   });
 
   syncNavigationMode();
+  initPhase3Interactions();
   window.lucide?.createIcons();
 }
