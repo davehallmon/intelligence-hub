@@ -23,6 +23,88 @@ function ensureLucide() {
   document.head.append(script);
 }
 
+let drawerCloseTimer = null;
+
+function drawerElements() {
+  return {
+    toggle: document.getElementById("menu-toggle"),
+    overlay: document.getElementById("drawer-overlay"),
+    drawer: document.getElementById("flyout-drawer"),
+    main: document.getElementById("main-content")
+  };
+}
+
+function setDrawerState(open) {
+  const { toggle, overlay, drawer, main } = drawerElements();
+  if (!toggle || !overlay || !drawer) return;
+
+  if (drawerCloseTimer) {
+    clearTimeout(drawerCloseTimer);
+    drawerCloseTimer = null;
+  }
+
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+  document.body.dataset.drawerOpen = String(open);
+
+  if (open) {
+    overlay.hidden = false;
+    drawer.hidden = false;
+    main?.setAttribute("aria-hidden", "true");
+    requestAnimationFrame(() => drawer.classList.add("is-open"));
+    return;
+  }
+
+  drawer.classList.remove("is-open");
+  main?.removeAttribute("aria-hidden");
+  delete document.body.dataset.drawerOpen;
+
+  const finishClose = () => {
+    drawer.hidden = true;
+    overlay.hidden = true;
+  };
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    finishClose();
+  } else {
+    drawerCloseTimer = window.setTimeout(finishClose, 260);
+  }
+}
+
+export function toggleDrawer() {
+  const { toggle } = drawerElements();
+  const isOpen = toggle?.getAttribute("aria-expanded") === "true";
+  setDrawerState(!isOpen);
+}
+
+export function closeDrawer() {
+  setDrawerState(false);
+}
+
+function bindDrawerControls() {
+  const { toggle, overlay, drawer } = drawerElements();
+  if (!toggle || !overlay || !drawer || toggle.dataset.drawerBound === "true") return;
+
+  toggle.dataset.drawerBound = "true";
+  toggle.addEventListener("click", toggleDrawer);
+
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) closeDrawer();
+  });
+
+  drawer.addEventListener("click", event => {
+    if (event.target.closest?.("[data-primary-tab]")) closeDrawer();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+      event.preventDefault();
+      closeDrawer();
+      toggle.focus();
+    }
+  });
+}
+
 export function initUIFoundation() {
   document.documentElement.dataset.uiVersion = "9.1";
 
@@ -31,6 +113,7 @@ export function initUIFoundation() {
   // v8/v9 compatibility styles by decorateUIFoundation().
   ensureStylesheet("css/variables.css");
   ensureLucide();
+  bindDrawerControls();
 }
 
 export function decorateUIFoundation() {
@@ -56,8 +139,8 @@ export function decorateUIFoundation() {
     container.setAttribute("aria-live", "polite");
   });
 
-  document.querySelector(".topbar")?.classList.add("zone-primary");
-  document.querySelector(".primary-nav-wrap")?.classList.add("zone-secondary");
+  document.querySelector("#app-topbar")?.classList.add("zone-primary");
+  document.querySelector("#flyout-drawer")?.classList.add("zone-secondary");
   document.querySelector("#panel-myfeed")?.classList.add("zone-secondary");
   document.querySelector("#panel-launchpad")?.classList.add("zone-tertiary");
 
