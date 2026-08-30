@@ -2,8 +2,16 @@ function text(value) {
   return String(value || "").trim();
 }
 
-function clear(container) {
-  if (container) container.replaceChildren();
+function clear(container, state = "ready") {
+  if (!container) return;
+  container.replaceChildren();
+  container.dataset.state = state;
+  if (state === "loading") container.setAttribute("aria-busy", "true");
+  else container.removeAttribute("aria-busy");
+}
+
+function refreshIcons() {
+  window.lucide?.createIcons();
 }
 
 function externalCard(tag = "a") {
@@ -41,36 +49,119 @@ export function setStatus(id, message, state = "") {
   node.dataset.state = state;
 }
 
+function skeletonCard() {
+  const card = document.createElement("div");
+  card.className = "skeleton-card";
+  card.setAttribute("aria-hidden", "true");
+  card.innerHTML = `
+    <div class="skeleton-card__media"></div>
+    <div class="skeleton-line skeleton-line--meta"></div>
+    <div class="skeleton-line skeleton-line--title"></div>
+    <div class="skeleton-line skeleton-line--title-short"></div>
+    <div class="skeleton-line skeleton-line--body"></div>
+    <div class="skeleton-line skeleton-line--body-short"></div>`;
+  return card;
+}
+
 export function renderLoading(containerId, message = "Loading…") {
   const container = document.getElementById(containerId);
-  clear(container);
+  if (!container) return;
+  clear(container, "loading");
+  container.setAttribute("aria-label", message);
+  const grid = document.createElement("div");
+  grid.className = "skeleton-grid";
+  const count = containerId === "myFeedFeed" ? 6 : 4;
+  for (let index = 0; index < count; index += 1) grid.append(skeletonCard());
+  container.append(grid);
+}
+
+function createStateMessage({ kind = "empty", title, message, icon = "inbox", retryTab = "" }) {
   const node = document.createElement("div");
-  node.className = "feed-empty";
-  node.textContent = message;
-  container?.append(node);
+  node.className = `state-message state-message--${kind}`;
+
+  const iconNode = document.createElement("i");
+  iconNode.className = "state-message__icon";
+  iconNode.dataset.lucide = icon;
+  iconNode.setAttribute("aria-hidden", "true");
+
+  const heading = document.createElement("p");
+  heading.className = "state-message__title";
+  heading.textContent = title;
+
+  const copy = document.createElement("p");
+  copy.className = "state-message__copy";
+  copy.textContent = message;
+
+  node.append(iconNode, heading, copy);
+
+  if (retryTab) {
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "btn button button--primary state-message__retry";
+    retry.textContent = "Retry";
+    retry.addEventListener("click", () => {
+      document.querySelector(`[data-refresh-feed="${retryTab}"]`)?.click();
+    });
+    node.append(retry);
+  }
+
+  return node;
 }
 
 export function renderEmpty(containerId, message) {
   const container = document.getElementById(containerId);
-  clear(container);
-  const node = document.createElement("div");
-  node.className = "feed-empty";
-  node.textContent = message;
-  container?.append(node);
+  if (!container) return;
+  clear(container, "empty");
+  container.append(createStateMessage({
+    kind: "empty",
+    title: "Nothing to show here yet",
+    message,
+    icon: "inbox"
+  }));
+  refreshIcons();
+}
+
+function retryTabFor(containerId) {
+  return ({
+    newsFeed: "news",
+    socialsFeed: "socials",
+    academicFeed: "academic",
+    researchFeed: "research",
+    videoFeed: "video",
+    booksFeed: "books",
+    myFeedAttention: "myfeed",
+    myFeedFeed: "myfeed"
+  })[containerId] || "";
 }
 
 export function renderError(containerId, error) {
   const container = document.getElementById(containerId);
-  clear(container);
-  const node = document.createElement("div");
-  node.className = "feed-error";
-  node.textContent = error?.message || String(error || "Unable to load this feed.");
-  container?.append(node);
+  if (!container) return;
+  clear(container, "error");
+  container.append(createStateMessage({
+    kind: "error",
+    title: "Unable to load this feed",
+    message: error?.message || String(error || "Unable to load this feed."),
+    icon: "circle-alert",
+    retryTab: retryTabFor(containerId)
+  }));
+  refreshIcons();
+}
+
+function contentBadgeClass(item) {
+  return ({
+    news: "badge--news",
+    social: "badge--social",
+    academic: "badge--academic",
+    research: "badge--research",
+    video: "badge--video",
+    highlight: "badge--books"
+  })[item.type] || "";
 }
 
 function appendMeta(container, item, label = "") {
   const meta = document.createElement("div");
-  meta.className = "feed-meta";
+  meta.className = "feed-meta card__meta";
 
   const profile = item.profiles?.[0];
   const sourceText = profile && profile !== item.source
@@ -92,6 +183,7 @@ function appendMeta(container, item, label = "") {
 
   if (label) {
     const badge = document.createElement("span");
+    badge.className = `badge ${contentBadgeClass(item)}`.trim();
     badge.textContent = label;
     meta.append(badge);
   }
@@ -106,7 +198,7 @@ function appendTopics(container, item, max = 3) {
   row.className = "card-topic-row";
   topics.forEach(topic => {
     const chip = document.createElement("span");
-    chip.className = "card-topic-chip";
+    chip.className = "card-topic-chip badge badge--topic";
     chip.textContent = topic;
     row.append(chip);
   });
@@ -133,7 +225,7 @@ function appendReasons(container, item) {
 
 function mediaPlaceholder(item) {
   const placeholder = document.createElement("div");
-  placeholder.className = "feed-media feed-media-placeholder";
+  placeholder.className = "feed-media feed-media-placeholder card__thumbnail";
   const icon = document.createElement("img");
   icon.className = "feed-source-icon";
   icon.alt = "";
@@ -154,7 +246,7 @@ function appendMedia(card, item) {
   }
 
   const media = document.createElement("div");
-  media.className = "feed-media";
+  media.className = "feed-media card__thumbnail";
   const image = document.createElement("img");
   image.className = "feed-image";
   image.alt = "";
@@ -169,22 +261,22 @@ function appendMedia(card, item) {
 
 export function createRichCard(item, { className = "feed-card", label = "", snippetLength = 360, showReasons = false } = {}) {
   const card = externalCard();
-  card.className = `${className} rich-feed-card`;
+  card.className = `${className} rich-feed-card card card--${item.type || "article"}`;
   card.href = item.url;
   appendMedia(card, item);
 
   const body = document.createElement("div");
-  body.className = "rich-feed-body";
+  body.className = "rich-feed-body card__body";
   appendMeta(body, item, label);
 
   const title = document.createElement("div");
-  title.className = "feed-title";
+  title.className = "feed-title card__title";
   title.textContent = text(item.title);
   body.append(title);
 
   if (item.summary) {
     const snippet = document.createElement("p");
-    snippet.className = "feed-snippet";
+    snippet.className = "feed-snippet card__excerpt";
     snippet.textContent = text(item.summary).slice(0, snippetLength);
     body.append(snippet);
   }
@@ -222,14 +314,14 @@ export function renderPapers(items) {
 
   items.forEach(item => {
     const card = externalCard();
-    card.className = `paper-card${item.pinned ? " is-pinned" : ""}`;
+    card.className = `paper-card card card--research${item.pinned ? " is-pinned" : ""}`;
     card.href = item.url;
 
     appendTopics(card, item, 5);
     appendMeta(card, item);
 
     const title = document.createElement("div");
-    title.className = "feed-title";
+    title.className = "feed-title card__title";
     title.textContent = text(item.title);
     card.append(title);
 
@@ -242,7 +334,7 @@ export function renderPapers(items) {
 
     if (item.summary) {
       const abstract = document.createElement("p");
-      abstract.className = "paper-abstract";
+      abstract.className = "paper-abstract card__excerpt";
       abstract.textContent = text(item.summary);
       card.append(abstract);
     }
@@ -256,11 +348,11 @@ export function renderVideos(items) {
 
   items.forEach(item => {
     const card = externalCard();
-    card.className = "video-card";
+    card.className = "video-card card card--video";
     card.href = item.url;
 
     const img = document.createElement("img");
-    img.className = "video-thumb";
+    img.className = "video-thumb card__thumbnail";
     img.alt = "";
     img.loading = "lazy";
     img.referrerPolicy = "no-referrer";
@@ -268,14 +360,14 @@ export function renderVideos(items) {
     card.append(img);
 
     const copy = document.createElement("div");
-    copy.className = "video-copy";
+    copy.className = "video-copy card__body";
     const title = document.createElement("div");
-    title.className = "video-title";
+    title.className = "video-title card__title";
     title.textContent = text(item.title);
     copy.append(title);
 
     const meta = document.createElement("div");
-    meta.className = "video-meta";
+    meta.className = "video-meta card__meta";
     meta.textContent = [item.profiles?.[0] || item.source || item.author, ageLabel(item.publishedAt)].filter(Boolean).join(" · ");
     copy.append(meta);
     appendTopics(copy, item, 2);
@@ -290,12 +382,12 @@ export function renderHighlights(items) {
 
   items.forEach(item => {
     const card = item.url ? externalCard() : externalCard("article");
-    card.className = `highlight-card${item.imageUrl ? " has-cover" : ""}`;
+    card.className = `highlight-card card card--books${item.imageUrl ? " has-cover" : ""}`;
     if (item.url) card.href = item.url;
 
     if (item.imageUrl) {
       const cover = document.createElement("img");
-      cover.className = "highlight-cover";
+      cover.className = "highlight-cover card__thumbnail";
       cover.alt = "";
       cover.loading = "lazy";
       cover.referrerPolicy = "no-referrer";
@@ -305,7 +397,7 @@ export function renderHighlights(items) {
     }
 
     const body = document.createElement("div");
-    body.className = "highlight-body";
+    body.className = "highlight-body card__body";
     appendMeta(body, item, item.badges?.[0] || "");
     const quote = document.createElement("blockquote");
     quote.textContent = text(item.summary);
