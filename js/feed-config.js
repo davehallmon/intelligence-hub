@@ -63,10 +63,10 @@ export const FEED_CONFIG = Object.freeze({
   },
 
   video: {
-    maxItems: 36,
-    // Add stable YouTube channel IDs (UC...) here and attach them to a profile ID.
-    // Example: channels: [{ name: "Creator Name", channelId: "UC...", profileIds: ["person-creator-name"] }]
-    channels: []
+    maxItems: 48,
+    // Verified official YouTube channels from the public source registry.
+    // Channel Atom feeds are generated at runtime from stable UC... channel IDs.
+    channels: publicSourcesFor("video")
   }
 });
 
