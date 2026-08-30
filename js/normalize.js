@@ -1,4 +1,5 @@
 import { classifyTopics } from "./topics.js";
+import { detectProfileIds, getProfiles, resolveProfileId } from "./profiles.js";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -24,11 +25,31 @@ export function normalizeFeedItem(item = {}, context = {}) {
   const source = clean(context.source || item.source || item.feedTitle || context.feedTitle);
   const sourceUrl = clean(context.sourceUrl || item.sourceUrl || "");
   const authors = unique([...(item.authors || []), item.author].filter(Boolean));
-  const profiles = unique([...(context.profiles || []), ...(item.profiles || [])]);
   const title = clean(item.title) || "Untitled";
   const summary = clean(item.description || item.summary || item.text);
+
+  const rawProfileRefs = unique([
+    ...(context.profileIds || []),
+    ...(context.profiles || []),
+    ...(item.profileIds || []),
+    ...(item.profiles || [])
+  ]);
+
+  // Seed explicit source→profile mappings, then conservatively identify canonical
+  // profiles that are actually named in the item title/summary/source/author fields.
+  const profileIds = detectProfileIds(
+    [title, summary, source, authors.join(" ")],
+    rawProfileRefs
+  );
+  const canonicalProfiles = getProfiles(profileIds).map(profile => profile.name);
+  const unresolvedProfiles = rawProfileRefs.filter(ref => !resolveProfileId(ref));
+  const profiles = unique([...canonicalProfiles, ...unresolvedProfiles]);
+
   const seededTopics = unique([...(context.topics || []), ...(item.topics || [])]);
-  const topics = classifyTopics([title, summary, source, authors.join(" "), profiles.join(" ")], seededTopics);
+  const topics = classifyTopics(
+    [title, summary, source, authors.join(" "), profiles.join(" ")],
+    seededTopics
+  );
 
   return {
     id: clean(item.id) || url || `${context.type || "item"}:${title}`,
@@ -40,6 +61,7 @@ export function normalizeFeedItem(item = {}, context = {}) {
     author: authors[0] || "",
     authors,
     profiles,
+    profileIds,
     publishedAt: clean(item.date || item.publishedAt),
     summary,
     imageUrl: clean(item.imageUrl || item.thumbnail || context.imageUrl),

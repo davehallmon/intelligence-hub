@@ -1,13 +1,36 @@
-/* Intelligence Hub v8.1 — image-aware feed cards + topic intelligence */
+/* Intelligence Hub v8.2 — image-aware cards + topic/profile intelligence */
 
-.topic-filter-bar {
+.feed-filter-stack {
+  display: grid;
+  gap: 7px;
+  padding: 0 1px 14px;
+}
+
+.feed-filter-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.feed-filter-label {
+  color: #68788e;
+  font-size: .62rem;
+  font-weight: 850;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.feed-filter-chips {
   display: flex;
   gap: 7px;
+  min-width: 0;
   overflow-x: auto;
-  padding: 0 1px 13px;
+  padding: 1px 1px 2px;
   scrollbar-width: thin;
 }
 
+.feed-filter-chip,
 .topic-filter-chip {
   flex: 0 0 auto;
   appearance: none;
@@ -22,16 +45,30 @@
   transition: .14s ease;
 }
 
+.feed-filter-chip:hover,
 .topic-filter-chip:hover {
   color: #e2e8f0;
   border-color: #3a4a60;
   background: #151f2e;
 }
 
+.feed-filter-chip[aria-pressed="true"],
 .topic-filter-chip[aria-pressed="true"] {
   color: #e8eaff;
   border-color: rgba(129,140,248,.38);
   background: rgba(99,102,241,.16);
+}
+
+.person-filter-chip[aria-pressed="true"] {
+  border-color: rgba(96,165,250,.36);
+  background: rgba(59,130,246,.13);
+  color: #dbeafe;
+}
+
+.organization-filter-chip[aria-pressed="true"] {
+  border-color: rgba(52,211,153,.32);
+  background: rgba(16,185,129,.11);
+  color: #d1fae5;
 }
 
 .rich-feed-card {
@@ -130,6 +167,13 @@
 @media (max-width: 760px) {
   .rich-feed-card { grid-template-columns: 132px minmax(0, 1fr); }
   .feed-media, .feed-image { min-height: 124px; }
+}
+
+@media (max-width: 620px) {
+  .feed-filter-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
 }
 
 @media (max-width: 540px) {
