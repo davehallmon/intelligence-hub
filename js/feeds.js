@@ -84,7 +84,7 @@ async function loadNews() {
     const sources = queries.map(query => ({ name: query, url: googleNewsRss(query, freshness) }));
     const { items, failures } = await collectPublicFeeds(sources);
 
-    const cutoff = Date.now() - 36 * 60 * 60 * 1000;
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     const merged = dedupe(sortNewest(items))
       .filter(item => !item.date || validDate(item) >= cutoff)
       .slice(0, maxItems);
