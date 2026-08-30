@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#0b0f17">
   <title>Intelligence Hub</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23111827'/%3E%3Cpath d='M35 7 14 35h15l-1 22 22-31H35z' fill='%23818cf8'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css">
-
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="tabs.css">
 </head>
 <body>
   <div class="shell">
@@ -27,7 +27,7 @@
           </div>
         </div>
         <div class="meta-row">
-          <span class="meta-pill">v7.2</span>
+          <span class="meta-pill">v7.3</span>
           <span class="meta-pill"><span id="totalLinks">356</span> unique links</span>
           <span class="meta-pill">Static GitHub Pages ready</span>
         </div>
@@ -59,14 +59,31 @@
             <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
             <path d="m20 20-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          <label for="search" style="position:absolute;left:-9999px">Search all bookmarks</label>
+          <label for="search" style="position:absolute;left:-9999px">Search Intelligence Hub</label>
           <input id="search" class="search-input" type="search"
                  autocomplete="off" spellcheck="false"
-                 placeholder="Search links, people, topics, organizations, products…">
+                 placeholder="Search destinations, tools, sources…">
           <span class="shortcut"><span class="kbd">/</span> or <span class="kbd">⌘K</span></span>
         </div>
-        <div class="search-status" id="searchStatus" aria-live="polite">356 links</div>
+        <div class="search-status" id="searchStatus" aria-live="polite">226 links</div>
       </div>
+
+      <div class="view-switcher">
+        <div class="view-tabs" id="viewTabs" role="tablist" aria-label="Intelligence Hub views">
+          <button class="view-tab" type="button" role="tab" data-view="destinations"
+                  aria-selected="true" aria-controls="hub">
+            <span>Destinations</span>
+            <span class="view-tab-count">226</span>
+          </button>
+          <button class="view-tab" type="button" role="tab" data-view="watchlists"
+                  aria-selected="false" aria-controls="hub" tabindex="-1">
+            <span>Watchlists</span>
+            <span class="view-tab-count">130</span>
+          </button>
+        </div>
+        <p class="view-description" id="viewDescription">Places to use, build, research, read, create, and publish.</p>
+      </div>
+
       <nav class="nav-chips" id="navChips" aria-label="Category shortcuts"></nav>
     </div>
 
@@ -74,11 +91,11 @@
 
     <div class="empty-state" id="emptyState">
       <strong>No matches found.</strong>
-      Try a broader term, a domain name, or a category such as “research,” “agents,” or “figures.”
+      Try a broader term, a domain name, or another primary view.
     </div>
 
     <footer class="footer">
-      <div><strong>Intelligence Hub</strong> · v7.2 · Hosted as a static site</div>
+      <div><strong>Intelligence Hub</strong> · v7.3 · Hosted as a static site</div>
       <div style="margin-top:5px">Every bookmark opens in a new tab. Favicons stay paused in preview/local mode and load automatically on GitHub Pages.</div>
     </footer>
   </div>
@@ -93,6 +110,6 @@
   <script src="data-watchlists-1.js"></script>
   <script src="data-watchlists-2.js"></script>
   <script src="app.js"></script>
-
+  <script src="tabs.js"></script>
 </body>
 </html>
