@@ -1,5 +1,9 @@
 /* Intelligence Hub v8.5 — social source policy settings */
 
+.settings-dialog {
+  overflow-y: auto;
+}
+
 .settings-section {
   margin-top: 16px;
   padding-top: 2px;
