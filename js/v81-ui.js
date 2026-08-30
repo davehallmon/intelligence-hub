@@ -7,13 +7,13 @@ export function initV81UI() {
   }
 
   const versionPill = document.querySelector(".meta-row .meta-pill");
-  if (versionPill?.textContent?.trim() === "v8") versionPill.textContent = "v8.1";
+  if (versionPill) versionPill.textContent = "v8.1.1";
 
   const footer = document.querySelector(".footer > div:first-child");
   if (footer) {
     const strong = footer.querySelector("strong");
     footer.replaceChildren();
     if (strong) footer.append(strong);
-    footer.append(document.createTextNode(" · v8.1 · Static GitHub Pages dashboard"));
+    footer.append(document.createTextNode(" · v8.1.1 · Static GitHub Pages dashboard"));
   }
 }
