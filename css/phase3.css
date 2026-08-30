@@ -1,0 +1,364 @@
+/* Intelligence Hub v9.2 — Phase 3 interaction and state layer.
+   Loaded after css/style.css so these rules refine, rather than replace, the responsive foundation. */
+
+/* MOCKUP 09c: watchlist-only filters. */
+#main-content[data-view="watchlist"] .pill-group {
+  display: flex !important;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0 16px;
+  scrollbar-width: thin;
+}
+
+#main-content[data-view="watchlist"] .pill-group .pill,
+#main-content[data-view="watchlist"] .pill-group .nav-chip {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 4px 14px;
+  border: 1px solid #334155;
+  border-radius: 999px;
+  background: #1e293b;
+  color: #a5b4fc;
+  font-size: 11px;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+#main-content[data-view="watchlist"] .pill-group .pill:hover,
+#main-content[data-view="watchlist"] .pill-group .pill:focus-visible {
+  border-color: #6366f1;
+  background: #202b40;
+  color: #e0e7ff;
+}
+
+/* MOCKUPS 12a/12b: desktop hover acknowledgement, actions, and delayed preview. */
+.interactive-card {
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .30);
+  isolation: isolate;
+}
+
+.card__primary-link {
+  display: grid;
+  grid-template-columns: inherit;
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  min-height: inherit;
+  overflow: hidden;
+  border-radius: inherit;
+  background: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card__primary-link:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 3px;
+}
+
+.card-actions {
+  position: absolute;
+  z-index: 8;
+  right: 9px;
+  bottom: 9px;
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid rgba(71, 85, 105, .72);
+  border-radius: 10px;
+  background: rgba(11, 15, 23, .92);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .28);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 150ms ease, transform 150ms ease;
+  backdrop-filter: blur(12px);
+}
+
+.card-action {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.card-action:hover,
+.card-action:focus-visible,
+.card-action[aria-pressed="true"] {
+  border-color: rgba(129, 140, 248, .42);
+  background: rgba(99, 102, 241, .15);
+  color: #eef2ff;
+}
+
+.card-action svg {
+  width: 17px;
+  height: 17px;
+}
+
+.card-preview {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  left: 0;
+  display: grid;
+  gap: 5px;
+  width: min(330px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid rgba(129, 140, 248, .48);
+  border-radius: 10px;
+  background: #4f5fd5;
+  color: #f8fafc;
+  box-shadow: 0 12px 30px rgba(79, 70, 229, .34);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 150ms ease, transform 150ms ease, visibility 0s linear 150ms;
+}
+
+.card-preview strong {
+  font-size: .66rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.card-preview span {
+  font-size: .76rem;
+  line-height: 1.45;
+}
+
+.card-preview--above {
+  top: auto;
+  bottom: calc(100% + 10px);
+  transform: translateY(2px);
+}
+
+.card-preview--right {
+  right: 0;
+  left: auto;
+}
+
+.interactive-card:focus-within {
+  z-index: 40;
+}
+
+.interactive-card:focus-within .card-actions {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.interactive-card:focus-within .card-preview {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition-delay: 500ms, 500ms, 500ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive-card:hover {
+    z-index: 40;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(99, 102, 241, .30);
+  }
+
+  .interactive-card:hover .card-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .interactive-card:hover .card-preview {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 500ms, 500ms, 500ms;
+  }
+}
+
+/* MOCKUP 13a: preserve the hero footprint while loading. */
+@media (min-width: 768px) {
+  #myFeedAttention .skeleton-grid .skeleton-card:first-child {
+    grid-column: span 2;
+  }
+}
+
+/* MOCKUP 13b: calmer full-width empty state. */
+.feed-grid[data-state="empty"] .state-message--empty {
+  min-height: 360px;
+  padding: 80px 24px;
+}
+
+.feed-grid[data-state="empty"] .state-message__icon {
+  width: 46px;
+  height: 46px;
+}
+
+.feed-grid[data-state="empty"] .state-message__title {
+  font-size: 1.05rem;
+}
+
+/* MOCKUP 14: Cmd/Ctrl+K command palette. */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: max(11vh, 72px) 16px 24px;
+  background: rgba(0, 0, 0, .70);
+  backdrop-filter: blur(4px);
+}
+
+.palette-overlay[hidden] {
+  display: none !important;
+}
+
+.command-palette {
+  width: min(560px, 100%);
+  max-height: min(72vh, 680px);
+  overflow: hidden;
+  border: 1px solid #3a475d;
+  border-radius: 12px;
+  background: #1e293b;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .52);
+}
+
+.command-palette__search {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #3a475d;
+}
+
+.command-palette__search svg {
+  width: 21px;
+  height: 21px;
+  color: #94a3b8;
+}
+
+.command-palette__search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #f8fafc;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.command-palette__search input::placeholder {
+  color: #94a3b8;
+}
+
+.command-palette__results {
+  max-height: min(52vh, 480px);
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.command-palette__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+}
+
+.command-palette__result:hover,
+.command-palette__result:focus-visible,
+.command-palette__result[aria-selected="true"] {
+  border-color: rgba(129, 140, 248, .28);
+  background: rgba(99, 102, 241, .15);
+  outline: none;
+}
+
+.command-palette__result-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.command-palette__result-copy strong {
+  overflow: hidden;
+  color: #f8fafc;
+  font-size: .9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette__result-copy span {
+  overflow: hidden;
+  color: #a5b4fc;
+  font-size: .68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette__enter {
+  color: #64748b;
+  font-size: .8rem;
+}
+
+.command-palette__empty {
+  padding: 28px 16px;
+  color: #94a3b8;
+  text-align: center;
+  font-size: .8rem;
+}
+
+.command-palette__footer {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 9px 14px;
+  border-top: 1px solid #3a475d;
+  color: #94a3b8;
+  font-size: .66rem;
+}
+
+body[data-palette-open="true"] {
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .palette-overlay {
+    padding-top: calc(var(--topbar-height) + 18px);
+  }
+
+  .command-palette {
+    max-height: calc(100dvh - var(--topbar-height) - 36px);
+  }
+
+  .command-palette__results {
+    max-height: calc(100dvh - var(--topbar-height) - 190px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive-card,
+  .card-actions,
+  .card-preview {
+    transition: none !important;
+  }
+}
