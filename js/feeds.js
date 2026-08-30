@@ -26,6 +26,7 @@ import {
 
 const CACHE = new Map();
 const ITEM_CACHE = new Map();
+const LOAD_PROMISES = new Map();
 
 function validDate(item) {
   const value = new Date(item.publishedAt || item.date || 0).valueOf();
@@ -372,18 +373,28 @@ async function loadTab(tab, { force = false } = {}) {
   if (!LOADERS[tab]) return [];
   if (!force && CACHE.get(tab) === "loaded") return ITEM_CACHE.get(tab) || [];
 
+  const inFlight = LOAD_PROMISES.get(tab);
+  if (inFlight) {
+    await inFlight.catch(() => {});
+    if (!force && CACHE.get(tab) === "loaded") return ITEM_CACHE.get(tab) || [];
+  }
+
   if (force) {
     CACHE.delete(tab);
     if (tab !== "myfeed") ITEM_CACHE.delete(tab);
   }
 
   CACHE.set(tab, "loading");
+  const task = LOADERS[tab]({ force });
+  LOAD_PROMISES.set(tab, task);
   try {
-    await LOADERS[tab]({ force });
+    await task;
     CACHE.set(tab, "loaded");
   } catch (error) {
     CACHE.delete(tab);
     throw error;
+  } finally {
+    if (LOAD_PROMISES.get(tab) === task) LOAD_PROMISES.delete(tab);
   }
   return ITEM_CACHE.get(tab) || [];
 }
