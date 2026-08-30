@@ -6,6 +6,7 @@ function clear(container, state = "ready") {
   if (!container) return;
   container.replaceChildren();
   container.dataset.state = state;
+  container.removeAttribute("aria-label");
   if (state === "loading") container.setAttribute("aria-busy", "true");
   else container.removeAttribute("aria-busy");
 }
