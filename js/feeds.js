@@ -53,6 +53,7 @@ async function collectPublicFeeds(sources, type) {
       source: item.source || source.name || feed.title,
       sourceUrl: item.sourceUrl || source.sourceUrl || feed.link || "",
       feedTitle: feed.title || source.name,
+      profileIds: source.profileIds || [],
       profiles: source.profiles || [],
       topics: source.topics || [],
       badges: source.badges || []
@@ -77,6 +78,7 @@ async function loadNews() {
     const sources = queries.map(entry => ({
       name: entry.label,
       url: googleNewsRss(entry.query, freshness),
+      profileIds: entry.profileIds || [],
       profiles: entry.profiles || [],
       topics: entry.topics || []
     }));
@@ -90,7 +92,7 @@ async function loadNews() {
     const withImages = merged.filter(item => item.imageUrl).length;
     setStatus("newsStatus", failures.length
       ? `${merged.length} stories · ${withImages} with media · ${failures.length} query feed${failures.length === 1 ? "" : "s"} unavailable`
-      : `${merged.length} stories · ${withImages} with media · topic tagged`, failures.length ? "partial" : "ok");
+      : `${merged.length} stories · ${withImages} with media · topic + profile tagged`, failures.length ? "partial" : "ok");
   } catch (error) {
     renderError("newsFeed", error);
     setStatus("newsStatus", error.message, "error");
@@ -121,6 +123,7 @@ async function loadSocials() {
         type: "social",
         source: source.name,
         sourceUrl: source.url,
+        profileIds: source.profileIds || [],
         profiles: source.profiles || []
       }));
     })());
@@ -144,7 +147,7 @@ async function loadSocials() {
   const state = failures.length && merged.length ? "partial" : failures.length ? "error" : "ok";
   setStatus("socialsStatus", failures.length
     ? `${merged.length} posts · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
-    : `${merged.length} posts · ${withImages} with media · topic tagged`, state);
+    : `${merged.length} posts · ${withImages} with media · topic + profile tagged`, state);
 }
 
 async function fetchAcademicSource(source) {
@@ -155,6 +158,7 @@ async function fetchAcademicSource(source) {
         type: "academic",
         source: source.name,
         sourceUrl: source.feedUrl,
+        profileIds: source.profileIds || [],
         profiles: source.profiles || []
       }));
     } catch { /* use Google News fallback */ }
@@ -165,6 +169,7 @@ async function fetchAcademicSource(source) {
     type: "academic",
     source: source.name,
     sourceUrl: item.sourceUrl || "",
+    profileIds: source.profileIds || [],
     profiles: source.profiles || [],
     badges: ["Google News fallback"]
   }));
@@ -184,7 +189,7 @@ async function loadAcademic() {
   const withImages = merged.filter(item => item.imageUrl).length;
   setStatus("academicStatus", failures.length
     ? `${merged.length} articles · ${withImages} with media · unavailable: ${failures.join(", ")}`
-    : `${merged.length} articles · ${withImages} with media · topic tagged`, failures.length ? "partial" : "ok");
+    : `${merged.length} articles · ${withImages} with media · topic + profile tagged`, failures.length ? "partial" : "ok");
 }
 
 async function loadResearch() {
@@ -206,7 +211,7 @@ async function loadResearch() {
     else renderEmpty("researchFeed", "arXiv returned no papers for the configured query.");
 
     const pinned = papers.filter(item => item.pinned).length;
-    setStatus("researchStatus", `${papers.length} papers · ${pinned} priority-topic match${pinned === 1 ? "" : "es"} · topic tagged`, "ok");
+    setStatus("researchStatus", `${papers.length} papers · ${pinned} priority-topic match${pinned === 1 ? "" : "es"} · topic + profile tagged`, "ok");
   } catch (error) {
     renderError("researchFeed", error);
     setStatus("researchStatus", error.message, "error");
@@ -223,7 +228,12 @@ async function loadVideo() {
 
   renderLoading("videoFeed", "Loading recent creator uploads…");
   setStatus("videoStatus", "Loading YouTube channel feeds…", "loading");
-  const sources = channels.map(channel => ({ name: channel.name, url: youtubeFeedUrl(channel.channelId), profiles: channel.profiles || [channel.name] }));
+  const sources = channels.map(channel => ({
+    name: channel.name,
+    url: youtubeFeedUrl(channel.channelId),
+    profileIds: channel.profileIds || [],
+    profiles: channel.profiles || (channel.profileIds?.length ? [] : [channel.name])
+  }));
   const { items, failures } = await collectPublicFeeds(sources, "video");
   const merged = dedupe(sortNewest(items)).map(item => ({
     ...item,
@@ -235,7 +245,7 @@ async function loadVideo() {
 
   setStatus("videoStatus", failures.length
     ? `${merged.length} videos · ${failures.length} channel feed${failures.length === 1 ? "" : "s"} unavailable`
-    : `${merged.length} videos · topic tagged`, failures.length ? "partial" : "ok");
+    : `${merged.length} videos · topic + profile tagged`, failures.length ? "partial" : "ok");
 }
 
 async function loadBooks() {
@@ -262,7 +272,7 @@ async function loadBooks() {
     if (recent.length) renderTopicFiltered("books", recent, renderHighlights, { maxTopics: 6 });
     else renderEmpty("booksFeed", `No highlights were returned for the last ${days} days.`);
 
-    setStatus("booksStatus", `${recent.length} highlights · direct Readwise API · topic tagged · last ${days} days`, "ok");
+    setStatus("booksStatus", `${recent.length} highlights · direct Readwise API · topic + profile tagged · last ${days} days`, "ok");
   } catch (error) {
     renderError("booksFeed", error);
     setStatus("booksStatus", error.message, "error");
