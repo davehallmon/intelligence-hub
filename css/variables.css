@@ -1,0 +1,97 @@
+:root {
+  /* Intelligence Hub v9.1 — canonical design tokens.
+     Existing legacy variables remain aliased below so the migration can be incremental. */
+
+  /* Brand + semantic colors */
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-primary-soft: rgba(99, 102, 241, .14);
+  --color-accent: #818cf8;
+  --color-success: #34d399;
+  --color-warning: #f59e0b;
+  --color-error: #f87171;
+
+  /* Dark surfaces — aligned to the supplied Intelligence Hub mockups. */
+  --bg-body: #0b0f17;
+  --bg-elevated: #0f1520;
+  --bg-surface: #111827;
+  --bg-surface-2: #0d1320;
+  --bg-card: #121a28;
+  --bg-card-hover: #182235;
+  --bg-input: #0a101a;
+
+  --text-primary: #edf2f7;
+  --text-secondary: #95a3b7;
+  --text-tertiary: #64748b;
+  --border-color: #263244;
+  --border-soft: #1c2736;
+
+  /* Content-type accents */
+  --color-news: #818cf8;
+  --color-social: #60a5fa;
+  --color-academic: #4ade80;
+  --color-research: #f59e0b;
+  --color-video: #f87171;
+  --color-books: #c084fc;
+
+  /* Spacing — 4/8px scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-size-h1: clamp(1.55rem, 4vw, 2.35rem);
+  --font-size-h2: clamp(1.25rem, 2.5vw, 1.65rem);
+  --font-size-card-title: clamp(1rem, 1.7vw, 1.16rem);
+  --font-size-body: 1rem;
+  --font-size-small: .8125rem;
+
+  /* Shape + elevation */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 13px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .18);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, .24);
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, .42);
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-pane: 250ms;
+  --ease-standard: ease;
+  --ease-pane: cubic-bezier(.2, .9, .3, 1);
+
+  /* Breakpoint constants for documentation / JS parity.
+     CSS media queries use the same literal values. */
+  --bp-mobile: 480px;
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+  --bp-wide: 1280px;
+
+  /* Legacy aliases — variables.css is the runtime source of truth. */
+  --bg: var(--bg-body);
+  --bg-elev: var(--bg-elevated);
+  --panel: var(--bg-surface);
+  --panel-2: var(--bg-surface-2);
+  --card: var(--bg-card);
+  --card-hover: var(--bg-card-hover);
+  --border: var(--border-color);
+  --text: var(--text-primary);
+  --muted: var(--text-secondary);
+  --muted-2: var(--text-tertiary);
+  --accent: var(--color-accent);
+  --accent-2: var(--color-primary);
+  --accent-soft: var(--color-primary-soft);
+  --success: var(--color-success);
+  --shadow: var(--shadow-md);
+  --radius: var(--radius-xl);
+}
