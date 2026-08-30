@@ -1,0 +1,93 @@
+/* Intelligence Hub v8.5 — social source policy settings */
+
+.settings-section {
+  margin-top: 16px;
+  padding-top: 2px;
+}
+
+.settings-section-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 9px;
+}
+
+.settings-section-heading > span {
+  color: #e2e8f0;
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.settings-section-heading small,
+.policy-legend small {
+  color: #738399;
+  font-size: .67rem;
+  line-height: 1.45;
+}
+
+.policy-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+
+.policy-chip {
+  border: 1px solid #28364a;
+  border-radius: 999px;
+  background: #0a101a;
+  color: #9aabc0;
+  padding: 4px 8px;
+  font-size: .63rem;
+  font-weight: 780;
+}
+
+.bridge-mappings {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.bridge-mapping {
+  padding: 12px;
+  border: 1px solid #253247;
+  border-radius: 12px;
+  background: rgba(8, 14, 24, .66);
+}
+
+.bridge-mapping-heading {
+  display: grid;
+  gap: 2px;
+}
+
+.bridge-mapping-heading strong {
+  color: #e2e8f0;
+  font-size: .77rem;
+}
+
+.bridge-mapping-heading span {
+  color: #738399;
+  font-size: .65rem;
+}
+
+.bridge-url-field {
+  margin-top: 10px;
+}
+
+.bridge-private-field {
+  margin-top: 9px;
+}
+
+.settings-warning {
+  margin: 12px 0;
+  padding: 10px 11px;
+  border: 1px solid rgba(234, 179, 8, .26);
+  border-radius: 10px;
+  background: rgba(234, 179, 8, .07);
+  color: #d7bd78;
+  font-size: .7rem;
+  line-height: 1.5;
+}
+
+.settings-warning[hidden] {
+  display: none;
+}
