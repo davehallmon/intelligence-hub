@@ -10,7 +10,13 @@ const feeds = createFeedDashboard();
 
 initSettings({
   onSaved() {
-    // The feed controller invalidates private-source and personalized tabs via its settings event.
+    // Settings dispatches ih:settings-saved immediately after this callback.
+    // Queue the rerank so feed invalidation completes first, and only refresh
+    // when My Feed is the active view.
+    setTimeout(() => {
+      if (document.body.dataset.primaryView !== "myfeed") return;
+      feeds.load("myfeed").catch(error => console.error("Unable to rerank My Feed:", error));
+    }, 0);
   }
 });
 
