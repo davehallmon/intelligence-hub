@@ -7,7 +7,7 @@ export function initV81UI() {
   }
 
   const versionPill = document.querySelector(".meta-row .meta-pill");
-  if (versionPill) versionPill.textContent = "v8.5";
+  if (versionPill) versionPill.textContent = "v9.0";
 
   const newsDescription = document.querySelector("#panel-news .feed-panel-header p:last-child");
   if (newsDescription) newsDescription.textContent = "Official profile feeds plus Google News coverage, merged into one high-signal timeline.";
@@ -23,6 +23,6 @@ export function initV81UI() {
     const strong = footer.querySelector("strong");
     footer.replaceChildren();
     if (strong) footer.append(strong);
-    footer.append(document.createTextNode(" · v8.5 · Static GitHub Pages dashboard"));
+    footer.append(document.createTextNode(" · v9.0 · Static GitHub Pages dashboard"));
   }
 }
