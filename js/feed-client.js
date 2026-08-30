@@ -22,14 +22,98 @@ export function stripHtml(value = "") {
   return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
 }
 
+function numericDimension(value) {
+  const match = String(value || "").match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function imageUrlLooksLowValue(url = "") {
+  const value = String(url).toLowerCase();
+  return (
+    !/^https?:\/\//i.test(value)
+    || /\b(?:pixel|spacer|beacon|tracking|analytics|transparent|blank)\b/i.test(value)
+    || /(?:^|[\/_.-])1x1(?:[\/_.-]|$)/i.test(value)
+    || /gravatar\.com\/avatar/i.test(value)
+    || /doubleclick|google-analytics|scorecardresearch/i.test(value)
+  );
+}
+
+function scoreImageCandidate(candidate) {
+  if (!candidate?.url || imageUrlLooksLowValue(candidate.url)) return -Infinity;
+
+  const width = Number(candidate.width || 0);
+  const height = Number(candidate.height || 0);
+  const url = String(candidate.url).toLowerCase();
+  let score = Number(candidate.baseScore || 0);
+
+  if (width && height && (width <= 80 || height <= 80)) return -Infinity;
+  if (width >= 320) score += 4;
+  if (width >= 640) score += 4;
+  if (width >= 1000) score += 2;
+  if (height >= 180) score += 3;
+  if (height >= 360) score += 2;
+
+  if (width && height) {
+    const ratio = width / height;
+    if (ratio >= 1.2 && ratio <= 2.2) score += 3;
+  }
+
+  if (/\b(?:hero|featured|feature|cover|lead|article|post|story)\b/i.test(url)) score += 3;
+  if (/wp-content|uploads|images|image|cdn/i.test(url)) score += 1;
+  if (/\b(?:avatar|profile|emoji|icon|logo|badge)\b/i.test(url)) score -= 5;
+
+  return score;
+}
+
+function bestCandidate(candidates) {
+  return candidates
+    .map(candidate => ({ ...candidate, score: scoreImageCandidate(candidate) }))
+    .filter(candidate => Number.isFinite(candidate.score))
+    .sort((a, b) => b.score - a.score)[0]?.url || "";
+}
+
+function parseSrcset(srcset = "") {
+  return String(srcset)
+    .split(",")
+    .map(part => {
+      const [url, descriptor = ""] = part.trim().split(/\s+/, 2);
+      const widthMatch = descriptor.match(/^(\d+)w$/i);
+      const densityMatch = descriptor.match(/^([\d.]+)x$/i);
+      return {
+        url,
+        width: widthMatch ? Number(widthMatch[1]) : densityMatch ? Math.round(Number(densityMatch[1]) * 640) : 0,
+        baseScore: densityMatch ? Number(densityMatch[1]) : 0
+      };
+    })
+    .filter(candidate => candidate.url);
+}
+
 export function firstImageFromHtml(value = "") {
   if (!value) return "";
   const doc = new DOMParser().parseFromString(String(value), "text/html");
-  const image = doc.querySelector("img[src], source[srcset]");
-  if (!image) return "";
-  if (image.matches("img[src]")) return image.getAttribute("src") || "";
-  const srcset = image.getAttribute("srcset") || "";
-  return srcset.split(",")[0]?.trim().split(/\s+/)[0] || "";
+  const candidates = [];
+
+  doc.querySelectorAll('meta[property="og:image"][content], meta[name="twitter:image"][content]').forEach(meta => {
+    candidates.push({ url: meta.getAttribute("content"), baseScore: 8 });
+  });
+
+  doc.querySelectorAll("img[src], img[srcset]").forEach(image => {
+    const width = numericDimension(image.getAttribute("width"));
+    const height = numericDimension(image.getAttribute("height"));
+    const src = image.getAttribute("src");
+    if (src) candidates.push({ url: src, width, height, baseScore: 2 });
+    parseSrcset(image.getAttribute("srcset")).forEach(candidate => {
+      candidates.push({ ...candidate, height, baseScore: 4 });
+    });
+  });
+
+  doc.querySelectorAll("source[srcset]").forEach(source => {
+    parseSrcset(source.getAttribute("srcset")).forEach(candidate => {
+      candidates.push({ ...candidate, baseScore: 5 });
+    });
+  });
+
+  return bestCandidate(candidates);
 }
 
 function childText(node, names) {
@@ -52,29 +136,41 @@ function elementsByLocalName(node, localName) {
   return [...node.getElementsByTagName("*")].filter(el => el.localName === localName);
 }
 
-function firstMediaImage(node) {
-  const thumbnails = elementsByLocalName(node, "thumbnail");
-  for (const element of thumbnails) {
-    const url = element.getAttribute("url") || element.getAttribute("href");
-    if (url) return url;
-  }
+function bestMediaImage(node) {
+  const candidates = [];
 
-  const media = elementsByLocalName(node, "content");
-  for (const element of media) {
+  elementsByLocalName(node, "thumbnail").forEach(element => {
+    const url = element.getAttribute("url") || element.getAttribute("href");
+    if (!url) return;
+    candidates.push({
+      url,
+      width: numericDimension(element.getAttribute("width")),
+      height: numericDimension(element.getAttribute("height")),
+      baseScore: 5
+    });
+  });
+
+  elementsByLocalName(node, "content").forEach(element => {
     const type = (element.getAttribute("type") || "").toLowerCase();
     const medium = (element.getAttribute("medium") || "").toLowerCase();
     const url = element.getAttribute("url") || element.getAttribute("src");
-    if (url && (medium === "image" || type.startsWith("image/"))) return url;
-  }
+    if (!url || !(medium === "image" || type.startsWith("image/"))) return;
+    candidates.push({
+      url,
+      width: numericDimension(element.getAttribute("width")),
+      height: numericDimension(element.getAttribute("height")),
+      baseScore: 7
+    });
+  });
 
-  const enclosures = [...node.getElementsByTagName("enclosure")];
-  for (const element of enclosures) {
+  [...node.getElementsByTagName("enclosure")].forEach(element => {
     const type = (element.getAttribute("type") || "").toLowerCase();
     const url = element.getAttribute("url") || "";
-    if (url && (!type || type.startsWith("image/"))) return url;
-  }
+    if (!url || (type && !type.startsWith("image/"))) return;
+    candidates.push({ url, baseScore: 6 });
+  });
 
-  return "";
+  return bestCandidate(candidates);
 }
 
 export function parseXmlFeed(xmlText, fallbackTitle = "") {
@@ -97,7 +193,7 @@ export function parseXmlFeed(xmlText, fallbackTitle = "") {
       const source = sourceNode?.textContent?.trim() || "";
       const sourceUrl = sourceNode?.getAttribute("url") || sourceNode?.getAttribute("href") || "";
       const rawContent = childText(node, ["content:encoded", "description", "summary", "content"]);
-      const imageUrl = firstMediaImage(node) || firstImageFromHtml(rawContent);
+      const imageUrl = bestMediaImage(node) || firstImageFromHtml(rawContent);
       const videoId = childText(node, ["yt:videoId"]);
 
       return {
@@ -160,8 +256,16 @@ async function fetchViaRss2Json(feedUrl, timeout = DEFAULT_TIMEOUT) {
       items: (data.items || []).map(item => {
         const rawContent = item.content || item.description || "";
         const enclosure = item.enclosure || {};
-        const enclosureImage = String(enclosure.type || "").startsWith("image/") ? enclosure.link : "";
-        const imageUrl = item.thumbnail || enclosureImage || firstImageFromHtml(rawContent);
+        const candidates = [
+          { url: item.thumbnail || "", baseScore: 5 },
+          {
+            url: String(enclosure.type || "").startsWith("image/") ? enclosure.link : "",
+            baseScore: 6
+          },
+          { url: firstImageFromHtml(rawContent), baseScore: 4 }
+        ];
+        const imageUrl = bestCandidate(candidates);
+
         return {
           title: item.title || "Untitled",
           link: item.link || item.guid || "",
