@@ -178,9 +178,10 @@ function renderSection(containerId, items, { attention = false } = {}) {
   const container = document.getElementById(containerId);
   if (!container) return;
   container.replaceChildren();
-  items.forEach(item => {
+  items.forEach((item, index) => {
+    const heroClass = attention && index === 0 ? " card--hero" : "";
     const card = createRichCard(item, {
-      className: `feed-card my-feed-card${attention ? " is-attention" : ""}`,
+      className: `feed-card my-feed-card${attention ? " is-attention" : ""}${heroClass}`,
       label: contentLabel(item.type),
       snippetLength: attention ? 300 : 360,
       showReasons: true
