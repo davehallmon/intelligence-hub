@@ -59,7 +59,10 @@ html[data-ui-version="9.1"] body {
 #main-content {
   min-height: calc(100dvh - var(--topbar-height));
   padding-top: 0;
-  transition: filter var(--duration-pane) var(--ease-pane), opacity var(--duration-pane) var(--ease-pane);
+  transition:
+    margin-left var(--duration-pane) var(--ease-pane),
+    filter var(--duration-pane) var(--ease-pane),
+    opacity var(--duration-pane) var(--ease-pane);
 }
 
 .drawer-overlay {
@@ -579,6 +582,114 @@ html[data-ui-version="9.1"] .shell {
   .feed-grid,
   .skeleton-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Phase 2: responsive persistent rail — mockups 10, 11a, 11b, and 11c. */
+@media (min-width: 768px) {
+  #menu-toggle {
+    display: none;
+  }
+
+  #drawer-overlay {
+    display: block !important;
+    position: fixed;
+    inset: var(--topbar-height) auto 0 0;
+    width: 64px;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  #flyout-drawer {
+    display: flex !important;
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 64px;
+    max-width: none;
+    height: 100%;
+    padding: 14px 0 12px;
+    box-shadow: 8px 0 24px rgba(0, 0, 0, .20);
+    transform: none !important;
+    pointer-events: auto;
+  }
+
+  .flyout-drawer__heading {
+    display: none;
+  }
+
+  .flyout-drawer__menu {
+    gap: 4px;
+  }
+
+  .drawer-item,
+  .drawer-item.primary-tab {
+    justify-content: center;
+    gap: 0;
+    min-height: 56px;
+    padding: 0;
+  }
+
+  .drawer-item .label {
+    display: none;
+  }
+
+  .drawer-item--settings {
+    margin-top: auto;
+  }
+
+  #main-content {
+    margin-left: 64px;
+  }
+
+  body[data-drawer-open="true"] {
+    overflow: auto;
+  }
+
+  body[data-drawer-open="true"] #main-content {
+    filter: none;
+  }
+
+  /* MOCKUP 11c: The first card spans 2 columns */
+  .card--hero {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  #drawer-overlay {
+    width: var(--rail-width);
+  }
+
+  #flyout-drawer {
+    width: var(--rail-width);
+    padding: 20px 0 16px;
+  }
+
+  .flyout-drawer__heading {
+    display: block;
+  }
+
+  .drawer-item,
+  .drawer-item.primary-tab {
+    justify-content: flex-start;
+    gap: 16px;
+    padding: 0 22px;
+  }
+
+  .drawer-item .label {
+    display: inline;
+  }
+
+  #main-content {
+    margin-left: var(--rail-width);
+  }
+}
+
+@media (min-width: 1280px) {
+  .feed-grid,
+  .skeleton-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 24px !important;
   }
 }
 
