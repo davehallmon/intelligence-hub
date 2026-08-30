@@ -1,0 +1,80 @@
+import { classifyTopics } from "./topics.js";
+
+function clean(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function unique(values) {
+  return [...new Set((values || []).map(clean).filter(Boolean))];
+}
+
+function domain(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ""); }
+  catch { return ""; }
+}
+
+function sourceFavicon(sourceUrl, itemUrl) {
+  const target = sourceUrl || itemUrl;
+  if (!target) return "";
+  return `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(target)}&sz=128`;
+}
+
+export function normalizeFeedItem(item = {}, context = {}) {
+  const url = clean(item.link || item.url || context.url);
+  const source = clean(context.source || item.source || item.feedTitle || context.feedTitle);
+  const sourceUrl = clean(context.sourceUrl || item.sourceUrl || "");
+  const authors = unique([...(item.authors || []), item.author].filter(Boolean));
+  const profiles = unique([...(context.profiles || []), ...(item.profiles || [])]);
+  const title = clean(item.title) || "Untitled";
+  const summary = clean(item.description || item.summary || item.text);
+  const seededTopics = unique([...(context.topics || []), ...(item.topics || [])]);
+  const topics = classifyTopics([title, summary, source, authors.join(" "), profiles.join(" ")], seededTopics);
+
+  return {
+    id: clean(item.id) || url || `${context.type || "item"}:${title}`,
+    type: context.type || item.type || "article",
+    title,
+    url,
+    source,
+    sourceUrl,
+    author: authors[0] || "",
+    authors,
+    profiles,
+    publishedAt: clean(item.date || item.publishedAt),
+    summary,
+    imageUrl: clean(item.imageUrl || item.thumbnail || context.imageUrl),
+    faviconUrl: clean(item.faviconUrl) || sourceFavicon(sourceUrl, url),
+    topics,
+    badges: unique([...(context.badges || []), ...(item.badges || [])]),
+    videoId: clean(item.videoId),
+    transport: clean(item.transport || context.transport),
+    raw: item
+  };
+}
+
+export function normalizeFeedItems(items, context = {}) {
+  return (items || []).map(item => normalizeFeedItem(item, context));
+}
+
+export function normalizeHighlight(highlight = {}, book = {}) {
+  return normalizeFeedItem({
+    id: highlight.id,
+    title: book.title || "Untitled",
+    link: highlight.highlight_url || book.highlights_url || book.source_url || "",
+    date: highlight.highlighted_at || highlight.updated || book.updated,
+    description: highlight.text || "",
+    author: book.author || "",
+    imageUrl: book.cover_image_url || book.cover_image || "",
+    topics: highlight.tags?.map?.(tag => tag.name || tag) || []
+  }, {
+    type: "highlight",
+    source: book.title || "Readwise",
+    sourceUrl: book.source_url || "",
+    profiles: book.author ? [book.author] : [],
+    badges: [book.category || book.source_type || ""].filter(Boolean)
+  });
+}
+
+export function normalizedDomain(item) {
+  return domain(item?.sourceUrl || item?.url || "");
+}
