@@ -64,6 +64,7 @@ export const FEED_CONFIG = Object.freeze({
 
   video: {
     maxItems: 48,
+    perChannelMax: 6,
     // Verified official YouTube channels from the public source registry.
     // Channel Atom feeds are generated at runtime from stable UC... channel IDs.
     channels: publicSourcesFor("video")
