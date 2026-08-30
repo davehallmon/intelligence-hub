@@ -41,8 +41,7 @@ function createMyFeedPanel() {
   panel.innerHTML = `
     <div class="feed-panel-header my-feed-intro intelligence-feed__header">
       <div class="intelligence-feed__context">
-        <p class="panel-kicker">My Feed · Personal intelligence layer</p>
-        <h2>Intelligence Feed</h2>
+        <h2>My Feed</h2>
         <p>The strongest signals across News, Socials, Academic, Research, and Video—ranked by explicit priorities, provenance, freshness, and diversity.</p>
       </div>
       <div class="feed-actions intelligence-feed__actions">
