@@ -7,7 +7,7 @@ export function initV81UI() {
   }
 
   const versionPill = document.querySelector(".meta-row .meta-pill");
-  if (versionPill) versionPill.textContent = "v8.3.1";
+  if (versionPill) versionPill.textContent = "v8.4";
 
   const newsDescription = document.querySelector("#panel-news .feed-panel-header p:last-child");
   if (newsDescription) newsDescription.textContent = "Official profile feeds plus Google News coverage, merged into one high-signal timeline.";
@@ -15,11 +15,14 @@ export function initV81UI() {
   const socialDescription = document.querySelector("#panel-socials .feed-panel-header p:last-child");
   if (socialDescription) socialDescription.textContent = "Direct public profile outlets plus your browser-local social bridge. No platform scraping.";
 
+  const videoDescription = document.querySelector("#panel-video .feed-panel-header p:last-child");
+  if (videoDescription) videoDescription.textContent = "Recent uploads from verified official YouTube channels, mapped to canonical profiles through public Atom feeds.";
+
   const footer = document.querySelector(".footer > div:first-child");
   if (footer) {
     const strong = footer.querySelector("strong");
     footer.replaceChildren();
     if (strong) footer.append(strong);
-    footer.append(document.createTextNode(" · v8.3.1 · Static GitHub Pages dashboard"));
+    footer.append(document.createTextNode(" · v8.4 · Static GitHub Pages dashboard"));
   }
 }
