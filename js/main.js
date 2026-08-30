@@ -24,6 +24,7 @@ function ensureLucide() {
 }
 
 let drawerCloseTimer = null;
+const persistentRailMedia = window.matchMedia("(min-width: 768px)");
 
 function drawerElements() {
   return {
@@ -34,15 +35,43 @@ function drawerElements() {
   };
 }
 
+function clearDrawerCloseTimer() {
+  if (!drawerCloseTimer) return;
+  clearTimeout(drawerCloseTimer);
+  drawerCloseTimer = null;
+}
+
+function syncNavigationMode() {
+  const { toggle, overlay, drawer, main } = drawerElements();
+  if (!toggle || !overlay || !drawer) return;
+
+  clearDrawerCloseTimer();
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-label", "Open navigation");
+  drawer.classList.remove("is-open");
+  main?.removeAttribute("aria-hidden");
+  delete document.body.dataset.drawerOpen;
+
+  if (persistentRailMedia.matches) {
+    overlay.hidden = false;
+    drawer.hidden = false;
+    return;
+  }
+
+  drawer.hidden = true;
+  overlay.hidden = true;
+}
+
 function setDrawerState(open) {
   const { toggle, overlay, drawer, main } = drawerElements();
   if (!toggle || !overlay || !drawer) return;
 
-  if (drawerCloseTimer) {
-    clearTimeout(drawerCloseTimer);
-    drawerCloseTimer = null;
+  if (persistentRailMedia.matches) {
+    syncNavigationMode();
+    return;
   }
 
+  clearDrawerCloseTimer();
   toggle.setAttribute("aria-expanded", String(open));
   toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
 
@@ -72,12 +101,17 @@ function setDrawerState(open) {
 }
 
 export function toggleDrawer() {
+  if (persistentRailMedia.matches) return;
   const { toggle } = drawerElements();
   const isOpen = toggle?.getAttribute("aria-expanded") === "true";
   setDrawerState(!isOpen);
 }
 
 export function closeDrawer() {
+  if (persistentRailMedia.matches) {
+    syncNavigationMode();
+    return;
+  }
   setDrawerState(false);
 }
 
@@ -92,11 +126,11 @@ function bindDrawerControls() {
   toggle.addEventListener("click", toggleDrawer);
 
   overlay.addEventListener("click", event => {
-    if (event.target === overlay) closeDrawer();
+    if (event.target === overlay && !persistentRailMedia.matches) closeDrawer();
   });
 
   drawer.addEventListener("click", event => {
-    if (event.target.closest?.("[data-primary-tab]")) closeDrawer();
+    if (event.target.closest?.("[data-primary-tab]") && !persistentRailMedia.matches) closeDrawer();
   });
 
   document.addEventListener("keydown", event => {
@@ -106,6 +140,8 @@ function bindDrawerControls() {
       toggle.focus();
     }
   });
+
+  persistentRailMedia.addEventListener("change", syncNavigationMode);
 }
 
 export function initUIFoundation() {
@@ -151,5 +187,12 @@ export function decorateUIFoundation() {
     card.classList.add("card", "card--bookmark");
   });
 
+  // Tablet mode hides the visible labels, so keep explicit accessible names.
+  document.querySelectorAll(".drawer-item").forEach(item => {
+    const label = item.querySelector(".label")?.textContent?.trim();
+    if (label && !item.getAttribute("aria-label")) item.setAttribute("aria-label", label);
+  });
+
+  syncNavigationMode();
   window.lucide?.createIcons();
 }
