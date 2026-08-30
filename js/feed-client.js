@@ -22,6 +22,16 @@ export function stripHtml(value = "") {
   return (doc.body.textContent || "").replace(/\s+/g, " ").trim();
 }
 
+export function firstImageFromHtml(value = "") {
+  if (!value) return "";
+  const doc = new DOMParser().parseFromString(String(value), "text/html");
+  const image = doc.querySelector("img[src], source[srcset]");
+  if (!image) return "";
+  if (image.matches("img[src]")) return image.getAttribute("src") || "";
+  const srcset = image.getAttribute("srcset") || "";
+  return srcset.split(",")[0]?.trim().split(/\s+/)[0] || "";
+}
+
 function childText(node, names) {
   for (const name of names) {
     const found = node.getElementsByTagName(name)?.[0];
@@ -38,25 +48,46 @@ function atomLink(node) {
   return preferred?.getAttribute("href") || childText(node, ["link"]);
 }
 
-function namespacedAttribute(node, tagName, attribute) {
-  const elements = node.getElementsByTagName(tagName);
-  return elements?.[0]?.getAttribute(attribute) || "";
+function elementsByLocalName(node, localName) {
+  return [...node.getElementsByTagName("*")].filter(el => el.localName === localName);
+}
+
+function firstMediaImage(node) {
+  const thumbnails = elementsByLocalName(node, "thumbnail");
+  for (const element of thumbnails) {
+    const url = element.getAttribute("url") || element.getAttribute("href");
+    if (url) return url;
+  }
+
+  const media = elementsByLocalName(node, "content");
+  for (const element of media) {
+    const type = (element.getAttribute("type") || "").toLowerCase();
+    const medium = (element.getAttribute("medium") || "").toLowerCase();
+    const url = element.getAttribute("url") || element.getAttribute("src");
+    if (url && (medium === "image" || type.startsWith("image/"))) return url;
+  }
+
+  const enclosures = [...node.getElementsByTagName("enclosure")];
+  for (const element of enclosures) {
+    const type = (element.getAttribute("type") || "").toLowerCase();
+    const url = element.getAttribute("url") || "";
+    if (url && (!type || type.startsWith("image/"))) return url;
+  }
+
+  return "";
 }
 
 export function parseXmlFeed(xmlText, fallbackTitle = "") {
   const xml = new DOMParser().parseFromString(xmlText, "application/xml");
-  if (xml.querySelector("parsererror")) {
-    throw new FeedFetchError("The feed returned invalid XML.");
-  }
+  if (xml.querySelector("parsererror")) throw new FeedFetchError("The feed returned invalid XML.");
 
   const feedTitle = childText(xml, ["title"]) || fallbackTitle;
-  const nodes = [
-    ...xml.getElementsByTagName("item"),
-    ...xml.getElementsByTagName("entry")
-  ];
+  const feedLink = atomLink(xml);
+  const nodes = [...xml.getElementsByTagName("item"), ...xml.getElementsByTagName("entry")];
 
   return {
     title: feedTitle,
+    link: feedLink,
     items: nodes.map(node => {
       const authorNames = [...node.getElementsByTagName("author")]
         .map(author => childText(author, ["name"]) || author.textContent?.trim())
@@ -64,24 +95,24 @@ export function parseXmlFeed(xmlText, fallbackTitle = "") {
 
       const sourceNode = node.getElementsByTagName("source")?.[0];
       const source = sourceNode?.textContent?.trim() || "";
-
-      const thumbnail =
-        namespacedAttribute(node, "media:thumbnail", "url") ||
-        namespacedAttribute(node, "media:content", "url") ||
-        childText(node, ["thumbnail"]);
-
+      const sourceUrl = sourceNode?.getAttribute("url") || sourceNode?.getAttribute("href") || "";
+      const rawContent = childText(node, ["content:encoded", "description", "summary", "content"]);
+      const imageUrl = firstMediaImage(node) || firstImageFromHtml(rawContent);
       const videoId = childText(node, ["yt:videoId"]);
 
       return {
         title: childText(node, ["title"]) || "Untitled",
         link: atomLink(node),
         date: childText(node, ["pubDate", "published", "updated", "dc:date"]),
-        description: stripHtml(childText(node, ["description", "summary", "content", "content:encoded"])),
+        description: stripHtml(rawContent),
+        rawContent,
         author: authorNames.join(", ") || childText(node, ["dc:creator", "author"]),
         authors: authorNames,
         source,
+        sourceUrl,
         id: childText(node, ["guid", "id"]),
-        thumbnail,
+        imageUrl,
+        thumbnail: imageUrl,
         videoId
       };
     })
@@ -125,18 +156,28 @@ async function fetchViaRss2Json(feedUrl, timeout = DEFAULT_TIMEOUT) {
 
     return {
       title: data.feed?.title || "",
-      items: (data.items || []).map(item => ({
-        title: item.title || "Untitled",
-        link: item.link || item.guid || "",
-        date: item.pubDate || "",
-        description: stripHtml(item.description || item.content || ""),
-        author: item.author || "",
-        authors: item.author ? [item.author] : [],
-        source: "",
-        id: item.guid || "",
-        thumbnail: item.thumbnail || item.enclosure?.link || "",
-        videoId: ""
-      }))
+      link: data.feed?.link || "",
+      items: (data.items || []).map(item => {
+        const rawContent = item.content || item.description || "";
+        const enclosure = item.enclosure || {};
+        const enclosureImage = String(enclosure.type || "").startsWith("image/") ? enclosure.link : "";
+        const imageUrl = item.thumbnail || enclosureImage || firstImageFromHtml(rawContent);
+        return {
+          title: item.title || "Untitled",
+          link: item.link || item.guid || "",
+          date: item.pubDate || "",
+          description: stripHtml(rawContent),
+          rawContent,
+          author: item.author || "",
+          authors: item.author ? [item.author] : [],
+          source: "",
+          sourceUrl: data.feed?.link || "",
+          id: item.guid || "",
+          imageUrl,
+          thumbnail: imageUrl,
+          videoId: ""
+        };
+      })
     };
   } finally {
     timer.cancel();
@@ -163,7 +204,6 @@ export async function fetchPublicFeed(feedUrl, { timeout = DEFAULT_TIMEOUT } = {
 }
 
 export async function fetchPrivateFeed(feedUrl, { timeout = DEFAULT_TIMEOUT } = {}) {
-  // Privacy rule: never forward a private/tokenized URL to a third-party proxy.
   try {
     const text = await fetchTextDirect(feedUrl, timeout);
     return { ...(parseXmlFeed(text)), transport: "direct-private" };
@@ -202,12 +242,8 @@ export async function fetchReadwiseExport(token, { updatedAfter, maxPages = 4 } 
       timer.cancel();
     }
 
-    if (response.status === 401 || response.status === 403) {
-      throw new FeedFetchError("Readwise rejected the token.");
-    }
-    if (!response.ok) {
-      throw new FeedFetchError(`Readwise returned HTTP ${response.status}.`);
-    }
+    if (response.status === 401 || response.status === 403) throw new FeedFetchError("Readwise rejected the token.");
+    if (!response.ok) throw new FeedFetchError(`Readwise returned HTTP ${response.status}.`);
 
     const data = await response.json();
     results.push(...(data.results || []));
