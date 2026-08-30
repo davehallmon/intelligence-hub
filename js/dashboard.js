@@ -1,7 +1,9 @@
 import { initSettings } from "./settings.js";
 import { createFeedDashboard } from "./feeds.js";
 import { initNavigation } from "./navigation.js";
+import { initV81UI } from "./v81-ui.js";
 
+initV81UI();
 const feeds = createFeedDashboard();
 
 initSettings({
