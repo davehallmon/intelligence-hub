@@ -44,19 +44,37 @@ function dedupe(items) {
   });
 }
 
+function limitPerSource(items, maxPerSource) {
+  const max = Number(maxPerSource);
+  if (!Number.isFinite(max) || max <= 0) return [...items];
+
+  const counts = new Map();
+  return items.filter(item => {
+    const key = item.sourceKey || item.source || item.profileIds?.join("|") || "unknown";
+    const count = counts.get(key) || 0;
+    if (count >= max) return false;
+    counts.set(key, count + 1);
+    return true;
+  });
+}
+
 async function collectPublicFeeds(sources, type) {
   const settled = await Promise.allSettled(sources.map(async source => {
     const feed = await fetchPublicFeed(source.url);
-    return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
-      type,
-      source: item.source || source.name || feed.title,
-      sourceUrl: item.sourceUrl || source.sourceUrl || feed.link || "",
-      feedTitle: feed.title || source.name,
-      profileIds: source.profileIds || [],
-      profiles: source.profiles || [],
-      topics: source.topics || [],
-      badges: source.badges || []
-    }));
+    return feed.items.map(item => {
+      const normalized = normalizeFeedItem({ ...item, transport: feed.transport }, {
+        type,
+        source: item.source || source.name || feed.title,
+        sourceUrl: item.sourceUrl || source.sourceUrl || feed.link || "",
+        feedTitle: feed.title || source.name,
+        profileIds: source.profileIds || [],
+        profiles: source.profiles || [],
+        topics: source.topics || [],
+        badges: source.badges || []
+      });
+      normalized.sourceKey = source.id || source.channelId || source.url || source.name || normalized.source;
+      return normalized;
+    });
   }));
 
   const items = [];
@@ -233,23 +251,28 @@ async function loadVideo() {
   renderLoading("videoFeed", "Loading recent creator uploads…");
   setStatus("videoStatus", "Loading YouTube channel feeds…", "loading");
   const sources = channels.map(channel => ({
+    id: channel.id,
+    channelId: channel.channelId,
     name: channel.name,
     url: youtubeFeedUrl(channel.channelId),
     profileIds: channel.profileIds || [],
     profiles: channel.profiles || (channel.profileIds?.length ? [] : [channel.name])
   }));
   const { items, failures } = await collectPublicFeeds(sources, "video");
-  const merged = dedupe(sortNewest(items)).map(item => ({
+  const ranked = dedupe(sortNewest(items)).map(item => ({
     ...item,
     imageUrl: item.imageUrl || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : "")
-  })).slice(0, FEED_CONFIG.video.maxItems);
+  }));
+  const balanced = limitPerSource(ranked, FEED_CONFIG.video.perChannelMax);
+  const merged = balanced.slice(0, FEED_CONFIG.video.maxItems);
 
   if (merged.length) renderTopicFiltered("video", merged, renderVideos, { maxTopics: 6 });
   else renderEmpty("videoFeed", "No recent uploads were returned by the configured channel feeds.");
 
+  const cap = FEED_CONFIG.video.perChannelMax;
   setStatus("videoStatus", failures.length
-    ? `${merged.length} videos · ${failures.length} channel feed${failures.length === 1 ? "" : "s"} unavailable`
-    : `${merged.length} videos · topic + profile tagged`, failures.length ? "partial" : "ok");
+    ? `${merged.length} videos · max ${cap}/channel · ${failures.length} channel feed${failures.length === 1 ? "" : "s"} unavailable`
+    : `${merged.length} videos · max ${cap}/channel · topic + profile tagged`, failures.length ? "partial" : "ok");
 }
 
 async function loadBooks() {
