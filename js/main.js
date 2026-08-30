@@ -26,14 +26,18 @@ function ensureLucide() {
 export function initUIFoundation() {
   document.documentElement.dataset.uiVersion = "9.1";
 
-  // Loaded after legacy styles so variables.css is authoritative at runtime and
-  // css/style.css can progressively migrate components without a destructive rewrite.
+  // variables.css is loaded after the legacy linked styles so its token values
+  // are authoritative at runtime. The component override layer is appended after
+  // v8/v9 compatibility styles by decorateUIFoundation().
   ensureStylesheet("css/variables.css");
-  ensureStylesheet("css/style.css");
   ensureLucide();
 }
 
 export function decorateUIFoundation() {
+  // This is intentionally added after my-feed.css / feed-intelligence.css so the
+  // v9.1 component and breakpoint rules are the final cascade layer.
+  ensureStylesheet("css/style.css");
+
   const feedContainers = [
     "myFeedAttention",
     "myFeedFeed",
