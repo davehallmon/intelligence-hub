@@ -1,14 +1,15 @@
 // Public, repository-safe feed configuration.
 // Never put private tokens or private feed URLs in this file.
+// Feed sources attach to canonical identities from profiles.js; profiles are not feeds.
 
 export const FEED_CONFIG = Object.freeze({
   news: {
     freshness: "1d",
     maxItems: 48,
     queries: [
-      { label: "OpenAI", query: "OpenAI", profiles: ["OpenAI"] },
-      { label: "Anthropic", query: "Anthropic", profiles: ["Anthropic"] },
-      { label: "Google DeepMind", query: "\"Google DeepMind\"", profiles: ["Google DeepMind"] },
+      { label: "OpenAI", query: "OpenAI", profileIds: ["org-openai"] },
+      { label: "Anthropic", query: "Anthropic", profileIds: ["org-anthropic"] },
+      { label: "Google DeepMind", query: "\"Google DeepMind\"", profileIds: ["org-google-deepmind"] },
       { label: "AI Agents", query: "\"AI agents\"", topics: ["AI Agents"] },
       { label: "AI Regulation", query: "\"AI regulation\"", topics: ["AI Regulation & Policy"] },
       { label: "AI Safety", query: "\"AI safety\"", topics: ["AI Safety & Alignment"] },
@@ -19,9 +20,11 @@ export const FEED_CONFIG = Object.freeze({
 
   socials: {
     maxItems: 50,
+    // Direct public outlets can attach to a profile here. X/LinkedIn/Threads
+    // profiles are intentionally supplied later through the browser-local social bridge.
     substackSources: [
-      { name: "One Useful Thing", url: "https://www.oneusefulthing.org/", profiles: ["Ethan Mollick"] },
-      { name: "Rachel Woods", url: "https://rachelwoods.substack.com/", profiles: ["Rachel Woods"] }
+      { name: "One Useful Thing", url: "https://www.oneusefulthing.org/", profileIds: ["person-ethan-mollick"] },
+      { name: "Rachel Woods", url: "https://rachelwoods.substack.com/", profileIds: ["person-rachel-woods"] }
     ]
   },
 
@@ -31,26 +34,22 @@ export const FEED_CONFIG = Object.freeze({
       {
         name: "Harvard Business Review",
         feedUrl: "https://feeds.hbr.org/harvardbusiness",
-        fallbackQuery: "site:hbr.org artificial intelligence OR technology OR leadership",
-        profiles: ["Harvard Business Review"]
+        fallbackQuery: "site:hbr.org artificial intelligence OR technology OR leadership"
       },
       {
         name: "MIT Technology Review",
         feedUrl: "https://www.technologyreview.com/feed/",
-        fallbackQuery: "site:technologyreview.com artificial intelligence",
-        profiles: ["MIT Technology Review"]
+        fallbackQuery: "site:technologyreview.com artificial intelligence"
       },
       {
         name: "Stanford HAI",
         feedUrl: "https://hai.stanford.edu/rss.xml",
-        fallbackQuery: "site:hai.stanford.edu AI",
-        profiles: ["Stanford HAI"]
+        fallbackQuery: "site:hai.stanford.edu AI"
       },
       {
         name: "Knowledge at Wharton",
         feedUrl: null,
-        fallbackQuery: "site:knowledge.wharton.upenn.edu AI OR technology OR management",
-        profiles: ["Knowledge at Wharton"]
+        fallbackQuery: "site:knowledge.wharton.upenn.edu AI OR technology OR management"
       }
     ]
   },
@@ -65,8 +64,8 @@ export const FEED_CONFIG = Object.freeze({
 
   video: {
     maxItems: 36,
-    // Add stable YouTube channel IDs (UC...) here.
-    // Example: channels: [{ name: "Creator Name", channelId: "UC...", profiles: ["Creator Name"] }]
+    // Add stable YouTube channel IDs (UC...) here and attach them to a profile ID.
+    // Example: channels: [{ name: "Creator Name", channelId: "UC...", profileIds: ["person-creator-name"] }]
     channels: []
   }
 });
