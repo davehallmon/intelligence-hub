@@ -7,6 +7,10 @@ function validDate(value) {
   return date && !Number.isNaN(date.valueOf()) ? date : null;
 }
 
+function dateValue(value) {
+  return validDate(value)?.valueOf() || 0;
+}
+
 function recencyScore(value) {
   const date = validDate(value);
   if (!date) return 0;
@@ -110,12 +114,16 @@ function scoreItem(item, priorities) {
   };
 }
 
-function primaryKey(item, dimension) {
-  if (dimension === "source") return item.sourceKey || item.source || item.url || item.id;
-  if (dimension === "profile") return item.profileIds?.[0] || item.sourceKey || item.source || "unprofiled";
-  if (dimension === "topic") return item.topics?.[0] || "untagged";
-  if (dimension === "type") return item.type || "article";
-  return "unknown";
+function keysFor(item, dimension) {
+  if (dimension === "source") return [item.sourceKey || item.source || item.url || item.id || "unknown"];
+  if (dimension === "profile") return item.profileIds?.length
+    ? [...new Set(item.profileIds)]
+    : [item.sourceKey || item.source || "unprofiled"];
+  if (dimension === "topic") return item.topics?.length
+    ? [...new Set(item.topics)]
+    : ["untagged"];
+  if (dimension === "type") return [item.type || "article"];
+  return ["unknown"];
 }
 
 function selectDiverse(ranked, limit, caps) {
@@ -126,16 +134,16 @@ function selectDiverse(ranked, limit, caps) {
 
   for (const item of ranked) {
     if (selected.length >= limit) break;
-    const blocked = Object.entries(caps).some(([dimension, cap]) => {
-      const key = primaryKey(item, dimension);
-      return (counts[dimension].get(key) || 0) >= cap;
-    });
+    const blocked = Object.entries(caps).some(([dimension, cap]) =>
+      keysFor(item, dimension).some(key => (counts[dimension].get(key) || 0) >= cap)
+    );
     if (blocked) continue;
 
     selected.push(item);
     Object.keys(caps).forEach(dimension => {
-      const key = primaryKey(item, dimension);
-      counts[dimension].set(key, (counts[dimension].get(key) || 0) + 1);
+      keysFor(item, dimension).forEach(key => {
+        counts[dimension].set(key, (counts[dimension].get(key) || 0) + 1);
+      });
     });
   }
 
@@ -146,7 +154,7 @@ export function rankMyFeed(items, settings) {
   const priorities = settings?.myFeedPriorities || { topics: {}, people: {}, organizations: {} };
   const ranked = items
     .map(item => scoreItem(item, priorities))
-    .sort((a, b) => b.myFeedScore - a.myFeedScore || new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+    .sort((a, b) => b.myFeedScore - a.myFeedScore || dateValue(b.publishedAt) - dateValue(a.publishedAt));
 
   const attention = selectDiverse(ranked, MY_FEED_LIMITS.attention, MY_FEED_LIMITS.attentionCaps);
   const attentionIds = new Set(attention.map(item => item.id || item.url));
