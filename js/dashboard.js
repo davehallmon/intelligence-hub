@@ -3,9 +3,12 @@ import { createFeedDashboard } from "./feeds.js";
 import { initNavigation } from "./navigation.js";
 import { initV81UI } from "./v81-ui.js";
 import { initMyFeedUI } from "./my-feed-ui.js";
+import { initUIFoundation, decorateUIFoundation } from "./main.js";
 
+initUIFoundation();
 initMyFeedUI();
 initV81UI();
+decorateUIFoundation();
 const feeds = createFeedDashboard();
 
 initSettings({
