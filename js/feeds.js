@@ -6,14 +6,10 @@ import {
   arxivQueryUrl
 } from "./feed-config.js";
 
-import {
-  fetchPublicFeed,
-  fetchPrivateFeed,
-  fetchReadwiseExport
-} from "./feed-client.js";
-
+import { fetchPublicFeed, fetchPrivateFeed, fetchReadwiseExport } from "./feed-client.js";
 import { getSettings } from "./settings.js";
-
+import { normalizeFeedItem, normalizeHighlight } from "./normalize.js";
+import { renderTopicFiltered, resetTopicFilter } from "./feed-filters.js";
 import {
   setStatus,
   renderLoading,
@@ -30,7 +26,7 @@ import {
 const CACHE = new Map();
 
 function validDate(item) {
-  const value = new Date(item.date || 0).valueOf();
+  const value = new Date(item.publishedAt || item.date || 0).valueOf();
   return Number.isNaN(value) ? 0 : value;
 }
 
@@ -41,29 +37,27 @@ function sortNewest(items) {
 function dedupe(items) {
   const seen = new Set();
   return items.filter(item => {
-    const key = String(item.link || item.id || item.title || "")
-      .toLowerCase()
-      .replace(/[#?].*$/, "")
-      .trim();
+    const key = String(item.url || item.link || item.id || item.title || "")
+      .toLowerCase().replace(/[#?].*$/, "").trim();
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
   });
 }
 
-async function collectPublicFeeds(sources) {
-  const settled = await Promise.allSettled(
-    sources.map(async source => {
-      const feed = await fetchPublicFeed(source.url);
-      return feed.items.map(item => ({
-        ...item,
-        source: item.source || source.name,
-        feedTitle: feed.title || source.name,
-        sourceName: source.name,
-        transport: feed.transport
-      }));
-    })
-  );
+async function collectPublicFeeds(sources, type) {
+  const settled = await Promise.allSettled(sources.map(async source => {
+    const feed = await fetchPublicFeed(source.url);
+    return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
+      type,
+      source: item.source || source.name || feed.title,
+      sourceUrl: item.sourceUrl || source.sourceUrl || feed.link || "",
+      feedTitle: feed.title || source.name,
+      profiles: source.profiles || [],
+      topics: source.topics || [],
+      badges: source.badges || []
+    }));
+  }));
 
   const items = [];
   const failures = [];
@@ -71,7 +65,6 @@ async function collectPublicFeeds(sources) {
     if (result.status === "fulfilled") items.push(...result.value);
     else failures.push({ source: sources[index]?.name, error: result.reason });
   });
-
   return { items, failures };
 }
 
@@ -81,24 +74,23 @@ async function loadNews() {
   setStatus("newsStatus", "Loading Google News query feeds…", "loading");
 
   try {
-    const sources = queries.map(query => ({ name: query, url: googleNewsRss(query, freshness) }));
-    const { items, failures } = await collectPublicFeeds(sources);
-
+    const sources = queries.map(entry => ({
+      name: entry.label,
+      url: googleNewsRss(entry.query, freshness),
+      profiles: entry.profiles || [],
+      topics: entry.topics || []
+    }));
+    const { items, failures } = await collectPublicFeeds(sources, "news");
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-    const merged = dedupe(sortNewest(items))
-      .filter(item => !item.date || validDate(item) >= cutoff)
-      .slice(0, maxItems);
+    const merged = dedupe(sortNewest(items)).filter(item => !item.publishedAt || validDate(item) >= cutoff).slice(0, maxItems);
 
     if (!merged.length) renderEmpty("newsFeed", "No recent items were returned by the configured Google News queries.");
-    else renderNews(merged);
+    else renderTopicFiltered("news", merged, renderNews);
 
-    setStatus(
-      "newsStatus",
-      failures.length
-        ? `${merged.length} stories · ${failures.length} query feed${failures.length === 1 ? "" : "s"} unavailable`
-        : `${merged.length} stories · updated now`,
-      failures.length ? "partial" : "ok"
-    );
+    const withImages = merged.filter(item => item.imageUrl).length;
+    setStatus("newsStatus", failures.length
+      ? `${merged.length} stories · ${withImages} with media · ${failures.length} query feed${failures.length === 1 ? "" : "s"} unavailable`
+      : `${merged.length} stories · ${withImages} with media · topic tagged`, failures.length ? "partial" : "ok");
   } catch (error) {
     renderError("newsFeed", error);
     setStatus("newsStatus", error.message, "error");
@@ -113,13 +105,11 @@ async function loadSocials() {
 
   if (settings.socialFeedUrl) {
     jobs.push((async () => {
-      const feed = settings.socialFeedPrivate
-        ? await fetchPrivateFeed(settings.socialFeedUrl)
-        : await fetchPublicFeed(settings.socialFeedUrl);
-      return feed.items.map(item => ({
-        ...item,
+      const feed = settings.socialFeedPrivate ? await fetchPrivateFeed(settings.socialFeedUrl) : await fetchPublicFeed(settings.socialFeedUrl);
+      return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
+        type: "social",
         source: item.source || feed.title || "Unified Social Feed",
-        feedTitle: feed.title || "Unified Social Feed"
+        sourceUrl: item.sourceUrl || feed.link || ""
       }));
     })());
   }
@@ -127,7 +117,12 @@ async function loadSocials() {
   FEED_CONFIG.socials.substackSources.forEach(source => {
     jobs.push((async () => {
       const feed = await fetchPublicFeed(substackFeedUrl(source.url));
-      return feed.items.map(item => ({ ...item, source: source.name, feedTitle: source.name }));
+      return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
+        type: "social",
+        source: source.name,
+        sourceUrl: source.url,
+        profiles: source.profiles || []
+      }));
     })());
   });
 
@@ -138,65 +133,58 @@ async function loadSocials() {
   }
 
   const settled = await Promise.allSettled(jobs);
-  const items = [];
-  const failures = [];
-  settled.forEach(result => {
-    if (result.status === "fulfilled") items.push(...result.value);
-    else failures.push(result.reason);
-  });
-
+  const items = [], failures = [];
+  settled.forEach(result => result.status === "fulfilled" ? items.push(...result.value) : failures.push(result.reason));
   const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.socials.maxItems);
-  if (merged.length) renderSocials(merged);
+
+  if (merged.length) renderTopicFiltered("socials", merged, renderSocials);
   else renderEmpty("socialsFeed", "Configured Social feeds returned no items.");
 
+  const withImages = merged.filter(item => item.imageUrl).length;
   const state = failures.length && merged.length ? "partial" : failures.length ? "error" : "ok";
-  setStatus(
-    "socialsStatus",
-    failures.length
-      ? `${merged.length} posts · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
-      : `${merged.length} posts · updated now`,
-    state
-  );
+  setStatus("socialsStatus", failures.length
+    ? `${merged.length} posts · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
+    : `${merged.length} posts · ${withImages} with media · topic tagged`, state);
 }
 
 async function fetchAcademicSource(source) {
   if (source.feedUrl) {
     try {
       const feed = await fetchPublicFeed(source.feedUrl);
-      return feed.items.map(item => ({ ...item, publication: source.name, fallback: false }));
-    } catch {
-      // Fall through to the scoped Google News query.
-    }
+      return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
+        type: "academic",
+        source: source.name,
+        sourceUrl: source.feedUrl,
+        profiles: source.profiles || []
+      }));
+    } catch { /* use Google News fallback */ }
   }
 
   const fallback = await fetchPublicFeed(googleNewsRss(source.fallbackQuery, "7d"));
-  return fallback.items.map(item => ({ ...item, publication: source.name, fallback: true }));
+  return fallback.items.map(item => normalizeFeedItem({ ...item, transport: fallback.transport }, {
+    type: "academic",
+    source: source.name,
+    sourceUrl: item.sourceUrl || "",
+    profiles: source.profiles || [],
+    badges: ["Google News fallback"]
+  }));
 }
 
 async function loadAcademic() {
   renderLoading("academicFeed", "Loading institutional publication feeds…");
   setStatus("academicStatus", "Loading publication metadata…", "loading");
-
   const settled = await Promise.allSettled(FEED_CONFIG.academic.sources.map(fetchAcademicSource));
-  const items = [];
-  const failures = [];
-
-  settled.forEach((result, index) => {
-    if (result.status === "fulfilled") items.push(...result.value);
-    else failures.push(FEED_CONFIG.academic.sources[index].name);
-  });
-
+  const items = [], failures = [];
+  settled.forEach((result, index) => result.status === "fulfilled" ? items.push(...result.value) : failures.push(FEED_CONFIG.academic.sources[index].name));
   const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.academic.maxItems);
-  if (merged.length) renderAcademic(merged);
+
+  if (merged.length) renderTopicFiltered("academic", merged, renderAcademic);
   else renderEmpty("academicFeed", "No academic publication items are currently available.");
 
-  setStatus(
-    "academicStatus",
-    failures.length
-      ? `${merged.length} articles · unavailable: ${failures.join(", ")}`
-      : `${merged.length} articles · updated now`,
-    failures.length ? "partial" : "ok"
-  );
+  const withImages = merged.filter(item => item.imageUrl).length;
+  setStatus("academicStatus", failures.length
+    ? `${merged.length} articles · ${withImages} with media · unavailable: ${failures.join(", ")}`
+    : `${merged.length} articles · ${withImages} with media · topic tagged`, failures.length ? "partial" : "ok");
 }
 
 async function loadResearch() {
@@ -205,22 +193,20 @@ async function loadResearch() {
 
   try {
     const feed = await fetchPublicFeed(arxivQueryUrl());
-    const keywords = FEED_CONFIG.research.pinKeywords;
-
+    const pinTopics = FEED_CONFIG.research.pinTopics || [];
     const papers = feed.items.map(item => {
-      const haystack = `${item.title} ${item.description}`.toLowerCase();
-      const matches = keywords.filter(keyword => haystack.includes(keyword.toLowerCase()));
-      return { ...item, matches, pinned: matches.length > 0 };
-    }).sort((a, b) => {
-      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
-      return validDate(b) - validDate(a);
-    }).slice(0, FEED_CONFIG.research.maxItems);
+      const normalized = normalizeFeedItem({ ...item, transport: feed.transport }, {
+        type: "research", source: "arXiv", sourceUrl: "https://arxiv.org/"
+      });
+      normalized.pinned = normalized.topics.some(topic => pinTopics.includes(topic));
+      return normalized;
+    }).sort((a, b) => a.pinned !== b.pinned ? (a.pinned ? -1 : 1) : validDate(b) - validDate(a)).slice(0, FEED_CONFIG.research.maxItems);
 
-    if (papers.length) renderPapers(papers);
+    if (papers.length) renderTopicFiltered("research", papers, renderPapers);
     else renderEmpty("researchFeed", "arXiv returned no papers for the configured query.");
 
     const pinned = papers.filter(item => item.pinned).length;
-    setStatus("researchStatus", `${papers.length} papers · ${pinned} keyword match${pinned === 1 ? "" : "es"} · ${feed.transport}`, "ok");
+    setStatus("researchStatus", `${papers.length} papers · ${pinned} priority-topic match${pinned === 1 ? "" : "es"} · topic tagged`, "ok");
   } catch (error) {
     renderError("researchFeed", error);
     setStatus("researchStatus", error.message, "error");
@@ -237,28 +223,19 @@ async function loadVideo() {
 
   renderLoading("videoFeed", "Loading recent creator uploads…");
   setStatus("videoStatus", "Loading YouTube channel feeds…", "loading");
+  const sources = channels.map(channel => ({ name: channel.name, url: youtubeFeedUrl(channel.channelId), profiles: channel.profiles || [channel.name] }));
+  const { items, failures } = await collectPublicFeeds(sources, "video");
+  const merged = dedupe(sortNewest(items)).map(item => ({
+    ...item,
+    imageUrl: item.imageUrl || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : "")
+  })).slice(0, FEED_CONFIG.video.maxItems);
 
-  const sources = channels.map(channel => ({ name: channel.name, url: youtubeFeedUrl(channel.channelId) }));
-  const { items, failures } = await collectPublicFeeds(sources);
-
-  const merged = dedupe(sortNewest(items))
-    .map(item => ({
-      ...item,
-      channelName: item.sourceName || item.author,
-      thumbnail: item.thumbnail || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : "")
-    }))
-    .slice(0, FEED_CONFIG.video.maxItems);
-
-  if (merged.length) renderVideos(merged);
+  if (merged.length) renderTopicFiltered("video", merged, renderVideos, { maxTopics: 6 });
   else renderEmpty("videoFeed", "No recent uploads were returned by the configured channel feeds.");
 
-  setStatus(
-    "videoStatus",
-    failures.length
-      ? `${merged.length} videos · ${failures.length} channel feed${failures.length === 1 ? "" : "s"} unavailable`
-      : `${merged.length} videos · updated now`,
-    failures.length ? "partial" : "ok"
-  );
+  setStatus("videoStatus", failures.length
+    ? `${merged.length} videos · ${failures.length} channel feed${failures.length === 1 ? "" : "s"} unavailable`
+    : `${merged.length} videos · topic tagged`, failures.length ? "partial" : "ok");
 }
 
 async function loadBooks() {
@@ -276,28 +253,16 @@ async function loadBooks() {
     const days = Number(settings.readwiseDays || 30);
     const updatedAfter = new Date(Date.now() - days * 86400000).toISOString();
     const books = await fetchReadwiseExport(settings.readwiseToken, { updatedAfter });
-
     const highlights = [];
-    books.forEach(book => {
-      (book.highlights || []).forEach(highlight => {
-        if (!highlight.text) return;
-        highlights.push({
-          text: highlight.text,
-          note: highlight.note || "",
-          date: highlight.highlighted_at || highlight.updated || book.updated,
-          title: book.title || "Untitled",
-          author: book.author || "",
-          category: book.category || book.source_type || "",
-          link: highlight.highlight_url || book.highlights_url || book.source_url || ""
-        });
-      });
-    });
-
+    books.forEach(book => (book.highlights || []).forEach(highlight => {
+      if (highlight.text) highlights.push(normalizeHighlight(highlight, book));
+    }));
     const recent = sortNewest(highlights).slice(0, 80);
-    if (recent.length) renderHighlights(recent);
+
+    if (recent.length) renderTopicFiltered("books", recent, renderHighlights, { maxTopics: 6 });
     else renderEmpty("booksFeed", `No highlights were returned for the last ${days} days.`);
 
-    setStatus("booksStatus", `${recent.length} highlights · direct Readwise API · last ${days} days`, "ok");
+    setStatus("booksStatus", `${recent.length} highlights · direct Readwise API · topic tagged · last ${days} days`, "ok");
   } catch (error) {
     renderError("booksFeed", error);
     setStatus("booksStatus", error.message, "error");
@@ -310,19 +275,13 @@ export function createFeedDashboard() {
   async function load(tab, { force = false } = {}) {
     if (!LOADERS[tab]) return;
     if (!force && CACHE.get(tab) === "loaded") return;
-
     CACHE.set(tab, "loading");
-    try {
-      await LOADERS[tab]();
-      CACHE.set(tab, "loaded");
-    } catch (error) {
-      CACHE.delete(tab);
-      throw error;
-    }
+    try { await LOADERS[tab](); CACHE.set(tab, "loaded"); }
+    catch (error) { CACHE.delete(tab); throw error; }
   }
 
   function invalidate(tab) {
-    if (tab) CACHE.delete(tab);
+    if (tab) { CACHE.delete(tab); resetTopicFilter(tab); }
     else CACHE.clear();
   }
 
