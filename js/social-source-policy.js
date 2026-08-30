@@ -12,7 +12,10 @@ export const SOCIAL_SOURCE_STATE = Object.freeze({
 });
 
 const directProfileIds = new Set(
-  publicSourcesFor("socials").flatMap(source => source.profileIds || [])
+  publicSourcesFor("socials").flatMap(source => [
+    ...(source.profileIds || []),
+    ...(source.candidateProfileIds || [])
+  ])
 );
 
 function deriveState(profile) {
