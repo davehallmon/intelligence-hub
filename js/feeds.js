@@ -418,7 +418,6 @@ export function createFeedDashboard() {
       if (tab !== "myfeed") ITEM_CACHE.delete(tab);
       resetTopicFilter(tab);
     } else {
-      [...LOADERS.keys?.() || []];
       Object.keys(LOADERS).forEach(key => INVALIDATION_GENERATION.set(key, generation(key) + 1));
       CACHE.clear();
       ITEM_CACHE.clear();
