@@ -27,6 +27,7 @@ import {
 const CACHE = new Map();
 const ITEM_CACHE = new Map();
 const LOAD_PROMISES = new Map();
+const INVALIDATION_GENERATION = new Map();
 
 function validDate(item) {
   const value = new Date(item.publishedAt || item.date || 0).valueOf();
@@ -65,6 +66,10 @@ function limitPerSource(items, maxPerSource) {
 function cacheItems(tab, items) {
   ITEM_CACHE.set(tab, items);
   return items;
+}
+
+function generation(tab) {
+  return INVALIDATION_GENERATION.get(tab) || 0;
 }
 
 async function collectPublicFeeds(sources, type) {
@@ -384,12 +389,14 @@ async function loadTab(tab, { force = false } = {}) {
     if (tab !== "myfeed") ITEM_CACHE.delete(tab);
   }
 
+  const startGeneration = generation(tab);
   CACHE.set(tab, "loading");
   const task = LOADERS[tab]({ force });
   LOAD_PROMISES.set(tab, task);
   try {
     await task;
-    CACHE.set(tab, "loaded");
+    if (generation(tab) === startGeneration) CACHE.set(tab, "loaded");
+    else CACHE.delete(tab);
   } catch (error) {
     CACHE.delete(tab);
     throw error;
@@ -406,10 +413,13 @@ export function createFeedDashboard() {
 
   function invalidate(tab) {
     if (tab) {
+      INVALIDATION_GENERATION.set(tab, generation(tab) + 1);
       CACHE.delete(tab);
       if (tab !== "myfeed") ITEM_CACHE.delete(tab);
       resetTopicFilter(tab);
     } else {
+      [...LOADERS.keys?.() || []];
+      Object.keys(LOADERS).forEach(key => INVALIDATION_GENERATION.set(key, generation(key) + 1));
       CACHE.clear();
       ITEM_CACHE.clear();
     }
