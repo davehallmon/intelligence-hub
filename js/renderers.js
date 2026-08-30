@@ -113,6 +113,24 @@ function appendTopics(container, item, max = 3) {
   container.append(row);
 }
 
+function appendReasons(container, item) {
+  const reasons = (item.myFeedReasons || []).slice(0, 4);
+  if (!reasons.length) return;
+  const row = document.createElement("div");
+  row.className = "my-feed-reason-row";
+  const label = document.createElement("span");
+  label.className = "my-feed-reason-label";
+  label.textContent = "Why";
+  row.append(label);
+  reasons.forEach(reason => {
+    const chip = document.createElement("span");
+    chip.className = "my-feed-reason-chip";
+    chip.textContent = reason;
+    row.append(chip);
+  });
+  container.append(row);
+}
+
 function mediaPlaceholder(item) {
   const placeholder = document.createElement("div");
   placeholder.className = "feed-media feed-media-placeholder";
@@ -149,7 +167,7 @@ function appendMedia(card, item) {
   card.append(media);
 }
 
-function createRichCard(item, { className = "feed-card", label = "", snippetLength = 360 } = {}) {
+export function createRichCard(item, { className = "feed-card", label = "", snippetLength = 360, showReasons = false } = {}) {
   const card = externalCard();
   card.className = `${className} rich-feed-card`;
   card.href = item.url;
@@ -171,6 +189,7 @@ function createRichCard(item, { className = "feed-card", label = "", snippetLeng
     body.append(snippet);
   }
 
+  if (showReasons) appendReasons(body, item);
   appendTopics(body, item);
   card.append(body);
   return card;
