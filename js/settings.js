@@ -1,9 +1,29 @@
 import { bridgeEligibleProfiles, socialPolicyFor } from "./social-source-policy.js";
+import { profilesForType } from "./profiles.js";
+import { TOPIC_LABELS } from "./topics.js";
+import { MY_FEED_DEFAULT_HIGH_TOPICS, PRIORITY_LEVELS } from "./my-feed-config.js";
 
 const SETTINGS_KEY = "intelligenceHub.privateSettings.v1";
 
+const ACTIVE_PEOPLE = Object.freeze(profilesForType("person", { includeWatchlist: false }));
+const ACTIVE_ORGANIZATIONS = Object.freeze(profilesForType("organization", { includeWatchlist: false }));
+const highTopicSet = new Set(MY_FEED_DEFAULT_HIGH_TOPICS);
+
+function defaultTopicPriorities() {
+  return Object.fromEntries(TOPIC_LABELS.map(topic => [topic, highTopicSet.has(topic) ? "high" : "normal"]));
+}
+
+function defaultProfilePriorities(profiles) {
+  return Object.fromEntries(profiles.map(profile => [profile.id, "normal"]));
+}
+
 const DEFAULTS = Object.freeze({
   socialProfileFeeds: Object.freeze({}),
+  myFeedPriorities: Object.freeze({
+    topics: Object.freeze(defaultTopicPriorities()),
+    people: Object.freeze(defaultProfilePriorities(ACTIVE_PEOPLE)),
+    organizations: Object.freeze(defaultProfilePriorities(ACTIVE_ORGANIZATIONS))
+  }),
   readwiseToken: "",
   readwiseDays: 30,
   rss2jsonApiKey: ""
@@ -23,6 +43,27 @@ function normalizeSocialProfileFeeds(value) {
   return clean;
 }
 
+function normalizePriority(value, fallback = "normal") {
+  return PRIORITY_LEVELS.includes(value) ? value : fallback;
+}
+
+function normalizePriorityMap(value, keys, defaults) {
+  const raw = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return Object.fromEntries(keys.map(key => [key, normalizePriority(raw[key], defaults[key] || "normal")]));
+}
+
+function normalizeMyFeedPriorities(value) {
+  const raw = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const topicDefaults = defaultTopicPriorities();
+  const peopleDefaults = defaultProfilePriorities(ACTIVE_PEOPLE);
+  const organizationDefaults = defaultProfilePriorities(ACTIVE_ORGANIZATIONS);
+  return {
+    topics: normalizePriorityMap(raw.topics, TOPIC_LABELS, topicDefaults),
+    people: normalizePriorityMap(raw.people, ACTIVE_PEOPLE.map(profile => profile.id), peopleDefaults),
+    organizations: normalizePriorityMap(raw.organizations, ACTIVE_ORGANIZATIONS.map(profile => profile.id), organizationDefaults)
+  };
+}
+
 export function getSettings() {
   try {
     const parsed = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
@@ -30,16 +71,23 @@ export function getSettings() {
       ...DEFAULTS,
       ...parsed,
       socialProfileFeeds: normalizeSocialProfileFeeds(parsed.socialProfileFeeds),
+      myFeedPriorities: normalizeMyFeedPriorities(parsed.myFeedPriorities),
       legacySocialFeedUrl: String(parsed.socialFeedUrl || "").trim()
     };
   } catch {
-    return { ...DEFAULTS, socialProfileFeeds: {}, legacySocialFeedUrl: "" };
+    return {
+      ...DEFAULTS,
+      socialProfileFeeds: {},
+      myFeedPriorities: normalizeMyFeedPriorities({}),
+      legacySocialFeedUrl: ""
+    };
   }
 }
 
 export function saveSettings(next) {
   const clean = {
     socialProfileFeeds: normalizeSocialProfileFeeds(next.socialProfileFeeds),
+    myFeedPriorities: normalizeMyFeedPriorities(next.myFeedPriorities),
     readwiseToken: String(next.readwiseToken || "").trim(),
     readwiseDays: Number(next.readwiseDays || 30),
     rss2jsonApiKey: String(next.rss2jsonApiKey || "").trim()
@@ -64,6 +112,89 @@ export function getSocialBridgeSources(settings = getSettings()) {
 
 export function clearSettings() {
   localStorage.removeItem(SETTINGS_KEY);
+}
+
+function prioritySelect(dimension, key, value) {
+  const select = document.createElement("select");
+  select.dataset.myFeedPriority = dimension;
+  select.dataset.priorityKey = key;
+  [
+    ["high", "High priority"],
+    ["normal", "Normal"],
+    ["lower", "Lower priority"]
+  ].forEach(([optionValue, label]) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = label;
+    option.selected = value === optionValue;
+    select.append(option);
+  });
+  return select;
+}
+
+function createPriorityRow({ key, label, meta = "", dimension, value }) {
+  const row = document.createElement("label");
+  row.className = "priority-row";
+  const copy = document.createElement("span");
+  copy.className = "priority-row-copy";
+  const name = document.createElement("strong");
+  name.textContent = label;
+  copy.append(name);
+  if (meta) {
+    const detail = document.createElement("small");
+    detail.textContent = meta;
+    copy.append(detail);
+  }
+  row.append(copy, prioritySelect(dimension, key, value));
+  return row;
+}
+
+function populatePriorities(fields, settings) {
+  if (fields.myFeedTopicPriorities) {
+    fields.myFeedTopicPriorities.replaceChildren(...TOPIC_LABELS.map(topic => createPriorityRow({
+      key: topic,
+      label: topic,
+      meta: highTopicSet.has(topic) ? "Approved v9.0 default: High" : "Default: Normal",
+      dimension: "topics",
+      value: settings.myFeedPriorities.topics[topic]
+    })));
+  }
+
+  if (fields.myFeedPeoplePriorities) {
+    fields.myFeedPeoplePriorities.replaceChildren(...ACTIVE_PEOPLE.map(profile => createPriorityRow({
+      key: profile.id,
+      label: profile.name,
+      meta: profile.tier === "core-active" ? "Core Active" : "Selective Active",
+      dimension: "people",
+      value: settings.myFeedPriorities.people[profile.id]
+    })));
+  }
+
+  if (fields.myFeedOrganizationPriorities) {
+    fields.myFeedOrganizationPriorities.replaceChildren(...ACTIVE_ORGANIZATIONS.map(profile => createPriorityRow({
+      key: profile.id,
+      label: profile.name,
+      meta: profile.tier === "core-active" ? "Core Active" : "Selective Active",
+      dimension: "organizations",
+      value: settings.myFeedPriorities.organizations[profile.id]
+    })));
+  }
+}
+
+function collectPriorityMap(form, dimension) {
+  const values = {};
+  form.querySelectorAll(`[data-my-feed-priority="${dimension}"]`).forEach(select => {
+    values[select.dataset.priorityKey] = normalizePriority(select.value);
+  });
+  return values;
+}
+
+function collectMyFeedPriorities(form) {
+  return {
+    topics: collectPriorityMap(form, "topics"),
+    people: collectPriorityMap(form, "people"),
+    organizations: collectPriorityMap(form, "organizations")
+  };
 }
 
 function createBridgeRow(profile, settings) {
@@ -127,6 +258,9 @@ export function initSettings({ onSaved } = {}) {
   if (!dialog || !form) return;
 
   const fields = {
+    myFeedTopicPriorities: document.getElementById("myFeedTopicPriorities"),
+    myFeedPeoplePriorities: document.getElementById("myFeedPeoplePriorities"),
+    myFeedOrganizationPriorities: document.getElementById("myFeedOrganizationPriorities"),
     socialProfileMappings: document.getElementById("socialProfileMappings"),
     legacySocialFeedNotice: document.getElementById("legacySocialFeedNotice"),
     readwiseToken: document.getElementById("readwiseToken"),
@@ -136,6 +270,7 @@ export function initSettings({ onSaved } = {}) {
 
   function populate() {
     const settings = getSettings();
+    populatePriorities(fields, settings);
     if (fields.socialProfileMappings) {
       fields.socialProfileMappings.replaceChildren(
         ...bridgeEligibleProfiles().map(profile => createBridgeRow(profile, settings))
@@ -175,6 +310,7 @@ export function initSettings({ onSaved } = {}) {
   form.addEventListener("submit", event => {
     event.preventDefault();
     const saved = saveSettings({
+      myFeedPriorities: collectMyFeedPriorities(form),
       socialProfileFeeds: collectSocialProfileFeeds(form),
       readwiseToken: fields.readwiseToken.value,
       readwiseDays: fields.readwiseDays.value,

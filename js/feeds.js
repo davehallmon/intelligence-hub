@@ -9,6 +9,8 @@ import { fetchPublicFeed, fetchPrivateFeed, fetchReadwiseExport } from "./feed-c
 import { getSettings, getSocialBridgeSources } from "./settings.js";
 import { normalizeFeedItem, normalizeHighlight } from "./normalize.js";
 import { renderTopicFiltered, resetTopicFilter } from "./feed-filters.js";
+import { rankMyFeed, renderMyFeed } from "./my-feed.js";
+import { MY_FEED_SOURCE_TABS } from "./my-feed-config.js";
 import {
   setStatus,
   renderLoading,
@@ -23,6 +25,9 @@ import {
 } from "./renderers.js";
 
 const CACHE = new Map();
+const ITEM_CACHE = new Map();
+const LOAD_PROMISES = new Map();
+const INVALIDATION_GENERATION = new Map();
 
 function validDate(item) {
   const value = new Date(item.publishedAt || item.date || 0).valueOf();
@@ -56,6 +61,15 @@ function limitPerSource(items, maxPerSource) {
     counts.set(key, count + 1);
     return true;
   });
+}
+
+function cacheItems(tab, items) {
+  ITEM_CACHE.set(tab, items);
+  return items;
+}
+
+function generation(tab) {
+  return INVALIDATION_GENERATION.get(tab) || 0;
 }
 
 async function collectPublicFeeds(sources, type) {
@@ -103,7 +117,7 @@ async function loadNews() {
     const direct = directSources.map(source => ({ ...source, badges: ["Official"] }));
     const { items, failures } = await collectPublicFeeds([...direct, ...querySources], "news");
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
-    const merged = dedupe(sortNewest(items)).filter(item => !item.publishedAt || validDate(item) >= cutoff).slice(0, maxItems);
+    const merged = cacheItems("news", dedupe(sortNewest(items)).filter(item => !item.publishedAt || validDate(item) >= cutoff).slice(0, maxItems));
 
     if (!merged.length) renderEmpty("newsFeed", "No recent items were returned by the configured official or coverage sources.");
     else renderTopicFiltered("news", merged, renderNews);
@@ -113,6 +127,7 @@ async function loadNews() {
       ? `${merged.length} stories · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
       : `${merged.length} stories · ${withImages} with media · official + coverage · topic + profile tagged`, failures.length ? "partial" : "ok");
   } catch (error) {
+    cacheItems("news", []);
     renderError("newsFeed", error);
     setStatus("newsStatus", error.message, "error");
   }
@@ -162,6 +177,7 @@ async function loadSocials() {
   });
 
   if (!jobs.length) {
+    cacheItems("socials", []);
     renderEmpty("socialsFeed", "No direct Social sources or profile-specific bridge feeds are configured.");
     setStatus("socialsStatus", "No Social feed sources configured.", "partial");
     return;
@@ -170,7 +186,7 @@ async function loadSocials() {
   const settled = await Promise.allSettled(jobs);
   const items = [], failures = [];
   settled.forEach(result => result.status === "fulfilled" ? items.push(...result.value) : failures.push(result.reason));
-  const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.socials.maxItems);
+  const merged = cacheItems("socials", dedupe(sortNewest(items)).slice(0, FEED_CONFIG.socials.maxItems));
 
   if (merged.length) renderTopicFiltered("socials", merged, renderSocials);
   else renderEmpty("socialsFeed", "Configured direct and profile-specific Social feeds returned no items.");
@@ -214,7 +230,7 @@ async function loadAcademic() {
   const settled = await Promise.allSettled(FEED_CONFIG.academic.sources.map(fetchAcademicSource));
   const items = [], failures = [];
   settled.forEach((result, index) => result.status === "fulfilled" ? items.push(...result.value) : failures.push(FEED_CONFIG.academic.sources[index].name));
-  const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.academic.maxItems);
+  const merged = cacheItems("academic", dedupe(sortNewest(items)).slice(0, FEED_CONFIG.academic.maxItems));
 
   if (merged.length) renderTopicFiltered("academic", merged, renderAcademic);
   else renderEmpty("academicFeed", "No academic publication items are currently available.");
@@ -232,13 +248,13 @@ async function loadResearch() {
   try {
     const feed = await fetchPublicFeed(arxivQueryUrl());
     const pinTopics = FEED_CONFIG.research.pinTopics || [];
-    const papers = feed.items.map(item => {
+    const papers = cacheItems("research", feed.items.map(item => {
       const normalized = normalizeFeedItem({ ...item, transport: feed.transport }, {
         type: "research", source: "arXiv", sourceUrl: "https://arxiv.org/"
       });
       normalized.pinned = normalized.topics.some(topic => pinTopics.includes(topic));
       return normalized;
-    }).sort((a, b) => a.pinned !== b.pinned ? (a.pinned ? -1 : 1) : validDate(b) - validDate(a)).slice(0, FEED_CONFIG.research.maxItems);
+    }).sort((a, b) => a.pinned !== b.pinned ? (a.pinned ? -1 : 1) : validDate(b) - validDate(a)).slice(0, FEED_CONFIG.research.maxItems));
 
     if (papers.length) renderTopicFiltered("research", papers, renderPapers);
     else renderEmpty("researchFeed", "arXiv returned no papers for the configured query.");
@@ -246,6 +262,7 @@ async function loadResearch() {
     const pinned = papers.filter(item => item.pinned).length;
     setStatus("researchStatus", `${papers.length} papers · ${pinned} priority-topic match${pinned === 1 ? "" : "es"} · topic + profile tagged`, "ok");
   } catch (error) {
+    cacheItems("research", []);
     renderError("researchFeed", error);
     setStatus("researchStatus", error.message, "error");
   }
@@ -254,6 +271,7 @@ async function loadResearch() {
 async function loadVideo() {
   const channels = FEED_CONFIG.video.channels;
   if (!channels.length) {
+    cacheItems("video", []);
     renderEmpty("videoFeed", "No YouTube channel IDs are configured yet. Add public UC… channel IDs to js/feed-config.js.");
     setStatus("videoStatus", "Add channel IDs to js/feed-config.js.", "partial");
     return;
@@ -267,7 +285,8 @@ async function loadVideo() {
     name: channel.name,
     url: youtubeFeedUrl(channel.channelId),
     profileIds: channel.profileIds || [],
-    profiles: channel.profiles || (channel.profileIds?.length ? [] : [channel.name])
+    profiles: channel.profiles || (channel.profileIds?.length ? [] : [channel.name]),
+    badges: ["Official"]
   }));
   const { items, failures } = await collectPublicFeeds(sources, "video");
   const ranked = dedupe(sortNewest(items)).map(item => ({
@@ -275,7 +294,7 @@ async function loadVideo() {
     imageUrl: item.imageUrl || (item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg` : "")
   }));
   const balanced = limitPerSource(ranked, FEED_CONFIG.video.perChannelMax);
-  const merged = balanced.slice(0, FEED_CONFIG.video.maxItems);
+  const merged = cacheItems("video", balanced.slice(0, FEED_CONFIG.video.maxItems));
 
   if (merged.length) renderTopicFiltered("video", merged, renderVideos, { maxTopics: 6 });
   else renderEmpty("videoFeed", "No recent uploads were returned by the configured channel feeds.");
@@ -286,9 +305,36 @@ async function loadVideo() {
     : `${merged.length} videos · max ${cap}/channel · topic + profile tagged`, failures.length ? "partial" : "ok");
 }
 
+async function loadMyFeed({ force = false } = {}) {
+  renderLoading("myFeedAttention", "Finding the strongest signals across your sources…");
+  renderLoading("myFeedFeed", "Ranking the broader feed…");
+  setStatus("myfeedStatus", "Loading and ranking News, Socials, Academic, Research, and Video…", "loading");
+
+  await Promise.allSettled(MY_FEED_SOURCE_TABS.map(tab => loadTab(tab, { force })));
+  const candidates = dedupe(MY_FEED_SOURCE_TABS.flatMap(tab => ITEM_CACHE.get(tab) || []));
+  const result = rankMyFeed(candidates, getSettings());
+  cacheItems("myfeed", [...result.attention, ...result.broader]);
+
+  if (!result.attention.length && !result.broader.length) {
+    renderEmpty("myFeedAttention", "No ranked items are available from the configured sources yet.");
+    renderEmpty("myFeedFeed", "Open an individual feed tab to inspect source availability.");
+    setStatus("myfeedStatus", "No items available to rank.", "partial");
+    return;
+  }
+
+  renderMyFeed(result);
+  const sourceTypes = new Set(candidates.map(item => item.type)).size;
+  setStatus(
+    "myfeedStatus",
+    `${candidates.length} candidates · ${result.attention.length} worth your attention · ${result.broader.length} more · ${sourceTypes} content types · deterministic ranking`,
+    "ok"
+  );
+}
+
 async function loadBooks() {
   const settings = getSettings();
   if (!settings.readwiseToken) {
+    cacheItems("books", []);
     renderEmpty("booksFeed", "Open Settings and add your Readwise API token to load recent highlights.");
     setStatus("booksStatus", "Readwise token not configured.", "partial");
     return;
@@ -305,32 +351,77 @@ async function loadBooks() {
     books.forEach(book => (book.highlights || []).forEach(highlight => {
       if (highlight.text) highlights.push(normalizeHighlight(highlight, book));
     }));
-    const recent = sortNewest(highlights).slice(0, 80);
+    const recent = cacheItems("books", sortNewest(highlights).slice(0, 80));
 
     if (recent.length) renderTopicFiltered("books", recent, renderHighlights, { maxTopics: 6 });
     else renderEmpty("booksFeed", `No highlights were returned for the last ${days} days.`);
 
     setStatus("booksStatus", `${recent.length} highlights · direct Readwise API · topic + profile tagged · last ${days} days`, "ok");
   } catch (error) {
+    cacheItems("books", []);
     renderError("booksFeed", error);
     setStatus("booksStatus", error.message, "error");
   }
 }
 
-const LOADERS = { news: loadNews, socials: loadSocials, academic: loadAcademic, research: loadResearch, video: loadVideo, books: loadBooks };
+const LOADERS = {
+  myfeed: loadMyFeed,
+  news: loadNews,
+  socials: loadSocials,
+  academic: loadAcademic,
+  research: loadResearch,
+  video: loadVideo,
+  books: loadBooks
+};
+
+async function loadTab(tab, { force = false } = {}) {
+  if (!LOADERS[tab]) return [];
+  if (!force && CACHE.get(tab) === "loaded") return ITEM_CACHE.get(tab) || [];
+
+  const inFlight = LOAD_PROMISES.get(tab);
+  if (inFlight) {
+    await inFlight.catch(() => {});
+    if (!force && CACHE.get(tab) === "loaded") return ITEM_CACHE.get(tab) || [];
+  }
+
+  if (force) {
+    CACHE.delete(tab);
+    if (tab !== "myfeed") ITEM_CACHE.delete(tab);
+  }
+
+  const startGeneration = generation(tab);
+  CACHE.set(tab, "loading");
+  const task = LOADERS[tab]({ force });
+  LOAD_PROMISES.set(tab, task);
+  try {
+    await task;
+    if (generation(tab) === startGeneration) CACHE.set(tab, "loaded");
+    else CACHE.delete(tab);
+  } catch (error) {
+    CACHE.delete(tab);
+    throw error;
+  } finally {
+    if (LOAD_PROMISES.get(tab) === task) LOAD_PROMISES.delete(tab);
+  }
+  return ITEM_CACHE.get(tab) || [];
+}
 
 export function createFeedDashboard() {
   async function load(tab, { force = false } = {}) {
-    if (!LOADERS[tab]) return;
-    if (!force && CACHE.get(tab) === "loaded") return;
-    CACHE.set(tab, "loading");
-    try { await LOADERS[tab](); CACHE.set(tab, "loaded"); }
-    catch (error) { CACHE.delete(tab); throw error; }
+    return loadTab(tab, { force });
   }
 
   function invalidate(tab) {
-    if (tab) { CACHE.delete(tab); resetTopicFilter(tab); }
-    else CACHE.clear();
+    if (tab) {
+      INVALIDATION_GENERATION.set(tab, generation(tab) + 1);
+      CACHE.delete(tab);
+      if (tab !== "myfeed") ITEM_CACHE.delete(tab);
+      resetTopicFilter(tab);
+    } else {
+      Object.keys(LOADERS).forEach(key => INVALIDATION_GENERATION.set(key, generation(key) + 1));
+      CACHE.clear();
+      ITEM_CACHE.clear();
+    }
   }
 
   document.querySelectorAll("[data-refresh-feed]").forEach(button => {
@@ -344,7 +435,12 @@ export function createFeedDashboard() {
   document.addEventListener("ih:settings-saved", () => {
     invalidate("socials");
     invalidate("books");
+    invalidate("myfeed");
   });
 
-  return { load, invalidate };
+  return {
+    load,
+    invalidate,
+    getItems(tab) { return [...(ITEM_CACHE.get(tab) || [])]; }
+  };
 }

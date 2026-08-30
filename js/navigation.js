@@ -1,4 +1,5 @@
-const PRIMARY_TABS = ["launchpad", "news", "socials", "academic", "research", "video", "books"];
+const PRIMARY_TABS = ["myfeed", "launchpad", "news", "socials", "academic", "research", "video", "books"];
+const NAV_VERSION = "9";
 const LAUNCHPAD_VIEWS = {
   destinations: "DESTINATIONS",
   watchlists: "TRACKING & WATCHLISTS"
@@ -23,6 +24,11 @@ function normalizeLaunchpad(value) {
   return Object.hasOwn(LAUNCHPAD_VIEWS, value) ? value : null;
 }
 
+function storedPrimary() {
+  if (localStorage.getItem("intelligenceHubNavVersion") !== NAV_VERSION) return null;
+  return normalizePrimary(localStorage.getItem("intelligenceHubPrimaryTab"));
+}
+
 function parseHash() {
   const raw = location.hash.replace(/^#/, "").toLowerCase();
   const [primaryRaw, secondaryRaw] = raw.split("/");
@@ -34,8 +40,8 @@ function parseHash() {
 
   const primary =
     normalizePrimary(primaryRaw)
-    || normalizePrimary(localStorage.getItem("intelligenceHubPrimaryTab"))
-    || "launchpad";
+    || storedPrimary()
+    || "myfeed";
 
   const secondary =
     primary === "launchpad"
@@ -179,6 +185,7 @@ export function initNavigation({ onPrimaryChange } = {}) {
     if (activePrimary === "launchpad") applyLaunchpadView();
     else emptyState.classList.remove("visible");
 
+    localStorage.setItem("intelligenceHubNavVersion", NAV_VERSION);
     localStorage.setItem("intelligenceHubPrimaryTab", activePrimary);
     syncHash();
     if (notify) onPrimaryChange?.(activePrimary);
