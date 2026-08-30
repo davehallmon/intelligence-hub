@@ -4,6 +4,7 @@ import { initNavigation } from "./navigation.js";
 import { initV81UI } from "./v81-ui.js";
 import { initMyFeedUI } from "./my-feed-ui.js";
 import { initUIFoundation, decorateUIFoundation } from "./main.js";
+import { initPhase4UX } from "./phase4.js";
 
 initUIFoundation();
 initMyFeedUI();
@@ -23,16 +24,19 @@ initSettings({
   }
 });
 
-document.addEventListener("click", event => {
-  const refresh = event.target.closest?.("[data-refresh-feed]");
-  const tab = refresh?.dataset.refreshFeed;
-  if (tab && tab !== "myfeed") feeds.invalidate("myfeed");
-});
-
-initNavigation({
+const navigation = initNavigation({
   onPrimaryChange(tab) {
     if (tab !== "launchpad") {
       feeds.load(tab).catch(error => console.error(`Unable to load ${tab}:`, error));
     }
+  }
+});
+
+initPhase4UX({
+  navigation,
+  async refresh(tab) {
+    if (tab !== "myfeed") feeds.invalidate("myfeed");
+    feeds.invalidate(tab);
+    return feeds.load(tab, { force: true });
   }
 });
