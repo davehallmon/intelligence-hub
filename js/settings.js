@@ -1,36 +1,124 @@
+import { bridgeEligibleProfiles, socialPolicyFor } from "./social-source-policy.js";
+
 const SETTINGS_KEY = "intelligenceHub.privateSettings.v1";
 
 const DEFAULTS = Object.freeze({
-  socialFeedUrl: "",
-  socialFeedPrivate: true,
+  socialProfileFeeds: Object.freeze({}),
   readwiseToken: "",
   readwiseDays: 30,
   rss2jsonApiKey: ""
 });
 
+const bridgeProfileIds = new Set(bridgeEligibleProfiles().map(profile => profile.profileId));
+
+function normalizeSocialProfileFeeds(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const clean = {};
+  Object.entries(value).forEach(([profileId, config]) => {
+    if (!bridgeProfileIds.has(profileId)) return;
+    const url = String(config?.url || "").trim();
+    if (!url) return;
+    clean[profileId] = { url, private: config?.private !== false };
+  });
+  return clean;
+}
+
 export function getSettings() {
   try {
     const parsed = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-    return { ...DEFAULTS, ...parsed };
+    return {
+      ...DEFAULTS,
+      ...parsed,
+      socialProfileFeeds: normalizeSocialProfileFeeds(parsed.socialProfileFeeds),
+      legacySocialFeedUrl: String(parsed.socialFeedUrl || "").trim()
+    };
   } catch {
-    return { ...DEFAULTS };
+    return { ...DEFAULTS, socialProfileFeeds: {}, legacySocialFeedUrl: "" };
   }
 }
 
 export function saveSettings(next) {
   const clean = {
-    socialFeedUrl: String(next.socialFeedUrl || "").trim(),
-    socialFeedPrivate: Boolean(next.socialFeedPrivate),
+    socialProfileFeeds: normalizeSocialProfileFeeds(next.socialProfileFeeds),
     readwiseToken: String(next.readwiseToken || "").trim(),
     readwiseDays: Number(next.readwiseDays || 30),
     rss2jsonApiKey: String(next.rss2jsonApiKey || "").trim()
   };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(clean));
-  return clean;
+  return { ...clean, legacySocialFeedUrl: "" };
+}
+
+export function getSocialBridgeSources(settings = getSettings()) {
+  return Object.entries(settings.socialProfileFeeds || {}).map(([profileId, config]) => {
+    const policy = socialPolicyFor(profileId);
+    return {
+      id: `local-social-${profileId}`,
+      name: policy?.name || profileId,
+      url: String(config?.url || "").trim(),
+      private: config?.private !== false,
+      profileIds: [profileId],
+      badges: ["Social bridge"]
+    };
+  }).filter(source => source.url);
 }
 
 export function clearSettings() {
   localStorage.removeItem(SETTINGS_KEY);
+}
+
+function createBridgeRow(profile, settings) {
+  const mapping = settings.socialProfileFeeds?.[profile.profileId] || {};
+  const row = document.createElement("div");
+  row.className = "bridge-mapping";
+  row.dataset.profileId = profile.profileId;
+
+  const heading = document.createElement("div");
+  heading.className = "bridge-mapping-heading";
+  const name = document.createElement("strong");
+  name.textContent = profile.name;
+  const meta = document.createElement("span");
+  meta.textContent = `${profile.mainOutlet || "Social outlet"} · Bridge-eligible`;
+  heading.append(name, meta);
+
+  const label = document.createElement("label");
+  label.className = "field bridge-url-field";
+  const labelText = document.createElement("span");
+  labelText.textContent = "Profile-specific RSS URL";
+  const input = document.createElement("input");
+  input.type = "url";
+  input.autocomplete = "off";
+  input.placeholder = "https://…/private-or-public-feed.xml";
+  input.value = mapping.url || "";
+  input.dataset.socialProfileUrl = profile.profileId;
+  label.append(labelText, input);
+
+  const privacy = document.createElement("label");
+  privacy.className = "check-field bridge-private-field";
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = mapping.private !== false;
+  checkbox.dataset.socialProfilePrivate = profile.profileId;
+  const privacyCopy = document.createElement("span");
+  privacyCopy.textContent = "Treat this feed as private";
+  const privacyNote = document.createElement("small");
+  privacyNote.textContent = "Private feeds are fetched directly and never sent through a public RSS proxy.";
+  privacyCopy.append(privacyNote);
+  privacy.append(checkbox, privacyCopy);
+
+  row.append(heading, label, privacy);
+  return row;
+}
+
+function collectSocialProfileFeeds(form) {
+  const mappings = {};
+  form.querySelectorAll("[data-social-profile-url]").forEach(input => {
+    const profileId = input.dataset.socialProfileUrl;
+    const url = String(input.value || "").trim();
+    if (!url || !bridgeProfileIds.has(profileId)) return;
+    const privacy = form.querySelector(`[data-social-profile-private="${profileId}"]`);
+    mappings[profileId] = { url, private: privacy?.checked !== false };
+  });
+  return mappings;
 }
 
 export function initSettings({ onSaved } = {}) {
@@ -39,8 +127,8 @@ export function initSettings({ onSaved } = {}) {
   if (!dialog || !form) return;
 
   const fields = {
-    socialFeedUrl: document.getElementById("socialFeedUrl"),
-    socialFeedPrivate: document.getElementById("socialFeedPrivate"),
+    socialProfileMappings: document.getElementById("socialProfileMappings"),
+    legacySocialFeedNotice: document.getElementById("legacySocialFeedNotice"),
     readwiseToken: document.getElementById("readwiseToken"),
     readwiseDays: document.getElementById("readwiseDays"),
     rss2jsonApiKey: document.getElementById("rss2jsonApiKey")
@@ -48,8 +136,14 @@ export function initSettings({ onSaved } = {}) {
 
   function populate() {
     const settings = getSettings();
-    fields.socialFeedUrl.value = settings.socialFeedUrl;
-    fields.socialFeedPrivate.checked = settings.socialFeedPrivate;
+    if (fields.socialProfileMappings) {
+      fields.socialProfileMappings.replaceChildren(
+        ...bridgeEligibleProfiles().map(profile => createBridgeRow(profile, settings))
+      );
+    }
+    if (fields.legacySocialFeedNotice) {
+      fields.legacySocialFeedNotice.hidden = !settings.legacySocialFeedUrl;
+    }
     fields.readwiseToken.value = settings.readwiseToken;
     fields.readwiseDays.value = String(settings.readwiseDays);
     fields.rss2jsonApiKey.value = settings.rss2jsonApiKey;
@@ -81,8 +175,7 @@ export function initSettings({ onSaved } = {}) {
   form.addEventListener("submit", event => {
     event.preventDefault();
     const saved = saveSettings({
-      socialFeedUrl: fields.socialFeedUrl.value,
-      socialFeedPrivate: fields.socialFeedPrivate.checked,
+      socialProfileFeeds: collectSocialProfileFeeds(form),
       readwiseToken: fields.readwiseToken.value,
       readwiseDays: fields.readwiseDays.value,
       rss2jsonApiKey: fields.rss2jsonApiKey.value
