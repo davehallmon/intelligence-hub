@@ -2,14 +2,18 @@
 // Never put private tokens or private feed URLs in this file.
 // Feed sources attach to canonical identities from profiles.js; profiles are not feeds.
 
+import { publicSourcesFor } from "./source-registry.js";
+
 export const FEED_CONFIG = Object.freeze({
   news: {
     freshness: "1d",
-    maxItems: 48,
+    maxItems: 64,
+    directSources: publicSourcesFor("news"),
+    // Google News remains a coverage layer. It complements official sources; it does not replace them.
     queries: [
-      { label: "OpenAI", query: "OpenAI", profileIds: ["org-openai"] },
-      { label: "Anthropic", query: "Anthropic", profileIds: ["org-anthropic"] },
-      { label: "Google DeepMind", query: "\"Google DeepMind\"", profileIds: ["org-google-deepmind"] },
+      { label: "OpenAI coverage", query: "OpenAI", profileIds: ["org-openai"] },
+      { label: "Anthropic coverage", query: "Anthropic", profileIds: ["org-anthropic"] },
+      { label: "Google DeepMind coverage", query: "\"Google DeepMind\"", profileIds: ["org-google-deepmind"] },
       { label: "AI Agents", query: "\"AI agents\"", topics: ["AI Agents"] },
       { label: "AI Regulation", query: "\"AI regulation\"", topics: ["AI Regulation & Policy"] },
       { label: "AI Safety", query: "\"AI safety\"", topics: ["AI Safety & Alignment"] },
@@ -19,13 +23,9 @@ export const FEED_CONFIG = Object.freeze({
   },
 
   socials: {
-    maxItems: 50,
-    // Direct public outlets can attach to a profile here. X/LinkedIn/Threads
-    // profiles are intentionally supplied later through the browser-local social bridge.
-    substackSources: [
-      { name: "One Useful Thing", url: "https://www.oneusefulthing.org/", profileIds: ["person-ethan-mollick"] },
-      { name: "Rachel Woods", url: "https://rachelwoods.substack.com/", profileIds: ["person-rachel-woods"] }
-    ]
+    maxItems: 70,
+    // Direct RSS/Atom/newsletter outlets. X/LinkedIn/Threads remain browser-local bridge sources.
+    publicSources: publicSourcesFor("socials")
   },
 
   academic: {
@@ -74,10 +74,6 @@ export function googleNewsRss(query, freshness = "1d") {
   const q = `${query} when:${freshness}`.trim();
   const params = new URLSearchParams({ q, hl: "en-US", gl: "US", ceid: "US:en" });
   return `https://news.google.com/rss/search?${params.toString()}`;
-}
-
-export function substackFeedUrl(url) {
-  return `${String(url).replace(/\/+$/, "")}/feed`;
 }
 
 export function youtubeFeedUrl(channelId) {

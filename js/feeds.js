@@ -1,7 +1,6 @@
 import {
   FEED_CONFIG,
   googleNewsRss,
-  substackFeedUrl,
   youtubeFeedUrl,
   arxivQueryUrl
 } from "./feed-config.js";
@@ -70,29 +69,31 @@ async function collectPublicFeeds(sources, type) {
 }
 
 async function loadNews() {
-  const { queries, freshness, maxItems } = FEED_CONFIG.news;
+  const { directSources = [], queries, freshness, maxItems } = FEED_CONFIG.news;
   renderLoading("newsFeed", "Loading the last 24 hours…");
-  setStatus("newsStatus", "Loading Google News query feeds…", "loading");
+  setStatus("newsStatus", "Loading official sources and news coverage…", "loading");
 
   try {
-    const sources = queries.map(entry => ({
+    const querySources = queries.map(entry => ({
       name: entry.label,
       url: googleNewsRss(entry.query, freshness),
       profileIds: entry.profileIds || [],
       profiles: entry.profiles || [],
-      topics: entry.topics || []
+      topics: entry.topics || [],
+      badges: ["Coverage"]
     }));
-    const { items, failures } = await collectPublicFeeds(sources, "news");
+    const direct = directSources.map(source => ({ ...source, badges: ["Official"] }));
+    const { items, failures } = await collectPublicFeeds([...direct, ...querySources], "news");
     const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     const merged = dedupe(sortNewest(items)).filter(item => !item.publishedAt || validDate(item) >= cutoff).slice(0, maxItems);
 
-    if (!merged.length) renderEmpty("newsFeed", "No recent items were returned by the configured Google News queries.");
+    if (!merged.length) renderEmpty("newsFeed", "No recent items were returned by the configured official or coverage sources.");
     else renderTopicFiltered("news", merged, renderNews);
 
     const withImages = merged.filter(item => item.imageUrl).length;
     setStatus("newsStatus", failures.length
-      ? `${merged.length} stories · ${withImages} with media · ${failures.length} query feed${failures.length === 1 ? "" : "s"} unavailable`
-      : `${merged.length} stories · ${withImages} with media · topic + profile tagged`, failures.length ? "partial" : "ok");
+      ? `${merged.length} stories · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
+      : `${merged.length} stories · ${withImages} with media · official + coverage · topic + profile tagged`, failures.length ? "partial" : "ok");
   } catch (error) {
     renderError("newsFeed", error);
     setStatus("newsStatus", error.message, "error");
@@ -100,8 +101,8 @@ async function loadNews() {
 }
 
 async function loadSocials() {
-  renderLoading("socialsFeed", "Loading social and newsletter feeds…");
-  setStatus("socialsStatus", "Loading configured feeds…", "loading");
+  renderLoading("socialsFeed", "Loading social, newsletter, and personal publishing feeds…");
+  setStatus("socialsStatus", "Loading direct profile outlets and configured social bridge…", "loading");
   const settings = getSettings();
   const jobs = [];
 
@@ -111,26 +112,29 @@ async function loadSocials() {
       return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
         type: "social",
         source: item.source || feed.title || "Unified Social Feed",
-        sourceUrl: item.sourceUrl || feed.link || ""
+        sourceUrl: item.sourceUrl || feed.link || "",
+        badges: ["Social bridge"]
       }));
     })());
   }
 
-  FEED_CONFIG.socials.substackSources.forEach(source => {
+  FEED_CONFIG.socials.publicSources.forEach(source => {
     jobs.push((async () => {
-      const feed = await fetchPublicFeed(substackFeedUrl(source.url));
+      const feed = await fetchPublicFeed(source.url);
       return feed.items.map(item => normalizeFeedItem({ ...item, transport: feed.transport }, {
         type: "social",
         source: source.name,
         sourceUrl: source.url,
         profileIds: source.profileIds || [],
-        profiles: source.profiles || []
+        profiles: source.profiles || [],
+        topics: source.topics || [],
+        badges: ["Direct"]
       }));
     })());
   });
 
   if (!jobs.length) {
-    renderEmpty("socialsFeed", "Add a unified Social RSS URL in Settings or public Substack sources in js/feed-config.js.");
+    renderEmpty("socialsFeed", "Add a unified Social RSS URL in Settings or public profile sources in js/source-registry.js.");
     setStatus("socialsStatus", "No Social feed sources configured.", "partial");
     return;
   }
@@ -141,13 +145,13 @@ async function loadSocials() {
   const merged = dedupe(sortNewest(items)).slice(0, FEED_CONFIG.socials.maxItems);
 
   if (merged.length) renderTopicFiltered("socials", merged, renderSocials);
-  else renderEmpty("socialsFeed", "Configured Social feeds returned no items.");
+  else renderEmpty("socialsFeed", "Configured Social and direct profile feeds returned no items.");
 
   const withImages = merged.filter(item => item.imageUrl).length;
   const state = failures.length && merged.length ? "partial" : failures.length ? "error" : "ok";
   setStatus("socialsStatus", failures.length
     ? `${merged.length} posts · ${withImages} with media · ${failures.length} source${failures.length === 1 ? "" : "s"} unavailable`
-    : `${merged.length} posts · ${withImages} with media · topic + profile tagged`, state);
+    : `${merged.length} posts · ${withImages} with media · direct outlets + bridge · topic + profile tagged`, state);
 }
 
 async function fetchAcademicSource(source) {
