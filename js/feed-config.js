@@ -6,22 +6,22 @@ export const FEED_CONFIG = Object.freeze({
     freshness: "1d",
     maxItems: 48,
     queries: [
-      "OpenAI",
-      "Anthropic",
-      "\"Google DeepMind\"",
-      "\"AI agents\"",
-      "\"AI regulation\"",
-      "\"AI safety\"",
-      "\"AI coding\"",
-      "\"generative AI\""
+      { label: "OpenAI", query: "OpenAI", profiles: ["OpenAI"] },
+      { label: "Anthropic", query: "Anthropic", profiles: ["Anthropic"] },
+      { label: "Google DeepMind", query: "\"Google DeepMind\"", profiles: ["Google DeepMind"] },
+      { label: "AI Agents", query: "\"AI agents\"", topics: ["AI Agents"] },
+      { label: "AI Regulation", query: "\"AI regulation\"", topics: ["AI Regulation & Policy"] },
+      { label: "AI Safety", query: "\"AI safety\"", topics: ["AI Safety & Alignment"] },
+      { label: "AI Coding", query: "\"AI coding\"", topics: ["AI-powered Coding"] },
+      { label: "Generative AI", query: "\"generative AI\"" }
     ]
   },
 
   socials: {
     maxItems: 50,
     substackSources: [
-      { name: "One Useful Thing", url: "https://www.oneusefulthing.org/" },
-      { name: "Rachel Woods", url: "https://rachelwoods.substack.com/" }
+      { name: "One Useful Thing", url: "https://www.oneusefulthing.org/", profiles: ["Ethan Mollick"] },
+      { name: "Rachel Woods", url: "https://rachelwoods.substack.com/", profiles: ["Rachel Woods"] }
     ]
   },
 
@@ -31,22 +31,26 @@ export const FEED_CONFIG = Object.freeze({
       {
         name: "Harvard Business Review",
         feedUrl: "https://feeds.hbr.org/harvardbusiness",
-        fallbackQuery: "site:hbr.org artificial intelligence OR technology OR leadership"
+        fallbackQuery: "site:hbr.org artificial intelligence OR technology OR leadership",
+        profiles: ["Harvard Business Review"]
       },
       {
         name: "MIT Technology Review",
         feedUrl: "https://www.technologyreview.com/feed/",
-        fallbackQuery: "site:technologyreview.com artificial intelligence"
+        fallbackQuery: "site:technologyreview.com artificial intelligence",
+        profiles: ["MIT Technology Review"]
       },
       {
         name: "Stanford HAI",
         feedUrl: "https://hai.stanford.edu/rss.xml",
-        fallbackQuery: "site:hai.stanford.edu AI"
+        fallbackQuery: "site:hai.stanford.edu AI",
+        profiles: ["Stanford HAI"]
       },
       {
         name: "Knowledge at Wharton",
         feedUrl: null,
-        fallbackQuery: "site:knowledge.wharton.upenn.edu AI OR technology OR management"
+        fallbackQuery: "site:knowledge.wharton.upenn.edu AI OR technology OR management",
+        profiles: ["Knowledge at Wharton"]
       }
     ]
   },
@@ -56,22 +60,13 @@ export const FEED_CONFIG = Object.freeze({
     searchQuery: "cat:cs.AI OR cat:cs.CL OR cat:cs.LG",
     maxResults: 45,
     maxItems: 45,
-    pinKeywords: [
-      "agentic",
-      "genai",
-      "generative ai",
-      "large language model",
-      "llm",
-      "retrieval augmented generation",
-      "rag",
-      "multimodal"
-    ]
+    pinTopics: ["AI Agents", "RAG", "Multimodal AI", "AI Safety & Alignment", "LLM-as-a-Judge"]
   },
 
   video: {
     maxItems: 36,
     // Add stable YouTube channel IDs (UC...) here.
-    // Example: channels: [{ name: "Creator Name", channelId: "UCxxxxxxxxxxxxxxxxxxxxxx" }]
+    // Example: channels: [{ name: "Creator Name", channelId: "UC...", profiles: ["Creator Name"] }]
     channels: []
   }
 });
