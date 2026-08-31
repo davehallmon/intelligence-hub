@@ -1,0 +1,96 @@
+/* Intelligence Hub v10 — mobile-only Watchlist refinement. */
+
+.watchlist-mobile-toggle {
+  display: none;
+}
+
+@media (max-width: 620px) {
+  .watchlist-panel {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .watchlist-controls {
+    margin: 14px 0 10px;
+    padding: 12px;
+  }
+
+  .watchlist-controls__heading {
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .watchlist-controls__heading p {
+    display: none;
+  }
+
+  .watchlist-mobile-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 5px 10px;
+    border: 1px solid rgba(129, 140, 248, .34);
+    border-radius: 999px;
+    background: rgba(99, 102, 241, .10);
+    color: #c7d2fe;
+    cursor: pointer;
+    font-size: .67rem;
+    font-weight: 760;
+  }
+
+  .watchlist-mobile-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .watchlist-mobile-toggle__chevron {
+    display: inline-block;
+    font-size: .9rem;
+    line-height: 1;
+    transition: transform .15s ease;
+  }
+
+  .watchlist-mobile-toggle[aria-expanded="true"] .watchlist-mobile-toggle__chevron {
+    transform: rotate(180deg);
+  }
+
+  .watchlist-controls.is-mobile-collapsed .watchlist-topic-group:not(.watchlist-topic-group--all) {
+    display: none;
+  }
+
+  .watchlist-controls.is-mobile-collapsed .watchlist-topic-groups {
+    gap: 0;
+  }
+
+  .watchlist-topic-group {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .watchlist-topic-row {
+    flex-wrap: nowrap;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 1px 1px 5px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .watchlist-topic-button {
+    flex: 0 0 auto;
+    max-width: min(82vw, 360px);
+    scroll-snap-align: start;
+  }
+
+  #watchlistStatus {
+    margin-bottom: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watchlist-mobile-toggle__chevron {
+    transition: none;
+  }
+}
