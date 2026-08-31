@@ -1,5 +1,6 @@
 import { initSettings } from "./settings.js";
 import { createFeedDashboard } from "./feeds.js";
+import { RUNTIME_LENS_SERVICE } from "./lens-service.js";
 import { initNavigation } from "./navigation.js";
 import { initV81UI } from "./v81-ui.js";
 import { initMyFeedUI } from "./my-feed-ui.js";
@@ -11,6 +12,24 @@ initMyFeedUI();
 initV81UI();
 decorateUIFoundation();
 const feeds = createFeedDashboard();
+
+// Internal v10 runtime read API. It intentionally exposes no item-store mutation
+// methods and does not alter the current v9.x navigation or rendering path.
+window.intelligenceHubV10 = Object.freeze({
+  phase: 6,
+  queryLens(lensId, options = {}) {
+    return RUNTIME_LENS_SERVICE.query(lensId, options);
+  },
+  buildLensReadModels(optionsByLens = {}) {
+    return RUNTIME_LENS_SERVICE.build(optionsByLens);
+  },
+  lensMembership(keyOrItem, optionsByLens = {}) {
+    return RUNTIME_LENS_SERVICE.membership(keyOrItem, optionsByLens);
+  },
+  snapshot(optionsByLens = {}) {
+    return RUNTIME_LENS_SERVICE.snapshot(optionsByLens);
+  }
+});
 
 initSettings({
   onSaved() {
