@@ -60,7 +60,7 @@ function repositoryContractChecks() {
   const main = read("js/main.js");
   const status = read("STATUS.md");
   const readme = read("README.md");
-  const migration = read("docs/architecture/MIGRATION_PLAN.md");
+  const milestones = read("docs/architecture/V10_MILESTONE_MAP.md");
 
   assert(!main.includes("lucide@latest"), "Lucide CDN dependency must be pinned to an exact version.");
   assert(/const LUCIDE_VERSION = "\d+\.\d+\.\d+";/.test(main), "Pinned Lucide version constant is missing from js/main.js.");
@@ -73,8 +73,8 @@ function repositoryContractChecks() {
 
   assert(readme.includes("PierView.io"), "README must identify the PierView.io product direction.");
   assert(status.includes("V10-M09"), "STATUS.md must identify the next stable milestone.");
-  assert(migration.includes("V10-M09"), "Migration plan must define the stable Products & Platforms milestone ID.");
-  assert(migration.includes("Do not use bare phase numbers"), "Migration plan must resolve phase-number ambiguity explicitly.");
+  assert(milestones.includes("V10-M09"), "Stable milestone map must define Products & Platforms as V10-M09.");
+  assert(milestones.includes("Do not use bare phase numbers"), "Stable milestone map must resolve phase-number ambiguity explicitly.");
 
   console.log("Repository contract/accessibility checks passed.");
 }
