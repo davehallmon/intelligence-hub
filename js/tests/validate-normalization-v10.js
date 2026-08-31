@@ -25,7 +25,9 @@ export function validateNormalizationV10() {
     featuredEntityIds: ["person-simon-willison"],
     mentionedEntityIds: ["person-arvind-narayanan"]
   });
+  assert(roleItem.type === "article" && Array.isArray(roleItem.profileIds), "legacy normalized fields must remain available");
   assert(hasOnly(roleItem.authorEntityIds, ["person-ethan-mollick"]), "authoredBy must remain distinct");
+  assert(roleItem.sourceEntityIds.includes("publication-hbr"), "source entity must resolve independently");
   assert(roleItem.publisherEntityIds.includes("publication-hbr"), "publisher must resolve independently");
   assert(hasOnly(roleItem.featuredEntityIds, ["person-simon-willison"]), "featuring must remain distinct");
   assert(roleItem.mentionedEntityIds.includes("person-arvind-narayanan"), "mentioned/about must remain distinct");
@@ -62,8 +64,10 @@ export function validateNormalizationV10() {
     badges: ["Official"],
     productEntityIds: ["product-claude"]
   });
+  assert(productAnnouncement.sourceEntityIds.includes("org-anthropic"), "organization announcement must retain source entity");
   assert(productAnnouncement.publisherEntityIds.includes("org-anthropic"), "organization announcement must retain publisher");
   assert(productAnnouncement.productEntityIds.includes("product-claude"), "organization announcement must relate to product");
+  assert(!productAnnouncement.publisherEntityIds.includes("product-claude"), "product relationship must not collapse into publisher");
   assert(productAnnouncement.evidenceType === EVIDENCE_TYPES.PRIMARY_SOURCE, "official announcement should classify as primary source");
   results.push("organization-product-link");
 
@@ -102,6 +106,19 @@ export function validateNormalizationV10() {
   assert(coverage.mentionedEntityIds.includes("org-openai"), "coverage subject should remain an about/mentioned relationship");
   assert(coverage.evidenceType === EVIDENCE_TYPES.INDEPENDENT_REPORTING, "coverage should classify as independent reporting");
   results.push("coverage-not-publisher");
+
+  const arxiv = normalizeFeedItem({
+    title: "Research paper",
+    link: "https://arxiv.org/abs/2608.12345"
+  }, {
+    type: "research",
+    source: "arXiv",
+    sourceUrl: "https://arxiv.org/"
+  });
+  assert(arxiv.sourceEndpointId === "endpoint-arxiv-current", "research source should resolve through canonical entity to endpoint");
+  assert(arxiv.researchSourceEntityIds.includes("research-source-arxiv"), "research source entity must be preserved");
+  assert(arxiv.evidenceType === EVIDENCE_TYPES.RESEARCH, "research item should retain research evidence class");
+  results.push("research-source-endpoint");
 
   return Object.freeze({ ok: true, fixtures: Object.freeze(results) });
 }
