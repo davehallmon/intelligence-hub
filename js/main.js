@@ -3,6 +3,8 @@ import { initPhase3Interactions } from "./phase3.js";
 // Intelligence Hub v9.1 — UI foundation compatibility entry.
 // The existing dashboard modules remain intact while the new design system is layered in.
 
+const LUCIDE_VERSION = "1.37.0";
+
 function ensureStylesheet(href) {
   if (document.querySelector(`link[href="${href}"]`)) return;
   const link = document.createElement("link");
@@ -18,7 +20,7 @@ function ensureLucide() {
   }
   if (document.querySelector('script[data-intelligence-hub-lucide]')) return;
   const script = document.createElement("script");
-  script.src = "https://unpkg.com/lucide@latest";
+  script.src = `https://unpkg.com/lucide@${LUCIDE_VERSION}`;
   script.defer = true;
   script.dataset.intelligenceHubLucide = "true";
   script.addEventListener("load", () => window.lucide?.createIcons());
@@ -146,6 +148,22 @@ function bindDrawerControls() {
   persistentRailMedia.addEventListener("change", syncNavigationMode);
 }
 
+function wirePrimaryTabSemantics() {
+  document.querySelectorAll("[data-primary-tab]").forEach(tab => {
+    const key = tab.dataset.primaryTab;
+    if (!key) return;
+    tab.id = `tab-${key}`;
+    tab.setAttribute("aria-controls", `panel-${key}`);
+  });
+
+  document.querySelectorAll("[data-primary-panel]").forEach(panel => {
+    const key = panel.dataset.primaryPanel;
+    if (!key) return;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", `tab-${key}`);
+  });
+}
+
 export function initUIFoundation() {
   document.documentElement.dataset.uiVersion = "9.1";
 
@@ -189,6 +207,10 @@ export function decorateUIFoundation() {
   document.querySelectorAll(".bookmark-card").forEach(card => {
     card.classList.add("card", "card--bookmark");
   });
+
+  // All primary destinations are injected before this decoration pass. Wire the
+  // full ARIA Tabs relationship once here so new v10 lenses inherit it centrally.
+  wirePrimaryTabSemantics();
 
   // Tablet mode hides the visible labels, so keep explicit accessible names.
   document.querySelectorAll(".drawer-item").forEach(item => {
