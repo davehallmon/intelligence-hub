@@ -86,7 +86,8 @@ function syncWatchlistView() {
   chips.querySelectorAll(".nav-chip").forEach(chip => chip.classList.add("pill"));
 
   const watchlistSelected = document.querySelector('#viewTabs [data-view="watchlists"][aria-selected="true"]');
-  const active = document.body.dataset.primaryView === "launchpad" && Boolean(watchlistSelected);
+  const active = document.body.dataset.primaryView === "watchlist"
+    || (document.body.dataset.primaryView === "launchpad" && Boolean(watchlistSelected));
   main.dataset.view = active ? "watchlist" : "feed";
 }
 
@@ -536,7 +537,7 @@ function decorateCardsWithin(root) {
 
 function bindCardDecorators() {
   const containers = [
-    "myFeedAttention", "myFeedFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
+    "myFeedAttention", "myFeedFeed", "watchlistFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
   ].map(id => document.getElementById(id)).filter(Boolean);
 
   containers.forEach(container => {
