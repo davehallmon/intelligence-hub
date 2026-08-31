@@ -1,4 +1,4 @@
-const PRIMARY_TABS = ["myfeed", "watchlist", "launchpad", "news", "socials", "academic", "research", "video", "books"];
+const PRIMARY_TABS = ["myfeed", "watchlist", "people-organizations", "launchpad", "news", "socials", "academic", "research", "video", "books"];
 const NAV_VERSION = "9";
 const LAUNCHPAD_VIEWS = {
   destinations: "DESTINATIONS",
