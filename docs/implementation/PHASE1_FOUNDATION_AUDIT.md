@@ -60,7 +60,9 @@ Repository-level checks performed:
 - connector bridge preserves current public source identifiers and live source ownership
 - Readwise/private credentials remain browser-local
 
-The local shell in this execution environment cannot resolve github.com, so the ES-module validator could not be executed from a cloned checkout here. `validate-foundation.js` is included as a pure manual/development validator for a normal local checkout or later CI step.
+The PR development record also reports that all new ES modules passed `node --check` and that `validate-foundation.js` was exercised against the 65-profile legacy inventory without configuration-reference or scarce-count errors. Node is used only for development validation; it is not introduced as an application runtime dependency.
+
+During a later continuation session, the available local shell could not resolve `github.com`, so that session could not independently repeat the checkout-based Node validation. Repository-side structure and references were re-audited through the connected GitHub source instead.
 
 ## Intentionally unresolved
 
