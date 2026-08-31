@@ -83,9 +83,9 @@ export function validateItemStoreV10() {
   const watchlist = queryLens(store.getItems(), "watchlist");
   const people = queryLens(store.getItems(), "people-organizations");
   const products = queryLens(store.getItems(), "products-platforms");
-  assert(watchlist.length === 1 && people.length === 1 && products.length === 1,
+  assert(watchlist.items.length === 1 && people.items.length === 1 && products.items.length === 1,
     "one canonical store object must be selectable into multiple lenses");
-  assert(watchlist[0].item === canonical && people[0].item === canonical && products[0].item === canonical,
+  assert(watchlist.items[0] === canonical && people.items[0] === canonical && products.items[0] === canonical,
     "lens read models must retain the exact shared canonical object reference");
   results.push("shared-object-multi-lens");
 
