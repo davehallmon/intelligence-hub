@@ -1,7 +1,7 @@
 // Intelligence Hub v10 — Watchlist mobile refinement.
 // Progressive enhancement only: the underlying Watchlist lens and topic controls stay authoritative.
 
-const MOBILE_WATCHLIST_QUERY = "(max-width: 620px)";
+const MOBILE_WATCHLIST_QUERY = "(max-width: 767px)";
 
 function ensureStylesheet() {
   if (document.querySelector('link[href="watchlist-mobile.css"]')) return;
