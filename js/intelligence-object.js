@@ -14,6 +14,13 @@ const TRACKING_PARAMS = new Set([
 
 const EVIDENCE_VALUES = new Set(Object.values(EVIDENCE_TYPES));
 const VERIFICATION_VALUES = new Set(Object.values(VERIFICATION_STATUS));
+const PUBLISHER_ENTITY_TYPES = new Set([
+  ENTITY_TYPES.PERSON,
+  ENTITY_TYPES.ORGANIZATION,
+  ENTITY_TYPES.PUBLICATION,
+  ENTITY_TYPES.MEDIA,
+  ENTITY_TYPES.RESEARCH_SOURCE
+]);
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -46,6 +53,10 @@ function resolveEntityRefs(refs = []) {
 
 function entityIdsForType(ids, type) {
   return unique(ids.filter(id => getEntity(id)?.type === type));
+}
+
+function publisherCapableEntityIds(ids) {
+  return unique(ids.filter(id => PUBLISHER_ENTITY_TYPES.has(getEntity(id)?.type)));
 }
 
 function normalizeEndpointName(value) {
@@ -183,18 +194,25 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
     ...(base.authors || [])
   ]), ENTITY_TYPES.PERSON);
 
-  const explicitPublishers = resolveEntityRefs(explicitRefs(item, context, [
-    "publisherEntityIds", "publishedBy"
+  const explicitSourceEntities = resolveEntityRefs(explicitRefs(item, context, [
+    "sourceEntityIds", "sourceEntities"
   ]));
+  const endpointSourceEntities = endpoint?.entityIds || [];
+  const sourceAliasEntities = resolveEntityRefs([base.source]);
+  const seededSourceEntities = isCoverage(base) ? [] : seededEntityIds;
+  const sourceEntities = unique([
+    ...explicitSourceEntities,
+    ...endpointSourceEntities,
+    ...sourceAliasEntities,
+    ...seededSourceEntities
+  ]);
 
-  const endpointPublishers = !isCoverage(base) ? (endpoint?.entityIds || []) : [];
-  const sourcePublisher = !isCoverage(base) ? resolveEntityRefs([base.source]) : [];
-  const seededPublishers = !isCoverage(base) ? seededEntityIds : [];
+  const explicitPublishers = publisherCapableEntityIds(resolveEntityRefs(explicitRefs(item, context, [
+    "publisherEntityIds", "publishedBy"
+  ])));
   const publishedBy = unique([
     ...explicitPublishers,
-    ...endpointPublishers,
-    ...sourcePublisher,
-    ...seededPublishers
+    ...publisherCapableEntityIds(sourceEntities)
   ]);
 
   const featuring = resolveEntityRefs(explicitRefs(item, context, [
@@ -220,6 +238,7 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
   const all = unique([
     ...legacyDetectedEntityIds,
     ...seededEntityIds,
+    ...sourceEntities,
     ...authoredBy,
     ...publishedBy,
     ...featuring,
@@ -228,6 +247,7 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
   ]);
 
   return Object.freeze({
+    sourceEntities: Object.freeze(sourceEntities),
     authoredBy: Object.freeze(authoredBy),
     publishedBy: Object.freeze(publishedBy),
     featuring: Object.freeze(featuring),
@@ -264,6 +284,7 @@ export function enrichIntelligenceObject(base, item = {}, context = {}) {
     dedupeKey: canonicalObjectKey,
     sourceEndpointId: endpoint?.id || clean(context.sourceEndpointId || item.sourceEndpointId),
     entityIds: relationships.all,
+    sourceEntityIds: relationships.sourceEntities,
     authorEntityIds: relationships.authoredBy,
     publisherEntityIds: relationships.publishedBy,
     featuredEntityIds: relationships.featuring,
@@ -279,6 +300,7 @@ export function enrichIntelligenceObject(base, item = {}, context = {}) {
     verificationStatus,
     provenance: Object.freeze({
       sourceEndpointId: endpoint?.id || null,
+      sourceEntityIds: relationships.sourceEntities,
       sourceLabel: base.source || "",
       sourceUrl: base.sourceUrl || "",
       transport: base.transport || "",
