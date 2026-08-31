@@ -150,6 +150,11 @@ function entityLensMatch(item, lensId, entityTypes, options = {}, { includeChild
 }
 
 function watchlistMatch(item, options = {}) {
+  const knowledgeOnly = item.objectType === "highlight"
+    || item.type === "highlight"
+    || item.sourceEndpointId === "endpoint-readwise-local";
+  if (knowledgeOnly && options.includeKnowledge !== true) return null;
+
   const allowedStates = allowedMonitoringStates(options);
   const selectedTopicIds = new Set(asArray(options.topicIds));
   const topicIds = watchlistTopicIdsForItem(item);
