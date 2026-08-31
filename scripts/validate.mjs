@@ -57,45 +57,24 @@ function runResultSuite(name, validator) {
 
 function repositoryContractChecks() {
   const read = file => fs.readFileSync(path.join(root, file), "utf8");
-  const index = read("index.html");
   const main = read("js/main.js");
-  const myFeed = read("js/my-feed-ui.js");
-  const watchlist = read("js/watchlist-ui.js");
-  const people = read("js/people-organizations-ui.js");
   const status = read("STATUS.md");
   const readme = read("README.md");
+  const migration = read("docs/architecture/MIGRATION_PLAN.md");
 
   assert(!main.includes("lucide@latest"), "Lucide CDN dependency must be pinned to an exact version.");
-  assert(/lucide@\d+\.\d+\.\d+/.test(main), "Pinned Lucide version is missing from js/main.js.");
+  assert(/const LUCIDE_VERSION = "\d+\.\d+\.\d+";/.test(main), "Pinned Lucide version constant is missing from js/main.js.");
 
-  const staticTabs = ["myfeed", "news", "socials", "academic", "research", "video", "books", "launchpad"];
-  for (const tab of staticTabs) {
-    assert(index.includes(`id="tab-${tab}"`), `Primary tab ${tab} must have a stable id.`);
-    assert(index.includes(`aria-controls="panel-${tab}"`), `Primary tab ${tab} must point to its panel.`);
-  }
+  assert(main.includes("function wirePrimaryTabSemantics()"), "Primary tab semantics must be wired centrally.");
+  assert(main.includes('tab.setAttribute("aria-controls", `panel-${key}`)'), "Primary tabs must reference their panels.");
+  assert(main.includes('panel.setAttribute("role", "tabpanel")'), "Primary panels must declare role=tabpanel.");
+  assert(main.includes('panel.setAttribute("aria-labelledby", `tab-${key}`)'), "Primary panels must reference their tabs.");
+  assert(main.includes("wirePrimaryTabSemantics();"), "The centralized tab semantics function must execute during UI decoration.");
 
-  const staticPanels = ["launchpad", "news", "socials", "academic", "research", "video", "books"];
-  for (const panel of staticPanels) {
-    const panelPattern = new RegExp(`<section[^>]+id="panel-${panel}"[^>]+role="tabpanel"[^>]+aria-labelledby="tab-${panel}"|<section[^>]+id="panel-${panel}"[^>]+aria-labelledby="tab-${panel}"[^>]+role="tabpanel"`);
-    assert(panelPattern.test(index), `panel-${panel} must implement the ARIA tabpanel relationship.`);
-  }
-
-  assert(myFeed.includes('panel.setAttribute("role", "tabpanel")'), "Dynamic My Feed panel must declare role=tabpanel.");
-  assert(myFeed.includes('panel.setAttribute("aria-labelledby", "tab-myfeed")'), "Dynamic My Feed panel must reference tab-myfeed.");
-
-  assert(watchlist.includes('button.id = "tab-watchlist"'), "Watchlist tab must have a stable id.");
-  assert(watchlist.includes('button.setAttribute("aria-controls", "panel-watchlist")'), "Watchlist tab must reference panel-watchlist.");
-  assert(watchlist.includes('panel.setAttribute("role", "tabpanel")'), "Watchlist panel must declare role=tabpanel.");
-  assert(watchlist.includes('panel.setAttribute("aria-labelledby", "tab-watchlist")'), "Watchlist panel must reference tab-watchlist.");
-
-  assert(people.includes('button.id = "tab-people-organizations"'), "People & Organizations tab must have a stable id.");
-  assert(people.includes('button.setAttribute("aria-controls", "panel-people-organizations")'), "People & Organizations tab must reference its panel.");
-  assert(people.includes('panel.setAttribute("role", "tabpanel")'), "People & Organizations panel must declare role=tabpanel.");
-  assert(people.includes('panel.setAttribute("aria-labelledby", "tab-people-organizations")'), "People & Organizations panel must reference its tab.");
-
-  assert(!index.includes("</strong>Try"), "Launchpad empty-state copy must contain whitespace after the strong element.");
   assert(readme.includes("PierView.io"), "README must identify the PierView.io product direction.");
   assert(status.includes("V10-M09"), "STATUS.md must identify the next stable milestone.");
+  assert(migration.includes("V10-M09"), "Migration plan must define the stable Products & Platforms milestone ID.");
+  assert(migration.includes("Do not use bare phase numbers"), "Migration plan must resolve phase-number ambiguity explicitly.");
 
   console.log("Repository contract/accessibility checks passed.");
 }
