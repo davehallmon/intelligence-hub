@@ -1,0 +1,173 @@
+/* Intelligence Hub v10 — Phase 7 visible Watchlist lens. */
+
+.watchlist-panel {
+  padding-top: 26px;
+}
+
+.watchlist-controls {
+  margin: 18px 0 14px;
+  padding: 15px 16px;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: rgba(13, 19, 32, .62);
+}
+
+.watchlist-controls__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.watchlist-controls__heading h3 {
+  margin: 0;
+  color: #e7edf6;
+  font-size: .9rem;
+  letter-spacing: -.01em;
+}
+
+.watchlist-controls__heading p {
+  margin: 4px 0 0;
+  color: #77879b;
+  font-size: .69rem;
+}
+
+.watchlist-topic-groups {
+  display: grid;
+  gap: 11px;
+}
+
+.watchlist-topic-group {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.watchlist-topic-group--all {
+  display: block;
+}
+
+.watchlist-topic-group__label {
+  padding-top: 8px;
+  color: #718096;
+  font-size: .61rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.watchlist-topic-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.watchlist-topic-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 5px 9px 5px 11px;
+  border: 1px solid #2d3a4e;
+  border-radius: 999px;
+  background: #131c2a;
+  color: #bac5d4;
+  cursor: pointer;
+  font-size: .66rem;
+  font-weight: 710;
+  line-height: 1.25;
+  text-align: left;
+  transition: background .15s ease, border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+.watchlist-topic-button:hover,
+.watchlist-topic-button:focus-visible {
+  border-color: rgba(129, 140, 248, .52);
+  background: #192438;
+  color: #eef2ff;
+  outline: none;
+}
+
+.watchlist-topic-button[aria-pressed="true"] {
+  border-color: rgba(129, 140, 248, .58);
+  background: rgba(99, 102, 241, .17);
+  color: #eef2ff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.watchlist-topic-button[data-monitoring-state="priority"] {
+  border-color: rgba(129, 140, 248, .29);
+}
+
+.watchlist-topic-button__label {
+  min-width: 0;
+}
+
+.watchlist-topic-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, .10);
+  color: #8fa0b5;
+  font-size: .57rem;
+  font-weight: 850;
+}
+
+.watchlist-topic-button[aria-pressed="true"] .watchlist-topic-count {
+  background: rgba(129, 140, 248, .17);
+  color: #c7d2fe;
+}
+
+.watchlist-card {
+  border-color: rgba(99, 102, 241, .14);
+}
+
+.watchlist-match-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.watchlist-match-label {
+  color: #69798f;
+  font-size: .56rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.watchlist-match-chip {
+  border: 1px solid rgba(52, 211, 153, .19);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, .07);
+  color: #9fdcc7;
+  padding: 2px 7px;
+  font-size: .57rem;
+  font-weight: 730;
+}
+
+@media (max-width: 620px) {
+  .watchlist-controls {
+    padding: 13px;
+  }
+
+  .watchlist-topic-group {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .watchlist-topic-group__label {
+    padding-top: 0;
+  }
+
+  .watchlist-topic-button {
+    max-width: 100%;
+  }
+}
