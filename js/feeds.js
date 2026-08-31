@@ -8,6 +8,7 @@ import {
 import { fetchPublicFeed, fetchPrivateFeed, fetchReadwiseExport } from "./feed-client.js";
 import { getSettings, getSocialBridgeSources } from "./settings.js";
 import { normalizeFeedItem, normalizeHighlight } from "./normalize.js";
+import { SHARED_ITEM_STORE } from "./item-store.js";
 import { renderTopicFiltered, resetTopicFilter } from "./feed-filters.js";
 import { rankMyFeed, renderMyFeed } from "./my-feed.js";
 import { MY_FEED_SOURCE_TABS } from "./my-feed-config.js";
@@ -65,6 +66,7 @@ function limitPerSource(items, maxPerSource) {
 
 function cacheItems(tab, items) {
   ITEM_CACHE.set(tab, items);
+  if (tab !== "myfeed") SHARED_ITEM_STORE.replaceSource(tab, items);
   return items;
 }
 
@@ -386,7 +388,10 @@ async function loadTab(tab, { force = false } = {}) {
 
   if (force) {
     CACHE.delete(tab);
-    if (tab !== "myfeed") ITEM_CACHE.delete(tab);
+    if (tab !== "myfeed") {
+      ITEM_CACHE.delete(tab);
+      SHARED_ITEM_STORE.clearSource(tab);
+    }
   }
 
   const startGeneration = generation(tab);
@@ -415,12 +420,16 @@ export function createFeedDashboard() {
     if (tab) {
       INVALIDATION_GENERATION.set(tab, generation(tab) + 1);
       CACHE.delete(tab);
-      if (tab !== "myfeed") ITEM_CACHE.delete(tab);
+      if (tab !== "myfeed") {
+        ITEM_CACHE.delete(tab);
+        SHARED_ITEM_STORE.clearSource(tab);
+      }
       resetTopicFilter(tab);
     } else {
       Object.keys(LOADERS).forEach(key => INVALIDATION_GENERATION.set(key, generation(key) + 1));
       CACHE.clear();
       ITEM_CACHE.clear();
+      SHARED_ITEM_STORE.clear();
     }
   }
 
@@ -441,6 +450,9 @@ export function createFeedDashboard() {
   return {
     load,
     invalidate,
-    getItems(tab) { return [...(ITEM_CACHE.get(tab) || [])]; }
+    getItems(tab) { return [...(ITEM_CACHE.get(tab) || [])]; },
+    getSharedItems() { return SHARED_ITEM_STORE.getItems(); },
+    getSharedEntries() { return SHARED_ITEM_STORE.getEntries(); },
+    getSharedStats() { return SHARED_ITEM_STORE.stats(); }
   };
 }
