@@ -3,7 +3,11 @@ const SAVED_ITEMS_KEY = "intelligenceHub.savedItems.v2";
 const LEGACY_SAVED_ITEMS_KEY = "intelligenceHub.savedItems.v1";
 const PULL_THRESHOLD = 72;
 const MAX_PULL_DISTANCE = 118;
-const REFRESHABLE_TABS = new Set(["myfeed", "news", "socials", "academic", "research", "video", "books"]);
+const V10_MOBILE_SHELL_QUERY = "(max-width: 767px)";
+const mobileShellMedia = window.matchMedia(V10_MOBILE_SHELL_QUERY);
+const REFRESHABLE_TABS = new Set([
+  "myfeed", "watchlist", "people-organizations", "news", "socials", "academic", "research", "video", "books"
+]);
 
 const COMMUNITY_LINKS = Object.freeze([
   { label: "r/singularity", url: "https://www.reddit.com/r/singularity/" },
@@ -12,6 +16,8 @@ const COMMUNITY_LINKS = Object.freeze([
 
 const CONTROL_LABELS = Object.freeze({
   myfeed: { route: "My Feed", topic: "Topics", person: "Figures", organization: "Organizations" },
+  watchlist: { route: "Watchlist", topic: "Topics", person: "Figures", organization: "Organizations" },
+  "people-organizations": { route: "People & Orgs", topic: "Topics", person: "People", organization: "Organizations" },
   news: { route: "News", topic: "Topics", person: "Figures", organization: "Regions / Orgs" },
   socials: { route: "Socials", topic: "Topics", person: "Figures", organization: "Organizations" },
   academic: { route: "Academic", topic: "Fields", person: "Authors", organization: "Journals / Institutions" },
@@ -464,14 +470,14 @@ function decorateSavedCard(card) {
 
 function decorateAllFeedCards(root = document) {
   removeLegacyBookmarkActions(root);
-  const selector = ".interactive-card, a.paper-card, a.video-card, a.highlight-card, article.highlight-card";
+  const selector = ".interactive-card, a.rich-feed-card, a.paper-card, a.video-card, a.highlight-card, article.highlight-card";
   if (root.matches?.(selector)) decorateSavedCard(root);
   root.querySelectorAll?.(selector).forEach(decorateSavedCard);
 }
 
 function bindSavedCardObservers() {
   const containers = [
-    "myFeedAttention", "myFeedFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
+    "myFeedAttention", "myFeedFeed", "watchlistFeed", "peopleOrganizationsFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
   ].map(id => document.getElementById(id)).filter(Boolean);
 
   containers.forEach(container => {
@@ -529,6 +535,40 @@ function prioritiesButton() {
     .find(button => /priorities/i.test(button.textContent || "")) || null;
 }
 
+function restoreV10InlineControls() {
+  if (mobileShellMedia.matches) return;
+
+  const watchlistToggle = document.getElementById("watchlistMobileToggle");
+  const watchlistHeading = document.querySelector(".watchlist-controls__heading");
+  if (watchlistToggle && watchlistHeading && watchlistToggle.parentElement !== watchlistHeading) {
+    watchlistHeading.append(watchlistToggle);
+  }
+
+  const entityLabel = document.querySelector(".entity-lens-select-label");
+  const entityControls = document.querySelector(".entity-lens-controls");
+  if (entityLabel && entityControls && entityLabel.parentElement !== entityControls) {
+    entityControls.append(entityLabel);
+  }
+}
+
+function appendV10MobileControls(tab, filtersHost, actionsHost) {
+  if (!mobileShellMedia.matches) return false;
+
+  if (tab === "watchlist") {
+    const toggle = document.getElementById("watchlistMobileToggle");
+    if (toggle) actionsHost.append(toggle);
+    return true;
+  }
+
+  if (tab === "people-organizations") {
+    const label = document.querySelector(".entity-lens-select-label");
+    if (label) filtersHost.append(label);
+    return true;
+  }
+
+  return false;
+}
+
 function syncBottomControls() {
   const bar = ensureBottomControls();
   const parking = ensureFilterParking();
@@ -540,8 +580,14 @@ function syncBottomControls() {
 
   [...filtersHost.children].forEach(child => parking.append(child));
   [...actionsHost.children].forEach(child => parking.append(child));
+  restoreV10InlineControls();
 
   if (!routeMeta || !REFRESHABLE_TABS.has(tab)) {
+    bar.hidden = true;
+    return;
+  }
+
+  if ((tab === "watchlist" || tab === "people-organizations") && !mobileShellMedia.matches) {
     bar.hidden = true;
     return;
   }
@@ -549,10 +595,13 @@ function syncBottomControls() {
   bar.hidden = false;
   if (routeLabel) routeLabel.textContent = routeMeta.route;
 
-  const filters = document.getElementById(`${tab}FeedFilters`);
-  if (filters) {
-    applyContextLabels(tab, filters);
-    filtersHost.append(filters);
+  const v10Handled = appendV10MobileControls(tab, filtersHost, actionsHost);
+  if (!v10Handled) {
+    const filters = document.getElementById(`${tab}FeedFilters`);
+    if (filters) {
+      applyContextLabels(tab, filters);
+      filtersHost.append(filters);
+    }
   }
 
   if (tab === "myfeed") {
@@ -622,6 +671,8 @@ function bindBottomControlSync() {
   document.addEventListener("click", event => {
     if (event.target.closest?.("[data-primary-tab]")) window.setTimeout(syncBottomControls, 0);
   });
+
+  mobileShellMedia.addEventListener?.("change", () => requestAnimationFrame(syncBottomControls));
 }
 
 function ensurePullIndicator() {
@@ -737,6 +788,8 @@ function bindPullToRefresh() {
     if (!retry) return;
     const feed = retry.closest?.("[id$='Feed'], #myFeedAttention, #myFeedFeed");
     const tab = ({
+      watchlistFeed: "watchlist",
+      peopleOrganizationsFeed: "people-organizations",
       newsFeed: "news",
       socialsFeed: "socials",
       academicFeed: "academic",
