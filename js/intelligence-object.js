@@ -56,6 +56,10 @@ function legacyTabForType(type) {
   return ({ social: "socials", highlight: "books" })[type] || type || "";
 }
 
+function endpointFitsTab(endpoint, legacyTab) {
+  return !legacyTab || !endpoint.legacyTab || endpoint.legacyTab === legacyTab;
+}
+
 function resolveSourceEndpoint(base, item = {}, context = {}) {
   const explicitId = clean(
     context.sourceEndpointId || item.sourceEndpointId || context.endpointId || item.endpointId
@@ -78,13 +82,22 @@ function resolveSourceEndpoint(base, item = {}, context = {}) {
 
   const sourceName = normalizeEndpointName(base.source);
   const legacyTab = legacyTabForType(base.type);
-  if (!sourceName) return null;
+  if (sourceName) {
+    const nameMatches = SOURCE_ENDPOINTS.filter(endpoint =>
+      normalizeEndpointName(endpoint.name) === sourceName && endpointFitsTab(endpoint, legacyTab)
+    );
+    if (nameMatches.length === 1) return nameMatches[0];
+  }
 
-  const matches = SOURCE_ENDPOINTS.filter(endpoint =>
-    normalizeEndpointName(endpoint.name) === sourceName &&
-    (!legacyTab || !endpoint.legacyTab || endpoint.legacyTab === legacyTab)
-  );
-  return matches.length === 1 ? matches[0] : null;
+  const sourceEntityId = resolveEntityAlias(base.source);
+  if (sourceEntityId) {
+    const entityMatches = SOURCE_ENDPOINTS.filter(endpoint =>
+      (endpoint.entityIds || []).includes(sourceEntityId) && endpointFitsTab(endpoint, legacyTab)
+    );
+    if (entityMatches.length === 1) return entityMatches[0];
+  }
+
+  return null;
 }
 
 export function canonicalizeUrl(value) {
