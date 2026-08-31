@@ -35,7 +35,7 @@ The legacy v9.x feed tabs and compatibility CSS/JS remain intentionally availabl
 
 ## Completed v10 implementation milestones
 
-Use the stable milestone IDs below rather than bare phase numbers.
+Use the stable milestone IDs below rather than bare phase numbers. The canonical ordinal-reconciliation map is `docs/architecture/V10_MILESTONE_MAP.md`.
 
 | ID | Milestone | State | Evidence |
 | --- | --- | --- | --- |
@@ -68,19 +68,17 @@ Use the stable milestone IDs below rather than bare phase numbers.
 
 ## Verification state
 
-### Automated / structural evidence already recorded
+### Automated / structural evidence
 
 - Multiple implementation PRs recorded `node --check` validation during development.
 - Phase-specific validation fixtures exist under `js/tests/` and `js/config/validate-foundation.js`.
 - GitHub Pages deployment after PR #28 succeeded.
-
-### Handoff-remediation validation goal
-
-The repository-handoff remediation introduces one canonical `npm run validate` command and GitHub Actions workflow so the existing fixtures actually execute on every pull request.
+- Repository-handoff remediation PR #29 adds the canonical `npm run validate` command and GitHub Actions workflow.
+- PR #29's first complete GitHub Actions validation run passed, executing JavaScript syntax checks, the existing v10 validation suites, the corrected shared-item-store fixture, shared mobile-shell structural checks, and repository handoff/accessibility contract checks.
 
 ### Manual acceptance still required
 
-A successful static deployment is not a substitute for live browser/device testing. PR #28's documented iPhone acceptance checklist has **not been recorded in the repository as completed**. Treat it as pending manual confirmation until a human records the result.
+A successful static deployment or source validation run is not a substitute for live browser/device testing. PR #28's documented iPhone acceptance checklist has **not been recorded in the repository as completed**. Treat it as pending manual confirmation until a human records the result.
 
 ## Next implementation milestone
 
@@ -114,10 +112,11 @@ When sources appear to conflict, use this order:
 2. `docs/configuration/RATIFIED_CONFIGURATION.md` — approved configuration values and product choices.
 3. `docs/architecture/PRODUCT_ARCHITECTURE.md` — target product contract.
 4. `docs/architecture/INFORMATION_ARCHITECTURE.md` — target data/information relationships.
-5. `docs/architecture/MIGRATION_PLAN.md` — staged sequence; stable milestone IDs govern future work.
-6. `TECHNICAL_SPEC.md` — current v9.x UI/runtime compatibility rules during migration.
-7. `docs/implementation/*` — historical implementation evidence at the time each file was written.
-8. Pull-request descriptions/commits — transaction history and verification evidence.
+5. `docs/architecture/V10_MILESTONE_MAP.md` — stable milestone IDs and phase-number reconciliation.
+6. `docs/architecture/MIGRATION_PLAN.md` — detailed staged scope/acceptance roadmap; translate old numeric headings through the milestone map.
+7. `TECHNICAL_SPEC.md` — current v9.x UI/runtime compatibility rules during migration.
+8. `docs/implementation/*` — historical implementation evidence at the time each file was written.
+9. Pull-request descriptions/commits — transaction history and verification evidence.
 
 Never infer current status from a historical phase audit alone.
 
