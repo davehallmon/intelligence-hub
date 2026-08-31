@@ -1,5 +1,6 @@
 import { classifyTopics } from "./topics.js";
 import { detectProfileIds, getProfiles, resolveProfileId } from "./profiles.js";
+import { enrichIntelligenceObject } from "./intelligence-object.js";
 
 function clean(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -51,7 +52,7 @@ export function normalizeFeedItem(item = {}, context = {}) {
     seededTopics
   );
 
-  return {
+  const legacyObject = {
     id: clean(item.id) || url || `${context.type || "item"}:${title}`,
     type: context.type || item.type || "article",
     title,
@@ -72,6 +73,10 @@ export function normalizeFeedItem(item = {}, context = {}) {
     transport: clean(item.transport || context.transport),
     raw: item
   };
+
+  // Phase 2 is additive. The live v9.x UI/ranking still consumes the legacy fields
+  // above while v10 relationships, provenance, evidence, and dedupe hooks are added.
+  return enrichIntelligenceObject(legacyObject, item, context);
 }
 
 export function normalizeFeedItems(items, context = {}) {
@@ -93,7 +98,8 @@ export function normalizeHighlight(highlight = {}, book = {}) {
     source: book.title || "Readwise",
     sourceUrl: book.source_url || "",
     profiles: book.author ? [book.author] : [],
-    badges: [book.category || book.source_type || ""].filter(Boolean)
+    badges: [book.category || book.source_type || ""].filter(Boolean),
+    sourceEndpointId: "endpoint-readwise-local"
   });
 }
 
