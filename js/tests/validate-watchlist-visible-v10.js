@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { MONITORING_STATES } from "../config/entity-types.js";
+import { queryLens } from "../lens-read-model.js";
 import {
   continuousWatchlistTopics,
   sortWatchlistEntries,
@@ -55,5 +56,34 @@ assert.equal(counts["prompt-harness-workflow"], 1);
 assert.equal(counts["rag-retrieval-knowledge"], 1);
 assert.equal(counts["ai-literacy-fluency"], 1, "Duplicate topic IDs within one entry count once.");
 assert.equal(counts["ai-education-learning"], 0, "Monitored topics with no current items remain visible with a zero count.");
+
+const liveArticle = Object.freeze({
+  id: "live-article",
+  type: "news",
+  objectType: "article",
+  topics: Object.freeze(["AI Adoption & Future of Work"]),
+  entityIds: Object.freeze([])
+});
+const libraryHighlight = Object.freeze({
+  id: "library-highlight",
+  type: "highlight",
+  objectType: "highlight",
+  sourceEndpointId: "endpoint-readwise-local",
+  topics: Object.freeze(["AI Adoption & Future of Work"]),
+  entityIds: Object.freeze([])
+});
+
+const continuousResult = queryLens([liveArticle, libraryHighlight], "watchlist");
+assert.deepEqual(
+  continuousResult.items.map(item => item.id),
+  ["live-article"],
+  "Library/Readwise highlights must not leak into continuous Watchlist monitoring."
+);
+const investigationResult = queryLens([liveArticle, libraryHighlight], "watchlist", { includeKnowledge: true });
+assert.deepEqual(
+  investigationResult.items.map(item => item.id),
+  ["live-article", "library-highlight"],
+  "Knowledge objects remain explicitly queryable when a future investigation opts in."
+);
 
 console.log("Watchlist visible migration fixtures passed.");
