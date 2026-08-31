@@ -6,6 +6,7 @@ import { initV81UI } from "./v81-ui.js";
 import { initMyFeedUI } from "./my-feed-ui.js";
 import { MY_FEED_SOURCE_TABS } from "./my-feed-config.js";
 import { initWatchlistUI } from "./watchlist-ui.js";
+import { initWatchlistMobileRefinement } from "./watchlist-mobile.js";
 import { initUIFoundation, decorateUIFoundation } from "./main.js";
 import { initPhase4UX } from "./phase4.js";
 
@@ -25,6 +26,7 @@ const watchlist = initWatchlistUI({
   },
   loadSources: loadWatchlistSources
 });
+initWatchlistMobileRefinement();
 
 initV81UI();
 decorateUIFoundation();
