@@ -1,22 +1,48 @@
-/* Intelligence Hub v10 — mobile-only Watchlist refinement. */
+/* Intelligence Hub v10 — mobile Watchlist shell integration. */
 
 .watchlist-mobile-toggle {
   display: none;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 767px) {
   .watchlist-panel {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #watchlistRefresh {
+    display: none !important;
   }
 
   .watchlist-controls {
-    margin: 14px 0 10px;
+    position: fixed;
+    z-index: 630;
+    right: 12px;
+    bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + 70px);
+    left: 12px;
+    max-height: min(58vh, 520px);
+    margin: 0;
     padding: 12px;
+    overflow-y: auto;
+    border-color: rgba(71, 85, 105, .88);
+    background: rgba(13, 19, 32, .985);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .42);
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition: opacity .15s ease, transform .18s ease, visibility .18s ease;
+    backdrop-filter: blur(18px);
+  }
+
+  .watchlist-controls.is-mobile-collapsed {
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(14px);
+    visibility: hidden;
   }
 
   .watchlist-controls__heading {
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
 
   .watchlist-controls__heading p {
@@ -28,15 +54,20 @@
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
-    min-height: 34px;
-    padding: 5px 10px;
-    border: 1px solid rgba(129, 140, 248, .34);
+    min-height: 36px;
+    padding: 5px 11px;
+    border: 1px solid rgba(129, 140, 248, .42);
     border-radius: 999px;
-    background: rgba(99, 102, 241, .10);
-    color: #c7d2fe;
+    background: rgba(99, 102, 241, .13);
+    color: #d7dcff;
     cursor: pointer;
     font-size: .67rem;
-    font-weight: 760;
+    font-weight: 780;
+  }
+
+  .context-controls .watchlist-mobile-toggle {
+    min-height: 38px;
+    white-space: nowrap;
   }
 
   .watchlist-mobile-toggle:focus-visible {
@@ -55,12 +86,8 @@
     transform: rotate(180deg);
   }
 
-  .watchlist-controls.is-mobile-collapsed .watchlist-topic-group:not(.watchlist-topic-group--all) {
-    display: none;
-  }
-
-  .watchlist-controls.is-mobile-collapsed .watchlist-topic-groups {
-    gap: 0;
+  .watchlist-topic-groups {
+    gap: 11px;
   }
 
   .watchlist-topic-group {
@@ -90,6 +117,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .watchlist-controls,
   .watchlist-mobile-toggle__chevron {
     transition: none;
   }

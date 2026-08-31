@@ -185,16 +185,35 @@
   border-color: rgba(99, 102, 241, .14);
 }
 
-@media (max-width: 620px) {
-  .entity-lens-controls {
-    display: grid;
-    gap: 12px;
-    padding: 13px;
+@media (max-width: 767px) {
+  .entity-lens-panel {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
   }
 
-  .entity-lens-select-label {
+  #peopleOrganizationsRefresh {
+    display: none !important;
+  }
+
+  .entity-lens-controls {
+    display: none;
+  }
+
+  .context-controls .entity-lens-select-label {
+    display: block;
+    width: min(62vw, 360px);
     min-width: 0;
-    width: 100%;
+  }
+
+  .context-controls .entity-lens-select-label > span {
+    display: none;
+  }
+
+  .context-controls .entity-lens-select {
+    min-height: 38px;
+    padding: 7px 30px 7px 10px;
+    border-color: rgba(71, 85, 105, .88);
+    background: rgba(17, 24, 39, .94);
+    font-size: .67rem;
   }
 
   .entity-coverage > summary {
