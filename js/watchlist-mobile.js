@@ -64,13 +64,24 @@ export function initWatchlistMobileRefinement() {
     setCollapsed(controls, button, true);
   }
 
+  function syncRoute() {
+    if (media.matches && document.body.dataset.primaryView !== "watchlist") {
+      setCollapsed(controls, button, true);
+    }
+  }
+
+  const routeObserver = new MutationObserver(syncRoute);
+  routeObserver.observe(document.body, { attributes: true, attributeFilter: ["data-primary-view"] });
+
   button.addEventListener("click", onToggle);
   controls.addEventListener("click", onTopicSelection);
   media.addEventListener?.("change", applyViewport);
   applyViewport();
+  syncRoute();
 
   return Object.freeze({
     destroy() {
+      routeObserver.disconnect();
       button.removeEventListener("click", onToggle);
       controls.removeEventListener("click", onTopicSelection);
       media.removeEventListener?.("change", applyViewport);
