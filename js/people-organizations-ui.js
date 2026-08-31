@@ -154,7 +154,7 @@ function renderCoverageInventory() {
   if (!list) return;
   list.replaceChildren();
 
-  monitoredEntitySourceCoverage()
+  [...monitoredEntitySourceCoverage()]
     .sort((a, b) => stateRank(a.entity.monitoringState) - stateRank(b.entity.monitoringState)
       || entityTypeRank(a.entity.type) - entityTypeRank(b.entity.type)
       || a.entity.name.localeCompare(b.entity.name))
