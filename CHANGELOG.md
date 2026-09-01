@@ -2,9 +2,10 @@
 
 This changelog is a high-level orientation layer over the repository's detailed pull-request history. PR descriptions and implementation audits remain the authoritative transaction records.
 
-## Unreleased — Repository handoff remediation
+## Unreleased — v10 visible-lens migration
 
-- Reframed root documentation around the PierView.io personal-intelligence product direction while preserving Intelligence Hub runtime compatibility naming.
+- PR #35 — added **V10-M09 Products & Platforms** as a visible lens over the shared canonical store/runtime lens service, with deterministic meaningful-change filtering, child Product inheritance, shared mobile controls, retry routing, and Saved behavior.
+- Repository handoff remediation reframed root documentation around the PierView.io personal-intelligence product direction while preserving Intelligence Hub runtime compatibility naming.
 - Added canonical present-state and agent/developer handoff documents.
 - Added stable v10 milestone IDs to eliminate ambiguous phase-number references.
 - Added repository authority/legacy map.
