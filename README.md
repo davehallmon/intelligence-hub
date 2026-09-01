@@ -15,8 +15,9 @@ The current GitHub Pages application combines a static Launchpad with live brows
 - canonical v10 configuration for people, organizations, products, publications, media, communities, research sources, topics, connectors, and lenses;
 - one shared canonical session item store beneath the existing source loaders;
 - reusable v10 lens read models over that shared store;
-- visible **Watchlist** and **People & Organizations** v10 lenses;
-- shared mobile Pull-to-Refresh, bottom controls, retry routing, and Saved behavior across the first visible v10 lenses.
+- visible **Watchlist**, **People & Organizations**, and **Products & Platforms** v10 lenses;
+- deterministic Product-change filtering that favors explicit model, feature, workflow/UI, integration, and documentation changes while preserving an All matched items view;
+- shared mobile Pull-to-Refresh, bottom controls, retry routing, and Saved behavior across the visible v10 lenses.
 
 ## Where the product is going
 
@@ -78,6 +79,7 @@ The current v9.x UI/runtime compatibility rules remain governed by [`TECHNICAL_S
 | `js/normalize.js`, `js/intelligence-object.js` | Normalization and v10 relationship/provenance enrichment |
 | `js/item-store.js` | Shared session-scoped canonical item store |
 | `js/lens-read-model.js`, `js/lens-service.js` | Pure lens selection plus runtime read service |
+| `js/product-change-classifier.js`, `js/products-platforms-ui.js` | Deterministic Product-change presentation and visible Products & Platforms lens |
 | `js/tests/` | Development-time acceptance fixtures and structural validators |
 | `docs/architecture/` | Product/information architecture and migration authority |
 | `docs/configuration/` | Ratified product configuration |
@@ -123,4 +125,4 @@ GitHub Pages publishes from the `main` branch and repository root. A successful 
 
 ## Current status
 
-The last runtime milestone on `main` before the repository-handoff remediation is PR #28, which integrated Watchlist and People & Organizations into the shared mobile shell. Continue from [`STATUS.md`](STATUS.md), not from a bare phase number in an older audit note.
+**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone is **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.

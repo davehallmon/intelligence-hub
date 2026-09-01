@@ -3,7 +3,8 @@
 **Status authority:** Current implementation/handoff state  
 **Last reconciled:** 2026-08-31  
 **Repository:** `davehallmon/intelligence-hub`  
-**Runtime baseline reconciled:** `815155efc5db83477bc523b967e87186d1d771b5` (merge of PR #28)
+**V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
+**Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -48,6 +49,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 | V10-M06 | Runtime lens service | Complete | PR #24 |
 | V10-M07 | Visible Watchlist lens | Complete | PR #25; mobile refinement PR #26 |
 | V10-M08 | Visible People & Organizations lens | Complete | PR #27; shared mobile-shell integration PR #28 |
+| V10-M09 | Visible Products & Platforms lens | Complete | PR #35 |
 
 ## Current visible v10 lenses
 
@@ -56,7 +58,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 - Priority + Active continuous topics only.
 - Uses the shared source loaders, canonical store, runtime lens service, and Watchlist read model.
 - Preserves the Watchlist / Library boundary.
-- Mobile uses the shared Phase 4 Pull-to-Refresh and scroll-aware bottom-control shell.
+- Mobile uses the shared Pull-to-Refresh and scroll-aware bottom-control shell.
 
 ### People & Organizations
 
@@ -66,43 +68,59 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 - Source coverage is explicitly classified as Direct, Shared, Discovery, Related, or Gap.
 - Mobile uses the same shared Pull-to-Refresh, bottom controls, retry routing, and Saved-star infrastructure as Watchlist.
 
+### Products & Platforms
+
+- 6 Priority + 10 Active continuously monitored Products.
+- Parked Products remain explicitly queryable but are not continuous defaults.
+- Child capabilities inherit monitored parents where ratified: `Claude Skills → Claude` and `Custom GPTs → ChatGPT`.
+- STORM remains outside continuous Product monitoring and is normalized toward Research/Questions.
+- The default visible view favors deterministic meaningful changes: model, feature, workflow/UI, integration, and documentation/release-note changes.
+- **All matched items** remains available so generic canonical Product matches are not destroyed by the presentation filter.
+- Match reasons come from the existing Products & Platforms read model.
+- Mobile reuses the shared Pull-to-Refresh, bottom controls, retry routing, and Saved-star infrastructure; no Product-specific gesture or persistence system was added.
+
 ## Verification state
 
 ### Automated / structural evidence
 
-- Multiple implementation PRs recorded `node --check` validation during development.
-- Phase-specific validation fixtures exist under `js/tests/` and `js/config/validate-foundation.js`.
-- GitHub Pages deployment after PR #28 succeeded.
-- Repository-handoff remediation PR #29 adds the canonical `npm run validate` command and GitHub Actions workflow.
-- PR #29's first complete GitHub Actions validation run passed, executing JavaScript syntax checks, the existing v10 validation suites, the corrected shared-item-store fixture, shared mobile-shell structural checks, and repository handoff/accessibility contract checks.
+- The canonical validation command is `npm run validate`.
+- GitHub Actions runs the same validation on pull requests and pushes to `main`.
+- PR #35 GitHub Actions run `33453616480`, job `99688760361`, passed on the merge ref.
+- That run syntax-checked 58 JavaScript files and passed foundation, normalization, connector, lens read-model, shared item-store, runtime lens-service, Watchlist, People & Organizations, Products & Platforms, shared mobile-shell, and repository contract/accessibility validation.
+- Dedicated V10-M09 fixtures verify the ratified 6/10 Product counts, child inheritance, Parked boundaries, meaningful-change classification, generic-mention filtering, all-match preservation, non-mutating newest-first sorting, and shared navigation/mobile/Saved/retry wiring.
 
 ### Manual acceptance still required
 
-A successful static deployment or source validation run is not a substitute for live browser/device testing. PR #28's documented iPhone acceptance checklist has **not been recorded in the repository as completed**. Treat it as pending manual confirmation until a human records the result.
+A successful static deployment or source validation run is not a substitute for live browser/device testing.
+
+- **Issue #30:** PR #28's documented iPhone acceptance checklist has still not been recorded as completed. It remains a separate human verification item.
+- **V10-M09:** rendered Products & Platforms behavior should be smoke-tested after deployment on mobile and desktop, including selector behavior, Pull-to-Refresh, Saved persistence, loading/empty/error/retry states, and remote-feed/CORS behavior.
+
+Do not represent either manual browser/device boundary as completed without recorded evidence.
 
 ## Next implementation milestone
 
-**V10-M09 — Products & Platforms visible migration**
+**V10-M10 — Publications & Media migration**
 
-This is the next product milestone after repository-governance remediation.
+Expected direction from the ratified architecture/migration plan:
 
-Expected boundaries:
-
-- use the existing canonical Product entities and parent/child relationships;
-- use the shared canonical store and runtime lens service;
-- do not create a product-specific ingestion silo;
-- preserve existing My Feed ranking and Saved semantics;
-- distinguish meaningful product/workflow changes from generic changelog volume;
-- do not implement Focus ranking early.
+- migrate Publications and Media using their canonical entities and current source relationships;
+- continue reusing the shared item store and runtime lens service;
+- preserve distinctions among authored-by, published-by, featuring, about/mentioned, and endpoint ownership;
+- preserve primary-source anchoring and cross-lens reuse of one intelligence object;
+- do not turn YouTube into a separate v10 lens when it is a connector/format for canonical Media or entity endpoints;
+- do not implement later Research, Communities, Signals, or Focus behavior early.
 
 ## Known gaps / unresolved items
 
-1. **Live iPhone acceptance for PR #28** — pending a recorded human smoke test.
-2. **Source expansion** — many Priority/Active People and Organizations still have explicit source gaps; endpoint verification must precede adding new sources.
-3. **Mockup binaries** — `assets/mockups/README.md` indexes the design references, but the image binaries are not currently stored in the repository.
-4. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
-5. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
-6. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
+1. **Live iPhone acceptance for PR #28** — Issue #30 remains pending a recorded human smoke test.
+2. **V10-M09 browser/device acceptance** — automated validation passed; live rendered Product-lens acceptance remains to be recorded after deployment.
+3. **Source expansion** — many monitored entities still have explicit source gaps; endpoint verification must precede adding new sources.
+4. **Product-change classifier tuning** — deterministic first implementation may need evidence-based tuning from observed live false positives/false negatives; do not silently convert it into hidden ranking or Focus logic.
+5. **Mockup binaries** — `assets/mockups/README.md` indexes the design references, but the image binaries are not currently stored in the repository.
+6. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
+7. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
+8. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
 
 ## Authority order for handoff
 

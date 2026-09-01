@@ -26,8 +26,8 @@ Stable milestone IDs and names below are authoritative for handoff, PR scope, st
 | V10-M06 | Runtime lens service | — inserted | 6 | Complete — PR #24 |
 | V10-M07 | Watchlist visible migration | 5 | 7 | Complete — PRs #25–26 |
 | V10-M08 | People & Organizations visible migration | 6 | 8 | Complete — PRs #27–28 |
-| V10-M09 | Products & Platforms visible migration | 7 | 9 | **Next product milestone** |
-| V10-M10 | Publications & Media migration | 8 | 10 | Planned |
+| V10-M09 | Products & Platforms visible migration | 7 | 9 | Complete — PR #35 |
+| V10-M10 | Publications & Media migration | 8 | 10 | **Next product milestone** |
 | V10-M11 | Research migration | 9 | 11 | Planned |
 | V10-M12 | Communities migration | 10 | 12 | Planned |
 | V10-M13 | Events & Learning migration | 11 | 13 | Planned |
@@ -41,11 +41,11 @@ Stable milestone IDs and names below are authoritative for handoff, PR scope, st
 
 A valid future instruction should say, for example:
 
-> Continue **V10-M09 — Products & Platforms visible migration**.
+> Continue **V10-M10 — Publications & Media migration**.
 
 A bare instruction such as:
 
-> Continue Phase 9.
+> Continue Phase 10.
 
 is ambiguous and must be reconciled against `STATUS.md` and this file before implementation.
 
@@ -53,7 +53,7 @@ is ambiguous and must be reconciled against `STATUS.md` and this file before imp
 
 `MIGRATION_PLAN.md` remains the detailed scope/acceptance roadmap. Read its named milestone sections for requirements, but translate any old numeric ordinal through this map.
 
-The detailed Product & Platforms requirements originally written under “Phase 7” therefore govern **V10-M09**. The detailed Publications & Media requirements originally written under “Phase 8” govern **V10-M10**, and so on.
+The detailed Product & Platforms requirements originally written under “Phase 7” govern **V10-M09**. The detailed Publications & Media requirements originally written under “Phase 8” govern **V10-M10**, and so on.
 
 ## Change rule
 

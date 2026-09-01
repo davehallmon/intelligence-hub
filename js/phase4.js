@@ -6,7 +6,7 @@ const MAX_PULL_DISTANCE = 118;
 const V10_MOBILE_SHELL_QUERY = "(max-width: 767px)";
 const mobileShellMedia = window.matchMedia(V10_MOBILE_SHELL_QUERY);
 const REFRESHABLE_TABS = new Set([
-  "myfeed", "watchlist", "people-organizations", "news", "socials", "academic", "research", "video", "books"
+  "myfeed", "watchlist", "people-organizations", "products-platforms", "news", "socials", "academic", "research", "video", "books"
 ]);
 
 const COMMUNITY_LINKS = Object.freeze([
@@ -18,6 +18,7 @@ const CONTROL_LABELS = Object.freeze({
   myfeed: { route: "My Feed", topic: "Topics", person: "Figures", organization: "Organizations" },
   watchlist: { route: "Watchlist", topic: "Topics", person: "Figures", organization: "Organizations" },
   "people-organizations": { route: "People & Orgs", topic: "Topics", person: "People", organization: "Organizations" },
+  "products-platforms": { route: "Products", topic: "Signals", person: "Products", organization: "Platforms" },
   news: { route: "News", topic: "Topics", person: "Figures", organization: "Regions / Orgs" },
   socials: { route: "Socials", topic: "Topics", person: "Figures", organization: "Organizations" },
   academic: { route: "Academic", topic: "Fields", person: "Authors", organization: "Journals / Institutions" },
@@ -477,7 +478,7 @@ function decorateAllFeedCards(root = document) {
 
 function bindSavedCardObservers() {
   const containers = [
-    "myFeedAttention", "myFeedFeed", "watchlistFeed", "peopleOrganizationsFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
+    "myFeedAttention", "myFeedFeed", "watchlistFeed", "peopleOrganizationsFeed", "productsPlatformsFeed", "newsFeed", "socialsFeed", "academicFeed", "researchFeed", "videoFeed", "booksFeed"
   ].map(id => document.getElementById(id)).filter(Boolean);
 
   containers.forEach(container => {
@@ -549,6 +550,12 @@ function restoreV10InlineControls() {
   if (entityLabel && entityControls && entityLabel.parentElement !== entityControls) {
     entityControls.append(entityLabel);
   }
+
+  const productInputs = document.querySelector(".product-lens-controls__inputs");
+  const productControls = document.querySelector(".product-lens-controls");
+  if (productInputs && productControls && productInputs.parentElement !== productControls) {
+    productControls.append(productInputs);
+  }
 }
 
 function appendV10MobileControls(tab, filtersHost, actionsHost) {
@@ -563,6 +570,12 @@ function appendV10MobileControls(tab, filtersHost, actionsHost) {
   if (tab === "people-organizations") {
     const label = document.querySelector(".entity-lens-select-label");
     if (label) filtersHost.append(label);
+    return true;
+  }
+
+  if (tab === "products-platforms") {
+    const inputs = document.querySelector(".product-lens-controls__inputs");
+    if (inputs) filtersHost.append(inputs);
     return true;
   }
 
@@ -587,7 +600,7 @@ function syncBottomControls() {
     return;
   }
 
-  if ((tab === "watchlist" || tab === "people-organizations") && !mobileShellMedia.matches) {
+  if (["watchlist", "people-organizations", "products-platforms"].includes(tab) && !mobileShellMedia.matches) {
     bar.hidden = true;
     return;
   }
@@ -790,6 +803,7 @@ function bindPullToRefresh() {
     const tab = ({
       watchlistFeed: "watchlist",
       peopleOrganizationsFeed: "people-organizations",
+      productsPlatformsFeed: "products-platforms",
       newsFeed: "news",
       socialsFeed: "socials",
       academicFeed: "academic",

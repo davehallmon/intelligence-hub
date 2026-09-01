@@ -8,6 +8,7 @@ import { MY_FEED_SOURCE_TABS } from "./my-feed-config.js";
 import { initWatchlistUI } from "./watchlist-ui.js";
 import { initWatchlistMobileRefinement } from "./watchlist-mobile.js";
 import { initPeopleOrganizationsUI } from "./people-organizations-ui.js";
+import { initProductsPlatformsUI } from "./products-platforms-ui.js";
 import { initUIFoundation, decorateUIFoundation } from "./main.js";
 import { initPhase4UX } from "./phase4.js";
 
@@ -36,14 +37,21 @@ const peopleOrganizations = initPeopleOrganizationsUI({
   loadSources: loadLensSources
 });
 
+const productsPlatforms = initProductsPlatformsUI({
+  queryLens(lensId, options = {}) {
+    return RUNTIME_LENS_SERVICE.query(lensId, options);
+  },
+  loadSources: loadLensSources
+});
+
 initV81UI();
 decorateUIFoundation();
 const feeds = createFeedDashboard();
 
 // Internal v10 runtime read API. It intentionally exposes no item-store mutation
-// methods; Phase 8 adds the second visible lens on top of the same read service.
+// methods; V10-M09 adds the Products & Platforms lens on the same read service.
 window.intelligenceHubV10 = Object.freeze({
-  phase: 8,
+  milestone: "V10-M09",
   queryLens(lensId, options = {}) {
     return RUNTIME_LENS_SERVICE.query(lensId, options);
   },
@@ -73,6 +81,9 @@ initSettings({
       if (active === "people-organizations") {
         peopleOrganizations.load().catch(error => console.error("Unable to reload People & Organizations:", error));
       }
+      if (active === "products-platforms") {
+        productsPlatforms.load().catch(error => console.error("Unable to reload Products & Platforms:", error));
+      }
     }, 0);
   }
 });
@@ -87,6 +98,10 @@ const navigation = initNavigation({
       peopleOrganizations.load().catch(error => console.error("Unable to load People & Organizations:", error));
       return;
     }
+    if (tab === "products-platforms") {
+      productsPlatforms.load().catch(error => console.error("Unable to load Products & Platforms:", error));
+      return;
+    }
     if (tab !== "launchpad") {
       feeds.load(tab).catch(error => console.error(`Unable to load ${tab}:`, error));
     }
@@ -98,6 +113,7 @@ initPhase4UX({
   async refresh(tab) {
     if (tab === "watchlist") return watchlist.load({ force: true });
     if (tab === "people-organizations") return peopleOrganizations.load({ force: true });
+    if (tab === "products-platforms") return productsPlatforms.load({ force: true });
     if (tab !== "myfeed") feeds.invalidate("myfeed");
     feeds.invalidate(tab);
     return feeds.load(tab, { force: true });
