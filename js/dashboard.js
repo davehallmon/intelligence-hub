@@ -51,7 +51,6 @@ const feeds = createFeedDashboard();
 // Internal v10 runtime read API. It intentionally exposes no item-store mutation
 // methods; V10-M09 adds the Products & Platforms lens on the same read service.
 window.intelligenceHubV10 = Object.freeze({
-  phase: 9,
   milestone: "V10-M09",
   queryLens(lensId, options = {}) {
     return RUNTIME_LENS_SERVICE.query(lensId, options);
