@@ -44,22 +44,24 @@ Ratified documentation
 
 Focus is intentionally last because it depends on nearly every other model being trustworthy.
 
+Stable milestone IDs are governed by [`V10_MILESTONE_MAP.md`](V10_MILESTONE_MAP.md). The original planning ordinals remain below only as historical cross-references.
+
 ---
 
-# Phase 0 — Architecture ratification
+## Original Phase 0 / V10-M00 — Architecture ratification
 
-## Scope
+### Scope
 
 Documentation only.
 
-### Deliverables
+#### Deliverables
 
 - `docs/architecture/PRODUCT_ARCHITECTURE.md`
 - `docs/architecture/INFORMATION_ARCHITECTURE.md`
 - `docs/configuration/RATIFIED_CONFIGURATION.md`
 - `docs/architecture/MIGRATION_PLAN.md`
 
-### Forbidden changes
+#### Forbidden changes
 
 - HTML
 - CSS
@@ -68,7 +70,7 @@ Documentation only.
 - ranking
 - Saved/local storage behavior
 
-### Acceptance criteria
+#### Acceptance criteria
 
 - exactly documentation/configuration governance files are added/changed;
 - current application remains byte-for-byte unchanged outside documentation;
@@ -77,13 +79,13 @@ Documentation only.
 
 ---
 
-# Phase 1 — Canonical configuration and entity foundation
+## Original Phase 1 / V10-M01 — Canonical configuration and entity foundation
 
-## Goal
+### Goal
 
 Introduce the target data model underneath the existing UI while preserving current visible behavior.
 
-## Likely modules
+### Likely modules
 
 Names are illustrative; implementation may refine them without changing responsibility boundaries.
 
@@ -99,7 +101,7 @@ Names are illustrative; implementation may refine them without changing responsi
   catalog.js
 ```
 
-## Work
+### Work
 
 1. Create a canonical entity registry supporting:
    - Person
@@ -116,13 +118,13 @@ Names are illustrative; implementation may refine them without changing responsi
 6. Introduce source-endpoint declarations without replacing working connectors.
 7. Encode lens configuration separately from entity existence.
 
-## Critical rule
+### Critical rule
 
 **Bookmark != monitored entity.**
 
 Existing bookmark/destination data may establish a known entity or Launchpad destination, but must not automatically grant Active/Priority monitoring.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - current app renders and behaves as before;
 - old profile IDs map deterministically to canonical entity IDs;
@@ -132,13 +134,13 @@ Existing bookmark/destination data may establish a known entity or Launchpad des
 
 ---
 
-# Phase 2 — Normalized Intelligence Object v10 relationships
+## Original Phase 2 / V10-M02 — Normalized Intelligence Object v10 relationships
 
-## Goal
+### Goal
 
 Extend the existing normalization layer so one item can relate to several entities and lenses without duplication.
 
-## Work
+### Work
 
 1. Preserve current normalized fields.
 2. Add relationship fields for:
@@ -157,7 +159,7 @@ Extend the existing normalization layer so one item can relate to several entiti
 5. Add relationship hooks for Questions, Library, and future story clusters.
 6. Add parent/child product relationship resolution.
 
-## Tests / verification
+### Tests / verification
 
 At minimum, fixtures should cover:
 
@@ -168,7 +170,7 @@ At minimum, fixtures should cover:
 - Priority-person guest appearance on an otherwise unmonitored channel;
 - private-source provenance preserved.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - one incoming item normalizes once;
 - one object can be selected by multiple lenses;
@@ -177,13 +179,13 @@ At minimum, fixtures should cover:
 
 ---
 
-# Phase 3 — Connector catalog and source-endpoint registry
+## Original Phase 3 / V10-M03 — Connector catalog and source-endpoint registry
 
-## Goal
+### Goal
 
 Separate **what exists** from **how it is ingested**.
 
-## Work
+### Work
 
 1. Register reusable connector types.
 2. Declare supported selector types per connector.
@@ -192,7 +194,7 @@ Separate **what exists** from **how it is ingested**.
 5. Add explicit distinction between evidence sources and discovery connectors.
 6. Add endpoint health/capability metadata where practical.
 
-## YouTube requirement
+### YouTube requirement
 
 YouTube must support:
 
@@ -204,7 +206,7 @@ YouTube must support:
 - transcript enrichment when feasible;
 - Shorts exclusion by default.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - the same connector implementation can serve multiple lenses/entities;
 - endpoint identity is not conflated with canonical entity identity;
@@ -212,13 +214,13 @@ YouTube must support:
 
 ---
 
-# Phase 4 — Lens engine
+## Original Phase 4 / V10-M04 — Lens engine
 
-## Goal
+### Goal
 
 Introduce a reusable lens-selection engine while existing tabs can still coexist during transition.
 
-## Work
+### Work
 
 1. Implement generic lens configuration:
    - entity selectors
@@ -232,21 +234,30 @@ Introduce a reusable lens-selection engine while existing tabs can still coexist
 3. Support multi-lens eligibility for one object.
 4. Preserve current route behavior until each visible lens is migrated.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - a single normalized object can appear logically in several lens results without data duplication;
 - lens behavior is configuration-driven rather than source-type hard-coded;
 - legacy source-type feeds can remain available during transition.
 
+### Inserted runtime-foundation milestones
+
+Implementation added two stable milestones that were not separate numbered phases in the original plan:
+
+- **V10-M05 — Shared canonical item store** — complete in PR #23;
+- **V10-M06 — Runtime lens service** — complete in PR #24.
+
+These insertions are why later original planning ordinals do not match implementation ordinals.
+
 ---
 
-# Phase 5 — Watchlist migration
+## Original Phase 5 / V10-M07 — Watchlist migration
 
-## Goal
+### Goal
 
 Make Watchlist the first visible v10 intelligence lens because its topic/facet configuration is already strongly ratified.
 
-## Work
+### Work
 
 - encode 5 Priority + 7 Active topics;
 - encode Core/Secondary/Parked facets;
@@ -254,7 +265,7 @@ Make Watchlist the first visible v10 intelligence lens because its topic/facet c
 - support include/exclude/search rules;
 - keep Parked topics searchable but non-continuous.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - no more than the ratified topics are continuously monitored;
 - parked topics do not leak into continuous monitoring merely because they exist in the taxonomy;
@@ -262,13 +273,13 @@ Make Watchlist the first visible v10 intelligence lens because its topic/facet c
 
 ---
 
-# Phase 6 — People & Organizations migration
+## Original Phase 6 / V10-M08 — People & Organizations migration
 
-## Goal
+### Goal
 
 Replace profile-as-feed assumptions with canonical entity monitoring.
 
-## Work
+### Work
 
 - encode ratified Priority/Active/Parked people;
 - implement authored/social/appearance preferences for Priority people;
@@ -276,7 +287,7 @@ Replace profile-as-feed assumptions with canonical entity monitoring.
 - support authoredBy / publishedBy / featuring / about distinctions;
 - attach newsletters, blogs, social profiles, YouTube, podcasts, research, and event endpoints to one entity.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - a person is never duplicated merely because they publish in several formats;
 - general press mentions are not treated as authored work;
@@ -284,13 +295,13 @@ Replace profile-as-feed assumptions with canonical entity monitoring.
 
 ---
 
-# Phase 7 — Products & Platforms migration
+## Original Phase 7 / V10-M09 — Products & Platforms migration
 
-## Goal
+### Goal
 
 Monitor meaningful workflow-affecting changes with parent/child product relationships.
 
-## Work
+### Work
 
 - encode Priority/Active/Parked products;
 - support child capabilities such as Claude Skills and Custom GPTs;
@@ -298,7 +309,7 @@ Monitor meaningful workflow-affecting changes with parent/child product relation
 - implement relevance rules for previews/experimental products;
 - avoid treating every changelog entry as important.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - parent/child product hierarchy works;
 - product updates can also relate to parent organization without duplicate items;
@@ -306,20 +317,45 @@ Monitor meaningful workflow-affecting changes with parent/child product relation
 
 ---
 
-# Phase 8 — Publications & Media migration
+## V10-M09A — Repository Structure Normalization
 
-## Goal
+### Goal
+
+Establish a durable repository structure before additional visible lenses arrive, without changing deployed behavior or removing active compatibility paths.
+
+### Work
+
+- archive indexed historical release documentation;
+- delete only source proven unreachable from production and validation entry points;
+- enforce JavaScript reachability and local-resource checks;
+- establish short-lived branch and pull-request lifecycle guidance;
+- move current lens modules, lens styles, and Node-only tests into durable responsibility-based locations;
+- preserve runtime load order, stylesheet cascade, object identity, and GitHub Pages behavior.
+
+### Acceptance criteria
+
+- repository validation passes;
+- no intentional product behavior or visual change occurs;
+- historical evidence remains discoverable;
+- production-active compatibility files remain until parity exists;
+- V10-M10 begins in the normalized directory and naming contract.
+
+---
+
+## Original Phase 8 / V10-M10 — Publications & Media migration
+
+### Goal
 
 Unify editorial and long-form audiovisual monitoring while preserving format distinctions.
 
-## Publications work
+### Publications work
 
 - Core/Active/Parked publication configuration;
 - canonical-article resolution across RSS/email/web;
 - primary-source preference in story relationships;
 - Analysis/Opinion evidence labels.
 
-## Media work
+### Media work
 
 - Core/Active/Parked Media properties;
 - episode trigger rules;
@@ -328,7 +364,7 @@ Unify editorial and long-form audiovisual monitoring while preserving format dis
 - multi-format canonical episode;
 - Priority-person guest discovery.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - newsletter/podcast/video copies of one episode do not become duplicate objects;
 - person-owned outlets attach to Person where appropriate;
@@ -336,13 +372,13 @@ Unify editorial and long-form audiovisual monitoring while preserving format dis
 
 ---
 
-# Phase 9 — Research migration
+## Original Phase 9 / V10-M11 — Research migration
 
-## Goal
+### Goal
 
 Replace the generic arXiv-heavy feed with an evidence-oriented research lens.
 
-## Work
+### Work
 
 - Core/Active/Parked Research domains;
 - approved/parked Research sources;
@@ -352,7 +388,7 @@ Replace the generic arXiv-heavy feed with an evidence-oriented research lens.
 - methodology and publication-status presentation;
 - research-specific Focus eligibility.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - general frontier-model research is not overrepresented merely because it is easy to ingest;
 - research cards expose method, sample, limitations, status, and why-it-matters;
@@ -360,13 +396,13 @@ Replace the generic arXiv-heavy feed with an evidence-oriented research lens.
 
 ---
 
-# Phase 10 — Communities migration
+## Original Phase 10 / V10-M12 — Communities migration
 
-## Goal
+### Goal
 
 Capture practitioner signals without building a social engagement feed.
 
-## Preflight requirement
+### Preflight requirement
 
 Before wiring new communities:
 
@@ -375,7 +411,7 @@ Before wiring new communities:
 - verify practical feed/API accessibility;
 - resolve the specific Core ingestion behavior for `r/WritingWithAI`.
 
-## Work
+### Work
 
 - Core/Active/Parked community configuration;
 - practical-evidence preferences;
@@ -383,7 +419,7 @@ Before wiring new communities:
 - unverified-community-report state;
 - official-confirmation update path.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - popularity alone never promotes a post;
 - repeated reports may cluster into one community signal;
@@ -391,13 +427,13 @@ Before wiring new communities:
 
 ---
 
-# Phase 11 — Events & Learning migration
+## Original Phase 11 / V10-M13 — Events & Learning migration
 
-## Goal
+### Goal
 
 Create an actionable opportunity lens rather than a generic calendar/event feed.
 
-## Work
+### Work
 
 - opportunity-type preferences;
 - Core/Active/Parked learning domains;
@@ -407,7 +443,7 @@ Create an actionable opportunity lens rather than a generic calendar/event feed.
 - Save / Calendar / Reminder actions;
 - post-event conversion into Media/Library material.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - only exceptional opportunities qualify for Focus;
 - event prestige/popularity does not substitute for applicability;
@@ -415,54 +451,54 @@ Create an actionable opportunity lens rather than a generic calendar/event feed.
 
 ---
 
-# Phase 12 — Library, Saved, Bookmarks, Personal
+## Original Phase 12 / V10-M14 — Library, Saved, Bookmarks, Personal
 
-## Goal
+### Goal
 
 Formalize personal-state boundaries without collapsing them into one storage bucket.
 
-## Work
+### Work
 
-### Library
+#### Library
 
 - incorporate approved Library content types;
 - full-text and related-knowledge search;
 - previous-encounter and contradiction support;
 - Library-to-Focus relevance signal.
 
-### Saved
+#### Saved
 
 - preserve current star behavior;
 - add read/unread/archive state;
 - AI classification with correction;
 - separate Saved from Library promotion.
 
-### Bookmarks
+#### Bookmarks
 
 - preserve Launchpad/directory behavior;
 - known-entity mapping;
 - no automatic monitoring.
 
-### Personal
+#### Personal
 
 - support approved manual/private inputs;
 - suggest lens/entity classification for approval;
 - enforce private provenance and Focus exclusion.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - `Library = learned`, `Saved = keep`, `Bookmarks = go`, `Personal = add` remains observable in state/UI;
 - private content cannot silently leak into Focus or public-source claims.
 
 ---
 
-# Phase 13 — Questions
+## Original Phase 13 / V10-M15 — Questions
 
-## Goal
+### Goal
 
 Implement a persistent plan-first investigation workspace over the shared intelligence graph.
 
-## Work
+### Work
 
 - support all ratified Question modes;
 - create/approve research plan before execution;
@@ -474,7 +510,7 @@ Implement a persistent plan-first investigation workspace over the shared intell
 - Question ↔ Watchlist promotion paths;
 - maximum 5 monitored Questions.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - no substantial Question executes before approved plan;
 - private evidence remains visibly private;
@@ -483,13 +519,13 @@ Implement a persistent plan-first investigation workspace over the shared intell
 
 ---
 
-# Phase 14 — Story clustering and Signals engine
+## Original Phase 14 / V10-M16 — Story clustering and Signals engine
 
-## Goal
+### Goal
 
 Create the synthesis layer required before v10 Focus can safely replace the current ranking experience.
 
-## Work
+### Work
 
 - canonical duplicate resolution;
 - story cluster creation;
@@ -499,7 +535,7 @@ Create the synthesis layer required before v10 Focus can safely replace the curr
 - signal detection;
 - signal maturity state.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - one development does not flood Focus with near-duplicate cards;
 - clusters retain all constituent provenance;
@@ -508,13 +544,13 @@ Create the synthesis layer required before v10 Focus can safely replace the curr
 
 ---
 
-# Phase 15 — Focus v10
+## Original Phase 15 / V10-M17 — Focus v10
 
-## Goal
+### Goal
 
 Implement the final decision layer after the underlying data relationships are trustworthy.
 
-## Work
+### Work
 
 - ratified promotion weights;
 - hard eligibility rules;
@@ -531,7 +567,7 @@ Implement the final decision layer after the underlying data relationships are t
 - pull-not-push behavior;
 - continuous ingestion with materially slower attention refresh.
 
-## Acceptance criteria
+### Acceptance criteria
 
 The north-star test must be demonstrably supportable:
 
@@ -547,13 +583,13 @@ Additionally:
 
 ---
 
-# Phase 16 — Legacy cleanup
+## Original Phase 16 / V10-M18 — Legacy cleanup
 
-## Goal
+### Goal
 
 Remove legacy pathways only after migrated replacements have parity and regression evidence.
 
-## Work
+### Work
 
 - identify source-type tabs/modules no longer needed;
 - remove compatibility aliases incrementally;
@@ -561,13 +597,13 @@ Remove legacy pathways only after migrated replacements have parity and regressi
 - update root README and `TECHNICAL_SPEC.md` when v10 becomes the live authority;
 - document final v10 runtime structure.
 
-## Rule
+### Rule
 
 Legacy code is technical debt only after the replacement has proven safe. Do not delete working compatibility code early merely to make the repository look cleaner.
 
 ---
 
-# 17. Pull-request discipline
+## Pull-request discipline
 
 Each implementation PR should include:
 
@@ -587,13 +623,15 @@ Preferred implementation characteristic:
 
 ---
 
-# 18. Immediate next implementation PR after architecture ratification
+## Historical post-ratification starting point — completed
 
-After the specification PR merges, the recommended first runtime PR is:
+This section preserves the first implementation recommendation made when the architecture was ratified. The Configuration/Data Foundation work was completed in PR #19. It is no longer the current next action; use [`STATUS.md`](../../STATUS.md) and the stable milestone map for present sequencing.
+
+The recommended first runtime PR was:
 
 **Configuration/Data Foundation**
 
-Scope:
+Scope recorded at ratification:
 
 - canonical entity types;
 - ratified Priority/Active/Parked configuration;

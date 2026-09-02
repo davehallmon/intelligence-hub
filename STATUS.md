@@ -1,7 +1,7 @@
 # PierView.io / Intelligence Hub — Current State
 
 **Status authority:** Current implementation/handoff state  
-**Last reconciled:** 2026-08-31  
+**Last reconciled:** 2026-09-02
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
@@ -98,7 +98,15 @@ A successful static deployment or source validation run is not a substitute for 
 
 Do not represent either manual browser/device boundary as completed without recorded evidence.
 
-## Next implementation milestone
+## Active pre-M10 repository remediation
+
+**V10-M09A — Repository Structure Normalization** is the active bounded concern tracked in Issue #36.
+
+- M09A.1 archives historical release documentation, removes only proven-dead code, strengthens repository reachability validation, and establishes contributor/branch-lifecycle guidance.
+- M09A.2 moves current lens modules, lens styles, and Node-only tests into durable locations without intentional runtime behavior change.
+- Production-active compatibility files remain protected until their owning replacement milestones prove parity.
+
+## Next product milestone
 
 **V10-M10 — Publications & Media migration**
 
@@ -121,6 +129,7 @@ Expected direction from the ratified architecture/migration plan:
 6. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
 7. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
 8. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
+9. **Repository hygiene** — Issue #36 tracks merged-branch deletion, automatic branch cleanup, historical-document archival, dead-file removal, and forward directory normalization before M10.
 
 ## Authority order for handoff
 
