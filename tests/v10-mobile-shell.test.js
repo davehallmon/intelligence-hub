@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "../..");
+const root = path.resolve(here, "..");
 
 function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -14,9 +14,9 @@ function expect(source, snippet, label) {
 }
 
 const phase4 = read("js/phase4.js");
-const watchlistMobile = read("js/watchlist-mobile.js");
-const watchlistCss = read("watchlist-mobile.css");
-const peopleCss = read("people-organizations.css");
+const watchlistMobile = read("js/lenses/watchlist-mobile.js");
+const watchlistCss = read("css/lenses/watchlist-mobile.css");
+const peopleCss = read("css/lenses/people-organizations.css");
 
 expect(phase4, '"watchlist", "people-organizations"', "v10 refreshable routes");
 expect(phase4, '"watchlistFeed", "peopleOrganizationsFeed"', "v10 saved-card containers");

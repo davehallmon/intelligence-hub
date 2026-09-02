@@ -1,9 +1,9 @@
 // Intelligence Hub v10 — Phase 7 visible Watchlist lens.
 // This is a view over the runtime lens service, not a separate ingestion path.
 
-import { MONITORING_STATES } from "./config/entity-types.js";
-import { WATCHLIST_TOPICS, getWatchlistTopic } from "./config/topic-taxonomy.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "./renderers.js";
+import { MONITORING_STATES } from "../config/entity-types.js";
+import { WATCHLIST_TOPICS, getWatchlistTopic } from "../config/topic-taxonomy.js";
+import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
 
 const CONTINUOUS_STATES = new Set([
   MONITORING_STATES.PRIORITY,
@@ -11,10 +11,10 @@ const CONTINUOUS_STATES = new Set([
 ]);
 
 function ensureStylesheet() {
-  if (document.querySelector('link[href="watchlist.css"]')) return;
+  if (document.querySelector('link[href="css/lenses/watchlist.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "watchlist.css";
+  link.href = "css/lenses/watchlist.css";
   document.head.append(link);
 }
 

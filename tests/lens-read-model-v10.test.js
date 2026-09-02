@@ -1,14 +1,14 @@
 // Intelligence Hub v10 — Phase 4 lens read-model acceptance fixtures.
 // Pure development-time assertions; not imported by the live UI.
 
-import { normalizeFeedItem } from "../normalize.js";
+import { normalizeFeedItem } from "../js/normalize.js";
 import {
   QUERYABLE_LENS_IDS,
   buildLensReadModels,
   lensMembershipForItem,
   queryLens,
   watchlistTopicIdsForItem
-} from "../lens-read-model.js";
+} from "../js/lenses/lens-read-model.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

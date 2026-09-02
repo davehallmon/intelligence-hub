@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
-import { MONITORING_STATES } from "../config/entity-types.js";
-import { queryLens } from "../lens-read-model.js";
+import { MONITORING_STATES } from "../js/config/entity-types.js";
+import { queryLens } from "../js/lenses/lens-read-model.js";
 import {
   continuousWatchlistTopics,
   sortWatchlistEntries,
   watchlistTopicCounts
-} from "../watchlist-ui.js";
+} from "../js/lenses/watchlist-ui.js";
 
 const monitored = continuousWatchlistTopics();
 assert.equal(monitored.length, 12, "Watchlist continuous controls must expose exactly 12 ratified topics.");

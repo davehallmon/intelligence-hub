@@ -1,9 +1,9 @@
 // Intelligence Hub v10 — Phase 8 visible People & Organizations lens.
 // This is a read model over the shared canonical item store, not a new feed silo.
 
-import { ENTITY_TYPES, MONITORING_STATES } from "./config/entity-types.js";
-import { getEntity } from "./config/entities.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "./renderers.js";
+import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
+import { getEntity } from "../config/entities.js";
+import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
 import {
   coverageLabel,
   monitoredEntitySourceCoverage,
@@ -13,10 +13,10 @@ import {
 } from "./entity-source-coverage.js";
 
 function ensureStylesheet() {
-  if (document.querySelector('link[href="people-organizations.css"]')) return;
+  if (document.querySelector('link[href="css/lenses/people-organizations.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "people-organizations.css";
+  link.href = "css/lenses/people-organizations.css";
   document.head.append(link);
 }
 

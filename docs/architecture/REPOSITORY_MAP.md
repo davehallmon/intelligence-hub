@@ -38,23 +38,23 @@
 | `js/intelligence-object.js` | v10 relationship, evidence, provenance and canonicalization enrichment |
 | `js/normalize.js` | Current normalization seam that preserves legacy fields while adding v10 relationships |
 | `js/item-store.js` | Shared session-scoped canonical item store |
-| `js/lens-read-model.js` | Pure read-only lens selection |
-| `js/lens-service.js` | Runtime bridge from shared store to lens read models |
+| `js/lenses/lens-read-model.js` | Pure read-only lens selection |
+| `js/lenses/lens-service.js` | Runtime bridge from shared store to lens read models |
 
 ## 4. Current composition and visible v10 UI
 
 | Path | Responsibility |
 | --- | --- |
 | `js/dashboard.js` | Browser composition root; creates feeds, navigation, settings and visible v10 lenses |
-| `js/watchlist-ui.js` | Visible Watchlist lens over the shared read model |
-| `js/watchlist-mobile.js` | Watchlist mobile integration seam into the shared interaction shell |
-| `js/people-organizations-ui.js` | Visible People & Organizations lens over the shared read model |
-| `js/entity-source-coverage.js` | Explicit monitored-entity source coverage inventory |
-| `js/products-platforms-ui.js` | Visible Products & Platforms lens over the shared read model |
-| `js/product-change-classifier.js` | Deterministic meaningful Product-change presentation classification |
-| `watchlist.css`, `watchlist-mobile.css` | Current visible Watchlist styling |
-| `people-organizations.css` | Current visible People & Organizations styling |
-| `products-platforms.css` | Current visible Products & Platforms styling |
+| `js/lenses/watchlist-ui.js` | Visible Watchlist lens over the shared read model |
+| `js/lenses/watchlist-mobile.js` | Watchlist mobile integration seam into the shared interaction shell |
+| `js/lenses/people-organizations-ui.js` | Visible People & Organizations lens over the shared read model |
+| `js/lenses/entity-source-coverage.js` | Explicit monitored-entity source coverage inventory |
+| `js/lenses/products-platforms-ui.js` | Visible Products & Platforms lens over the shared read model |
+| `js/lenses/product-change-classifier.js` | Deterministic meaningful Product-change presentation classification |
+| `css/lenses/watchlist.css`, `css/lenses/watchlist-mobile.css` | Current visible Watchlist styling |
+| `css/lenses/people-organizations.css` | Current visible People & Organizations styling |
+| `css/lenses/products-platforms.css` | Current visible Products & Platforms styling |
 
 ## 5. Cross-route interaction authorities
 
@@ -118,9 +118,9 @@ These are valuable historical evidence. They are **not present-state authorities
 ## 9. Validation
 
 - `package.json` defines the canonical development-time validation command.
-- `scripts/validate.mjs` runs syntax, entry-point reachability, public configuration-surface, acceptance and structural checks.
+- `scripts/validate.mjs` runs syntax, entry-point reachability, production-resource, root-placement, public configuration-surface, acceptance and structural checks.
 - `js/config/validate-foundation.js` validates canonical configuration references and scarce-tier counts.
-- `js/tests/` contains phase/milestone acceptance fixtures.
+- `tests/` contains Node-only milestone acceptance fixtures using `<responsibility>.test.js` names.
 - `.github/workflows/validate.yml` runs the same validation on pull requests and `main`.
 
 Automated source validation does not replace deployed browser/device acceptance.

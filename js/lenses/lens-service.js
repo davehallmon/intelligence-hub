@@ -2,7 +2,7 @@
 // Bridges the shared canonical item store to the pure Phase 4 lens read model.
 // This module performs no ingestion, persistence, ranking, rendering, or navigation.
 
-import { SHARED_ITEM_STORE } from "./item-store.js";
+import { SHARED_ITEM_STORE } from "../item-store.js";
 import {
   QUERYABLE_LENS_IDS,
   queryLens,

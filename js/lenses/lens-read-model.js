@@ -2,12 +2,12 @@
 // Pure, read-only selectors over canonical intelligence objects. No ranking,
 // rendering, ingestion, storage, or navigation behavior lives here.
 
-import { getEntity } from "./config/entities.js";
-import { ENTITY_TYPES, MONITORING_STATES } from "./config/entity-types.js";
-import { getLens } from "./config/lenses.js";
-import { WATCHLIST_TOPICS } from "./config/topic-taxonomy.js";
-import { legacyTopicToWatchlistId } from "./config/legacy-map.js";
-import { EVIDENCE_TYPES } from "./config/evidence-types.js";
+import { getEntity } from "../config/entities.js";
+import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
+import { getLens } from "../config/lenses.js";
+import { WATCHLIST_TOPICS } from "../config/topic-taxonomy.js";
+import { legacyTopicToWatchlistId } from "../config/legacy-map.js";
+import { EVIDENCE_TYPES } from "../config/evidence-types.js";
 
 export const QUERYABLE_LENS_IDS = Object.freeze([
   "watchlist",

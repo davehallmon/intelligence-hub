@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
-import { MONITORING_STATES } from "../config/entity-types.js";
+import { MONITORING_STATES } from "../js/config/entity-types.js";
 import {
   SOURCE_COVERAGE_LEVELS,
   monitoredPeopleOrganizations,
   sourceCoverageForEntity,
   summarizeMonitoredEntitySourceCoverage
-} from "../entity-source-coverage.js";
-import { sortEntityLensEntries, sortedMonitoredEntities } from "../people-organizations-ui.js";
+} from "../js/lenses/entity-source-coverage.js";
+import { sortEntityLensEntries, sortedMonitoredEntities } from "../js/lenses/people-organizations-ui.js";
 
 const followed = monitoredPeopleOrganizations();
 const summary = summarizeMonitoredEntitySourceCoverage();

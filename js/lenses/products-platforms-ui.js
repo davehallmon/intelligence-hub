@@ -1,10 +1,10 @@
 // Intelligence Hub v10 — V10-M09 visible Products & Platforms lens.
 // This is a read model over the shared canonical item store, not a new feed silo.
 
-import { ENTITY_TYPES, MONITORING_STATES } from "./config/entity-types.js";
-import { entitiesByType, getEntity } from "./config/entities.js";
+import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
+import { entitiesByType, getEntity } from "../config/entities.js";
 import { classifyProductChange } from "./product-change-classifier.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "./renderers.js";
+import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
 
 const MONITORED_STATES = new Set([
   MONITORING_STATES.PRIORITY,
@@ -12,10 +12,10 @@ const MONITORED_STATES = new Set([
 ]);
 
 function ensureStylesheet() {
-  if (document.querySelector('link[href="products-platforms.css"]')) return;
+  if (document.querySelector('link[href="css/lenses/products-platforms.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "products-platforms.css";
+  link.href = "css/lenses/products-platforms.css";
   document.head.append(link);
 }
 

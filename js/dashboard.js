@@ -1,14 +1,14 @@
 import { initSettings } from "./settings.js";
 import { createFeedDashboard } from "./feeds.js";
-import { RUNTIME_LENS_SERVICE } from "./lens-service.js";
+import { RUNTIME_LENS_SERVICE } from "./lenses/lens-service.js";
 import { initNavigation } from "./navigation.js";
 import { initV81UI } from "./v81-ui.js";
 import { initMyFeedUI } from "./my-feed-ui.js";
 import { MY_FEED_SOURCE_TABS } from "./my-feed-config.js";
-import { initWatchlistUI } from "./watchlist-ui.js";
-import { initWatchlistMobileRefinement } from "./watchlist-mobile.js";
-import { initPeopleOrganizationsUI } from "./people-organizations-ui.js";
-import { initProductsPlatformsUI } from "./products-platforms-ui.js";
+import { initWatchlistUI } from "./lenses/watchlist-ui.js";
+import { initWatchlistMobileRefinement } from "./lenses/watchlist-mobile.js";
+import { initPeopleOrganizationsUI } from "./lenses/people-organizations-ui.js";
+import { initProductsPlatformsUI } from "./lenses/products-platforms-ui.js";
 import { initUIFoundation, decorateUIFoundation } from "./main.js";
 import { initPhase4UX } from "./phase4.js";
 
