@@ -302,6 +302,7 @@ await import("../tests/lens-service-v10.test.js");
 await import("../tests/watchlist-visible-v10.test.js");
 await import("../tests/people-organizations-v10.test.js");
 await import("../tests/products-platforms-v10.test.js");
+await import("../tests/product-attribution-v10.test.js");
 await import("../tests/v10-mobile-shell.test.js");
 
 repositoryContractChecks();

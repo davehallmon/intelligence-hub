@@ -6,6 +6,7 @@ import { ENTITY_TYPES } from "./config/entity-types.js";
 import { EVIDENCE_TYPES, VERIFICATION_STATUS } from "./config/evidence-types.js";
 import { legacyProfileIdsToEntityIds } from "./config/legacy-map.js";
 import { SOURCE_ENDPOINTS } from "./connectors/catalog.js";
+import { resolveProductAttributions } from "./product-attribution.js";
 
 const TRACKING_PARAMS = new Set([
   "fbclid", "gclid", "dclid", "msclkid", "mc_cid", "mc_eid", "mkt_tok",
@@ -234,6 +235,14 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
     "organizationEntityIds", "productEntityIds", "publicationEntityIds",
     "mediaEntityIds", "communityEntityIds", "researchSourceEntityIds"
   ]));
+  const explicitProductEntityIds = entityIdsForType(explicitlyRelated, ENTITY_TYPES.PRODUCT);
+  const productAttributions = resolveProductAttributions({
+    title: base.title,
+    summary: base.summary,
+    sourceEntityIds: sourceEntities,
+    explicitProductEntityIds
+  });
+  const derivedProductEntityIds = productAttributions.map(attribution => attribution.entityId);
 
   const all = unique([
     ...legacyDetectedEntityIds,
@@ -243,7 +252,8 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
     ...publishedBy,
     ...featuring,
     ...mentioned,
-    ...explicitlyRelated
+    ...explicitlyRelated,
+    ...derivedProductEntityIds
   ]);
 
   return Object.freeze({
@@ -258,7 +268,8 @@ function buildRelationships(base, item = {}, context = {}, endpoint = null) {
     publications: Object.freeze(entityIdsForType(all, ENTITY_TYPES.PUBLICATION)),
     media: Object.freeze(entityIdsForType(all, ENTITY_TYPES.MEDIA)),
     communities: Object.freeze(entityIdsForType(all, ENTITY_TYPES.COMMUNITY)),
-    researchSources: Object.freeze(entityIdsForType(all, ENTITY_TYPES.RESEARCH_SOURCE))
+    researchSources: Object.freeze(entityIdsForType(all, ENTITY_TYPES.RESEARCH_SOURCE)),
+    productAttributions
   });
 }
 
@@ -291,6 +302,7 @@ export function enrichIntelligenceObject(base, item = {}, context = {}) {
     mentionedEntityIds: relationships.mentioned,
     organizationEntityIds: relationships.organizations,
     productEntityIds: relationships.products,
+    productAttributions: relationships.productAttributions,
     publicationEntityIds: relationships.publications,
     mediaEntityIds: relationships.media,
     communityEntityIds: relationships.communities,
