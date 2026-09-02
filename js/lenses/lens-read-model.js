@@ -103,6 +103,20 @@ function rolesForEntity(item, entityId) {
   return roles;
 }
 
+function entityMatchReason(item, lensId, entity, anchor) {
+  if (lensId === "products-platforms") {
+    const attribution = (item.productAttributions || []).find(entry => entry.entityId === entity?.id);
+    if (attribution) {
+      return anchor.id === entity.id
+        ? attribution.reason
+        : `${attribution.reason}; monitored through ${stateLabel(anchor.monitoringState)} ${anchor.name}`;
+    }
+  }
+  return anchor.id === entity?.id
+    ? `${stateLabel(anchor.monitoringState)} ${entity?.type || "entity"}: ${entity?.name || entity?.id}`
+    : `${entity?.name || entity?.id} belongs to ${stateLabel(anchor.monitoringState)} ${anchor.name}`;
+}
+
 export function watchlistTopicIdsForItem(item = {}) {
   const explicit = unique([
     ...asArray(item.watchlistTopicIds),
@@ -132,9 +146,7 @@ function entityLensMatch(item, lensId, entityTypes, options = {}, { includeChild
       entityId,
       monitoringAnchorId: anchor.id,
       roles: Object.freeze(rolesForEntity(item, entityId)),
-      reason: anchor.id === entityId
-        ? `${stateLabel(anchor.monitoringState)} ${entity?.type || "entity"}: ${entity?.name || entityId}`
-        : `${entity?.name || entityId} belongs to ${stateLabel(anchor.monitoringState)} ${anchor.name}`
+      reason: entityMatchReason(item, lensId, entity, anchor)
     }));
   });
 
