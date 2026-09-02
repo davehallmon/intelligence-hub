@@ -5,7 +5,8 @@
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
-**Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization
+**Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization  
+**Current execution gate:** Issue #40 — Pre-V10-M10 Readiness Gate (**V10-M10 paused**)
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -50,7 +51,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 | V10-M06 | Runtime lens service | Complete | PR #24 |
 | V10-M07 | Visible Watchlist lens | Complete | PR #25; mobile refinement PR #26 |
 | V10-M08 | Visible People & Organizations lens | Complete | PR #27; shared mobile-shell integration PR #28 |
-| V10-M09 | Visible Products & Platforms lens | Complete | PR #35 |
+| V10-M09 | Visible Products & Platforms lens | Component implementation complete; operational acceptance gated | PR #35; Issue #40 |
 
 ## Current visible v10 lenses
 
@@ -97,6 +98,7 @@ A successful static deployment or source validation run is not a substitute for 
 
 - **Issue #30:** PR #28's documented iPhone acceptance checklist has still not been recorded as completed. It remains a separate human verification item.
 - **V10-M09:** rendered Products & Platforms behavior should be smoke-tested after deployment on mobile and desktop, including selector behavior, Pull-to-Refresh, Saved persistence, loading/empty/error/retry states, and remote-feed/CORS behavior.
+- **Issue #40:** the broader pre-V10-M10 gate also requires production-shaped Product attribution, deliberate near-miss rejection, deterministic browser verification, private-source protection, repository governance/hygiene, and auditable engineering-agent evidence.
 
 Do not represent either manual browser/device boundary as completed without recorded evidence.
 
@@ -109,11 +111,15 @@ Do not represent either manual browser/device boundary as completed without reco
 - Issue #36 remains open for deletion of the verified merged remote branches, enabling automatic merged-branch deletion, and recording deployed mobile/desktop smoke testing.
 - Production-active compatibility files remain protected until their owning replacement milestones prove parity.
 
-## Next product milestone
+## Next product milestone — paused
 
-**V10-M10 — Publications & Media migration**
+**V10-M10 — Publications & Media migration is not authorized to begin.**
 
-Expected direction from the ratified architecture/migration plan:
+The current execution boundary is the [Pre-V10-M10 Readiness Gate](docs/implementation/v10-m10-readiness-gate-2026-09-02.md), governed through [Issue #40](https://github.com/davehallmon/intelligence-hub/issues/40). Work must remain within the gate's remediation and evidence scope until every MUST requirement is PASS, approved N/A, or an authorized bounded waiver. P0 correctness, privacy, and state-integrity requirements cannot be waived.
+
+V10-M09 is therefore recognized as component-implemented but not yet operationally accepted. A green source validator, a successful Pages deployment, or an unsupported agent completion statement cannot independently open V10-M10.
+
+Once the gate opens, the ratified V10-M10 direction remains unchanged:
 
 - migrate Publications and Media using their canonical entities and current source relationships;
 - continue reusing the shared item store and runtime lens service;
@@ -124,29 +130,31 @@ Expected direction from the ratified architecture/migration plan:
 
 ## Known gaps / unresolved items
 
-1. **Live iPhone acceptance for PR #28** — Issue #30 remains pending a recorded human smoke test.
-2. **V10-M09 browser/device acceptance** — automated validation passed; live rendered Product-lens acceptance remains to be recorded after deployment.
-3. **Source expansion** — many monitored entities still have explicit source gaps; endpoint verification must precede adding new sources.
-4. **Product-change classifier tuning** — deterministic first implementation may need evidence-based tuning from observed live false positives/false negatives; do not silently convert it into hidden ranking or Focus logic.
-5. **Mockup binaries** — `assets/mockups/README.md` indexes the design references, but the image binaries are not currently stored in the repository.
-6. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
-7. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
-8. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
-9. **Repository hygiene follow-through** — PRs #37–38 completed historical-document archival, dead-file removal, and forward directory normalization. Issue #36 remains open for settings-level merged-branch cleanup and deployed smoke evidence.
+1. **Pre-V10-M10 readiness gate** — Issue #40 is open and V10-M10 remains paused until its evidence-backed decision matrix is complete.
+2. **Live iPhone acceptance for PR #28** — Issue #30 remains pending a recorded human smoke test.
+3. **V10-M09 browser/device acceptance** — automated validation passed; live rendered Product-lens acceptance remains to be recorded after deployment.
+4. **Source expansion** — many monitored entities still have explicit source gaps; endpoint verification must precede adding new sources.
+5. **Product-change classifier tuning** — deterministic first implementation may need evidence-based tuning from observed live false positives/false negatives; do not silently convert it into hidden ranking or Focus logic.
+6. **Mockup binaries** — `assets/mockups/README.md` indexes the design references, but the image binaries are not currently stored in the repository.
+7. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
+8. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
+9. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
+10. **Repository hygiene follow-through** — PRs #37–38 completed historical-document archival, dead-file removal, and forward directory normalization. Issue #36 remains open for settings-level merged-branch cleanup and deployed smoke evidence.
 
 ## Authority order for handoff
 
 When sources appear to conflict, use this order:
 
 1. `STATUS.md` — present state and next milestone.
-2. `docs/configuration/RATIFIED_CONFIGURATION.md` — approved configuration values and product choices.
-3. `docs/architecture/PRODUCT_ARCHITECTURE.md` — target product contract.
-4. `docs/architecture/INFORMATION_ARCHITECTURE.md` — target data/information relationships.
-5. `docs/architecture/V10_MILESTONE_MAP.md` — stable milestone IDs and phase-number reconciliation.
-6. `docs/architecture/MIGRATION_PLAN.md` — detailed staged scope/acceptance roadmap; translate old numeric headings through the milestone map.
-7. `TECHNICAL_SPEC.md` — current v9.x UI/runtime compatibility rules during migration.
-8. `docs/implementation/*` — historical implementation evidence at the time each file was written.
-9. Pull-request descriptions/commits — transaction history and verification evidence.
+2. `docs/implementation/v10-m10-readiness-gate-2026-09-02.md` and Issue #40 — current execution gate and auditable precondition for V10-M10.
+3. `docs/configuration/RATIFIED_CONFIGURATION.md` — approved configuration values and product choices.
+4. `docs/architecture/PRODUCT_ARCHITECTURE.md` — target product contract.
+5. `docs/architecture/INFORMATION_ARCHITECTURE.md` — target data/information relationships.
+6. `docs/architecture/V10_MILESTONE_MAP.md` — stable milestone IDs and phase-number reconciliation.
+7. `docs/architecture/MIGRATION_PLAN.md` — detailed staged scope/acceptance roadmap; translate old numeric headings through the milestone map.
+8. `TECHNICAL_SPEC.md` — current v9.x UI/runtime compatibility rules during migration.
+9. Other `docs/implementation/*` — historical implementation evidence at the time each file was written.
+10. Pull-request descriptions/commits — transaction history and verification evidence.
 
 Never infer current status from a historical phase audit alone.
 
@@ -156,7 +164,8 @@ Before beginning a new implementation PR:
 
 1. read this file;
 2. verify current `main` SHA;
-3. identify the stable milestone ID and named concern;
-4. confirm the files/behaviors intentionally preserved;
-5. run `npm run validate` before proposing merge;
-6. update this status file when the current milestone or next milestone changes.
+3. check Issue #40 and remain within pre-V10-M10 remediation until the gate formally passes;
+4. identify the stable milestone ID and named concern;
+5. confirm the files/behaviors intentionally preserved;
+6. run `npm run validate` before proposing merge;
+7. update this status file when the current milestone, gate state, or next milestone changes.
