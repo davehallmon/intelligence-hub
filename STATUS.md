@@ -7,6 +7,7 @@
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
 **Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization
 **Current execution gate:** Issue #40 — Pre-V10-M10 Readiness Gate (**V10-M10 paused**)
+**Latest Product-attribution correction:** PR #42 — shared-path deterministic Product attribution
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -73,12 +74,14 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 ### Products & Platforms
 
 - 6 Priority + 10 Active continuously monitored Products.
+- Production normalization derives conservative Product relationships from explicit Product names in item titles/summaries; owner organization alone is not sufficient.
 - Parked Products remain explicitly queryable but are not continuous defaults.
 - Child capabilities inherit monitored parents where ratified: `Claude Skills → Claude` and `Custom GPTs → ChatGPT`.
 - STORM remains outside continuous Product monitoring and is normalized toward Research/Questions.
 - The default visible view favors deterministic meaningful changes: model, feature, workflow/UI, integration, and documentation/release-note changes.
 - **All matched items** remains available so generic canonical Product matches are not destroyed by the presentation filter.
 - Match reasons come from the existing Products & Platforms read model.
+- Match reasons retain the attribution method, matched alias, and matched title/summary field.
 - Mobile reuses the shared Pull-to-Refresh, bottom controls, retry routing, and Saved-star infrastructure; no Product-specific gesture or persistence system was added.
 
 ## Verification state
@@ -91,6 +94,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 - That run syntax-checked 58 JavaScript files and passed foundation, normalization, connector, lens read-model, shared item-store, runtime lens-service, Watchlist, People & Organizations, Products & Platforms, shared mobile-shell, and repository contract/accessibility validation.
 - Dedicated V10-M09 fixtures verify the ratified 6/10 Product counts, child inheritance, Parked boundaries, meaningful-change classification, generic-mention filtering, all-match preservation, non-mutating newest-first sorting, and shared navigation/mobile/Saved/retry wiring.
 - PR #38 GitHub Actions run `33611154736` passed after the path-only normalization. Its repository contract checks cover JavaScript reachability, configuration exports, local Markdown references, production resource resolution, and the root-file allowlist in addition to all existing product fixtures.
+- PR #42 adds production-path Product attribution fixtures for the observed Google DeepMind/Gemini case, owner-only rejection, common-language near misses, child inheritance, Parked explicit query, meaningful-filter separation, and exact cross-lens object reuse. This is code-level evidence only until GitHub CI and the browser gate are recorded.
 
 ### Manual acceptance still required
 
