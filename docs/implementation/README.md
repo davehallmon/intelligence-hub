@@ -18,6 +18,10 @@ Historical implementation phase numbers diverged from the stable v10 milestone s
 
 See [`V10_MILESTONE_MAP.md`](../architecture/V10_MILESTONE_MAP.md) for the canonical ordinal reconciliation. New evidence files should use lowercase kebab-case and the stable milestone ID, for example `v10-m10-publications-media-audit.md`.
 
+## Current precondition gate
+
+V10-M10 remains paused under the [Pre-V10-M10 Readiness Gate](v10-m10-readiness-gate-2026-09-02.md), governed through [Issue #40](https://github.com/davehallmon/intelligence-hub/issues/40). This gate is an active execution precondition, not evidence that its requirements have passed. [`STATUS.md`](../../STATUS.md) remains the present-state authority.
+
 ## Current path note
 
 The historical audits above name the paths that existed when their transactions were completed. V10-M09A.2 later moved shared/visible lens modules to `js/lenses/`, lens styles to `css/lenses/`, and Node-only fixtures to `tests/`. The historical records are intentionally not rewritten; use the current [`Repository Map`](../architecture/REPOSITORY_MAP.md) for live ownership.
