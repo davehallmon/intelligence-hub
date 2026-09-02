@@ -5,7 +5,7 @@
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
-**Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization  
+**Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization
 **Current execution gate:** Issue #40 — Pre-V10-M10 Readiness Gate (**V10-M10 paused**)
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
