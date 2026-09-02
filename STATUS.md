@@ -5,7 +5,7 @@
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
-**Latest repository-structure evidence:** PR #37 — V10-M09A.1 documentation and dead-file hygiene
+**Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -89,6 +89,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 - PR #35 GitHub Actions run `33453616480`, job `99688760361`, passed on the merge ref.
 - That run syntax-checked 58 JavaScript files and passed foundation, normalization, connector, lens read-model, shared item-store, runtime lens-service, Watchlist, People & Organizations, Products & Platforms, shared mobile-shell, and repository contract/accessibility validation.
 - Dedicated V10-M09 fixtures verify the ratified 6/10 Product counts, child inheritance, Parked boundaries, meaningful-change classification, generic-mention filtering, all-match preservation, non-mutating newest-first sorting, and shared navigation/mobile/Saved/retry wiring.
+- PR #38 GitHub Actions run `33611154736` passed after the path-only normalization. Its repository contract checks cover JavaScript reachability, configuration exports, local Markdown references, production resource resolution, and the root-file allowlist in addition to all existing product fixtures.
 
 ### Manual acceptance still required
 
@@ -99,12 +100,13 @@ A successful static deployment or source validation run is not a substitute for 
 
 Do not represent either manual browser/device boundary as completed without recorded evidence.
 
-## Active pre-M10 repository remediation
+## Repository normalization follow-through
 
-**V10-M09A — Repository Structure Normalization** is the active bounded concern tracked in Issue #36.
+**V10-M09A — Repository Structure Normalization** is implementation-complete in PRs #37–38. Its remaining administrative and human-verification follow-through is tracked in Issue #36.
 
 - M09A.1 is complete in PR #37: historical release documentation is indexed under `docs/history/`, proven-dead `tabs.js` is removed, and repository reachability/contribution rules are enforced.
-- M09A.2 is the active path-only normalization: current lens modules move to `js/lenses/`, lens styles to `css/lenses/`, and Node-only fixtures to `tests/` without intentional runtime behavior change.
+- M09A.2 is complete in PR #38: current lens modules are under `js/lenses/`, lens styles are under `css/lenses/`, and Node-only fixtures are under `tests/`; production paths and validation were updated without intentional runtime behavior change.
+- Issue #36 remains open for deletion of the verified merged remote branches, enabling automatic merged-branch deletion, and recording deployed mobile/desktop smoke testing.
 - Production-active compatibility files remain protected until their owning replacement milestones prove parity.
 
 ## Next product milestone
@@ -130,7 +132,7 @@ Expected direction from the ratified architecture/migration plan:
 6. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
 7. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
 8. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
-9. **Repository hygiene** — Issue #36 tracks merged-branch deletion, automatic branch cleanup, historical-document archival, dead-file removal, and forward directory normalization before M10.
+9. **Repository hygiene follow-through** — PRs #37–38 completed historical-document archival, dead-file removal, and forward directory normalization. Issue #36 remains open for settings-level merged-branch cleanup and deployed smoke evidence.
 
 ## Authority order for handoff
 
