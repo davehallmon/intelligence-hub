@@ -27,7 +27,7 @@ Stable milestone IDs and names below are authoritative for handoff, PR scope, st
 | V10-M07 | Watchlist visible migration | 5 | 7 | Complete — PRs #25–26 |
 | V10-M08 | People & Organizations visible migration | 6 | 8 | Complete — PRs #27–28 |
 | V10-M09 | Products & Platforms visible migration | 7 | 9 | Complete — PR #35 |
-| V10-M09A | Repository Structure Normalization | — inserted | — | Active — Issue #36 |
+| V10-M09A | Repository Structure Normalization | — inserted | — | Implementation complete — PRs #37–38; Issue #36 follow-through |
 | V10-M10 | Publications & Media migration | 8 | 10 | **Next product milestone** |
 | V10-M11 | Research migration | 9 | 11 | Planned |
 | V10-M12 | Communities migration | 10 | 12 | Planned |

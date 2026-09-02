@@ -126,4 +126,4 @@ GitHub Pages publishes from the `main` branch and repository root. A successful 
 
 ## Current status
 
-**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. **V10-M09A — Repository Structure Normalization** is the active pre-M10 remediation concern. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone remains **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.
+**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. **V10-M09A — Repository Structure Normalization** is implementation-complete in PRs #37–38; Issue #36 retains the settings-level branch cleanup and deployed smoke-test follow-through. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone is **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.
