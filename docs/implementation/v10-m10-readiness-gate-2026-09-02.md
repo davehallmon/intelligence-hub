@@ -1,10 +1,15 @@
 # PierView.io / Intelligence Hub — Pre-V10-M10 Readiness Gate
 
-**Purpose:** Define the complete, auditable set of conditions that must be satisfied before implementation begins on **V10-M10 — Publications & Media migration**.  
-**Repository:** [`davehallmon/intelligence-hub`](https://github.com/davehallmon/intelligence-hub)  
-**Governed tracker:** [GitHub Issue #40](https://github.com/davehallmon/intelligence-hub/issues/40)  
-**Initial baseline:** `main@b602c1af3c8027cb75e57781d7b617f83fb1b048`  
-**Established:** 2026-09-02  
+**Purpose:** Define the complete, auditable set of conditions that must be satisfied before implementation begins on **V10-M10 — Publications & Media migration**.
+
+**Repository:** [`davehallmon/intelligence-hub`](https://github.com/davehallmon/intelligence-hub)
+
+**Governed tracker:** [GitHub Issue #40](https://github.com/davehallmon/intelligence-hub/issues/40)
+
+**Initial baseline:** `main@b602c1af3c8027cb75e57781d7b617f83fb1b048`
+
+**Established:** 2026-09-02
+
 **Gate state at establishment:** **PAUSED / NOT YET SATISFIED**
 
 ## 1. Gate Decision Rule
