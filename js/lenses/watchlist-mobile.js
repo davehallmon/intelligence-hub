@@ -4,10 +4,10 @@
 const MOBILE_WATCHLIST_QUERY = "(max-width: 767px)";
 
 function ensureStylesheet() {
-  if (document.querySelector('link[href="watchlist-mobile.css"]')) return;
+  if (document.querySelector('link[href="css/lenses/watchlist-mobile.css"]')) return;
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = "watchlist-mobile.css";
+  link.href = "css/lenses/watchlist-mobile.css";
   document.head.append(link);
 }
 

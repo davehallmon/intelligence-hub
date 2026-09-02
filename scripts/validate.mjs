@@ -5,13 +5,44 @@ import { fileURLToPath } from "node:url";
 
 import * as configuration from "../js/config/index.js";
 import { validateFoundation } from "../js/config/validate-foundation.js";
-import { validateNormalizationV10 } from "../js/tests/validate-normalization-v10.js";
-import { validateConnectorsV10 } from "../js/tests/validate-connectors-v10.js";
-import { validateLensReadModelV10 } from "../js/tests/validate-lens-read-model-v10.js";
-import { validateItemStoreV10 } from "../js/tests/validate-item-store-v10.js";
+import { validateNormalizationV10 } from "../tests/normalization-v10.test.js";
+import { validateConnectorsV10 } from "../tests/connectors-v10.test.js";
+import { validateLensReadModelV10 } from "../tests/lens-read-model-v10.test.js";
+import { validateItemStoreV10 } from "../tests/item-store-v10.test.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
+const ROOT_FILE_ALLOWLIST = new Set([
+  ".editorconfig",
+  ".gitignore",
+  ".nojekyll",
+  ".nvmrc",
+  "AGENTS.md",
+  "CHANGELOG.md",
+  "CODE_OF_CONDUCT.md",
+  "CONTRIBUTING.md",
+  "LICENSE",
+  "LICENSE.md",
+  "README.md",
+  "SECURITY.md",
+  "STATUS.md",
+  "TECHNICAL_SPEC.md",
+  "app.js",
+  "dashboard.css",
+  "data-destinations-1.js",
+  "data-destinations-2.js",
+  "data-destinations-3.js",
+  "data-watchlists-1.js",
+  "data-watchlists-2.js",
+  "feed-intelligence.css",
+  "index.html",
+  "my-feed.css",
+  "package-lock.json",
+  "package.json",
+  "social-source-policy.css",
+  "styles.css",
+  "tabs.css"
+]);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -64,6 +95,12 @@ function localReference(fromFile, specifier) {
   const cleanSpecifier = specifier.replace(/[?#].*$/, "");
   const base = specifier.startsWith("/") ? root : path.dirname(fromFile);
   return path.resolve(base, cleanSpecifier.replace(/^\//, ""));
+}
+
+function browserReference(reference) {
+  if (!reference || /^(?:[a-z]+:|\/\/|#)/i.test(reference)) return null;
+  const cleanReference = reference.replace(/[?#].*$/, "").replace(/^\//, "");
+  return cleanReference ? path.resolve(root, cleanReference) : null;
 }
 
 function javascriptReferences(file) {
@@ -141,6 +178,46 @@ function repositoryReachabilityChecks() {
   console.log(
     `Repository reachability passed (${productionGraph.size} production, ${validationGraph.size} validation files).`
   );
+
+  return Object.freeze({ html, productionGraph, validationGraph });
+}
+
+function productionResourceChecks(html, productionGraph) {
+  const references = new Set();
+
+  for (const match of html.matchAll(/\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)) {
+    const resource = browserReference(match[1]);
+    if (resource) references.add(resource);
+  }
+
+  for (const file of productionGraph) {
+    if (!/\.(?:js|mjs)$/.test(file)) continue;
+    const source = fs.readFileSync(file, "utf8");
+    for (const match of source.matchAll(/["']([^"']+\.css(?:[?#][^"']*)?)["']/gi)) {
+      const resource = browserReference(match[1]);
+      if (resource) references.add(resource);
+    }
+  }
+
+  const broken = [...references]
+    .filter(file => !fs.existsSync(file))
+    .map(relative)
+    .sort();
+  assert(broken.length === 0, `Production resources do not resolve: ${broken.join(", ")}`);
+  console.log(`Production resource validation passed for ${references.size} local resources.`);
+}
+
+function rootFileContractChecks() {
+  const unexpected = fs.readdirSync(root, { withFileTypes: true })
+    .filter(entry => entry.isFile() && !ROOT_FILE_ALLOWLIST.has(entry.name))
+    .map(entry => entry.name)
+    .sort();
+
+  assert(
+    unexpected.length === 0,
+    `Unexpected repository-root files require an explicit placement decision: ${unexpected.join(", ")}`
+  );
+  console.log("Repository-root file contract passed.");
 }
 
 function markdownReferenceChecks() {
@@ -210,7 +287,9 @@ function repositoryContractChecks() {
 }
 
 syntaxCheck();
-repositoryReachabilityChecks();
+const repositoryGraphs = repositoryReachabilityChecks();
+productionResourceChecks(repositoryGraphs.html, repositoryGraphs.productionGraph);
+rootFileContractChecks();
 markdownReferenceChecks();
 runResultSuite("Foundation validation", validateFoundation);
 runResultSuite("Normalization validation", validateNormalizationV10);
@@ -219,11 +298,11 @@ runResultSuite("Lens read-model validation", validateLensReadModelV10);
 runResultSuite("Shared item-store validation", validateItemStoreV10);
 
 // These modules use node:assert and execute their fixtures on import.
-await import("../js/tests/validate-lens-service-v10.js");
-await import("../js/tests/validate-watchlist-visible-v10.js");
-await import("../js/tests/validate-people-organizations-v10.js");
-await import("../js/tests/validate-products-platforms-v10.js");
-await import("../js/tests/validate-v10-mobile-shell.js");
+await import("../tests/lens-service-v10.test.js");
+await import("../tests/watchlist-visible-v10.test.js");
+await import("../tests/people-organizations-v10.test.js");
+await import("../tests/products-platforms-v10.test.js");
+await import("../tests/v10-mobile-shell.test.js");
 
 repositoryContractChecks();
 console.log("All Intelligence Hub / PierView.io repository validations passed.");

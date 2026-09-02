@@ -5,6 +5,7 @@
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
+**Latest repository-structure evidence:** PR #37 — V10-M09A.1 documentation and dead-file hygiene
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -102,8 +103,8 @@ Do not represent either manual browser/device boundary as completed without reco
 
 **V10-M09A — Repository Structure Normalization** is the active bounded concern tracked in Issue #36.
 
-- M09A.1 archives historical release documentation, removes only proven-dead code, strengthens repository reachability validation, and establishes contributor/branch-lifecycle guidance.
-- M09A.2 moves current lens modules, lens styles, and Node-only tests into durable locations without intentional runtime behavior change.
+- M09A.1 is complete in PR #37: historical release documentation is indexed under `docs/history/`, proven-dead `tabs.js` is removed, and repository reachability/contribution rules are enforced.
+- M09A.2 is the active path-only normalization: current lens modules move to `js/lenses/`, lens styles to `css/lenses/`, and Node-only fixtures to `tests/` without intentional runtime behavior change.
 - Production-active compatibility files remain protected until their owning replacement milestones prove parity.
 
 ## Next product milestone

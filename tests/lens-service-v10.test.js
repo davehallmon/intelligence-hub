@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 
-import { CanonicalItemStore } from "../item-store.js";
-import { RuntimeLensService } from "../lens-service.js";
+import { CanonicalItemStore } from "../js/item-store.js";
+import { RuntimeLensService } from "../js/lenses/lens-service.js";
 
 function object(overrides = {}) {
   return {

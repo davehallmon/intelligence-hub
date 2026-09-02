@@ -78,9 +78,9 @@ The current v9.x UI/runtime compatibility rules remain governed by [`TECHNICAL_S
 | `js/connectors/` | Connector capabilities and canonical source-endpoint registry |
 | `js/normalize.js`, `js/intelligence-object.js` | Normalization and v10 relationship/provenance enrichment |
 | `js/item-store.js` | Shared session-scoped canonical item store |
-| `js/lens-read-model.js`, `js/lens-service.js` | Pure lens selection plus runtime read service |
-| `js/product-change-classifier.js`, `js/products-platforms-ui.js` | Deterministic Product-change presentation and visible Products & Platforms lens |
-| `js/tests/` | Development-time acceptance fixtures and structural validators |
+| `js/lenses/` | Shared lens selection/service plus visible lens UI and lens-specific helpers |
+| `css/lenses/` | Visible v10 lens styling |
+| `tests/` | Node-only acceptance fixtures and structural validators |
 | `docs/architecture/` | Product/information architecture and migration authority |
 | `docs/configuration/` | Ratified product configuration |
 | `docs/implementation/` | Historical implementation/audit records for completed migration work |
@@ -99,7 +99,7 @@ Node is used **only for development-time validation**, not as a production depen
 npm run validate
 ```
 
-The validation command syntax-checks JavaScript, verifies that local JavaScript is reachable from a production or validation entry point, checks the canonical configuration export surface, and runs the repository's v10 acceptance/structural fixtures. Pull requests also run the same validation in GitHub Actions.
+The validation command syntax-checks JavaScript, verifies entry-point reachability and production resources, enforces the repository-root file contract, checks local Markdown references and the canonical configuration export surface, and runs the repository's v10 acceptance/structural fixtures. Pull requests also run the same validation in GitHub Actions.
 
 Browser/device acceptance remains necessary for interaction changes, especially mobile gestures, responsive navigation, and remote-feed transport behavior.
 

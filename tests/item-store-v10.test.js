@@ -1,8 +1,8 @@
 // Intelligence Hub v10 — Phase 5 shared-item-store acceptance fixtures.
 // Development-time assertions only; not imported by the live UI.
 
-import { CanonicalItemStore } from "../item-store.js";
-import { queryLens } from "../lens-read-model.js";
+import { CanonicalItemStore } from "../js/item-store.js";
+import { queryLens } from "../js/lenses/lens-read-model.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

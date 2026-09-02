@@ -6,12 +6,12 @@ import {
   getSourceEndpoint,
   validateEndpointReferences,
   SOURCE_ENDPOINTS
-} from "../connectors/catalog.js";
+} from "../js/connectors/catalog.js";
 import {
   auditCurrentFeedEndpointCoverage,
   privateSocialBridgeDescriptor
-} from "../connectors/live-source-map.js";
-import { getWatchlistTopic } from "../config/topic-taxonomy.js";
+} from "../js/connectors/live-source-map.js";
+import { getWatchlistTopic } from "../js/config/topic-taxonomy.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

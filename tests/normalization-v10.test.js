@@ -1,8 +1,8 @@
 // Intelligence Hub v10 — Phase 2 normalization fixtures.
 // Pure development-time assertions; this file is not imported by the live UI.
 
-import { normalizeFeedItem } from "../normalize.js";
-import { EVIDENCE_TYPES } from "../config/evidence-types.js";
+import { normalizeFeedItem } from "../js/normalize.js";
+import { EVIDENCE_TYPES } from "../js/config/evidence-types.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

@@ -3,23 +3,23 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
-import { entitiesByType } from "../config/entities.js";
-import { queryLens } from "../lens-read-model.js";
-import { normalizeFeedItem } from "../normalize.js";
+import { ENTITY_TYPES, MONITORING_STATES } from "../js/config/entity-types.js";
+import { entitiesByType } from "../js/config/entities.js";
+import { queryLens } from "../js/lenses/lens-read-model.js";
+import { normalizeFeedItem } from "../js/normalize.js";
 import {
   PRODUCT_CHANGE_TYPES,
   classifyProductChange
-} from "../product-change-classifier.js";
+} from "../js/lenses/product-change-classifier.js";
 import {
   filterProductEntries,
   monitoredProducts,
   sortProductLensEntries,
   sortedMonitoredProducts
-} from "../products-platforms-ui.js";
+} from "../js/lenses/products-platforms-ui.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, "../..");
+const root = path.resolve(here, "..");
 
 function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
@@ -148,8 +148,8 @@ assert.equal(sortedMonitoredProducts()[0].monitoringState, MONITORING_STATES.PRI
 const dashboard = read("js/dashboard.js");
 const navigation = read("js/navigation.js");
 const phase4 = read("js/phase4.js");
-const productCss = read("products-platforms.css");
-const productUi = read("js/products-platforms-ui.js");
+const productCss = read("css/lenses/products-platforms.css");
+const productUi = read("js/lenses/products-platforms-ui.js");
 
 expect(navigation, '"people-organizations", "products-platforms", "launchpad"', "Products primary route order");
 expect(dashboard, 'initProductsPlatformsUI', "Products runtime initialization");

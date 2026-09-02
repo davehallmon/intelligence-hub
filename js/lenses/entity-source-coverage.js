@@ -2,9 +2,9 @@
 // Coverage describes available intake paths; it does not change monitoring state,
 // add sources, or imply that discovery coverage was authored by the target entity.
 
-import { ENTITY_TYPES, MONITORING_STATES } from "./config/entity-types.js";
-import { entitiesByType, getEntity } from "./config/entities.js";
-import { SOURCE_ENDPOINTS } from "./connectors/catalog.js";
+import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
+import { entitiesByType, getEntity } from "../config/entities.js";
+import { SOURCE_ENDPOINTS } from "../connectors/catalog.js";
 
 export const SOURCE_COVERAGE_LEVELS = Object.freeze({
   DIRECT: "direct",

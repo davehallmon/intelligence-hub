@@ -54,8 +54,9 @@ Unless a later ratified decision explicitly changes them:
 - `js/feeds.js` / `js/feed-client.js` — current live loading and transport behavior.
 - `js/normalize.js` + `js/intelligence-object.js` — normalized object authority.
 - `js/item-store.js` — shared canonical session store.
-- `js/lens-read-model.js` — pure v10 selection/read models.
-- `js/lens-service.js` — runtime bridge from shared store to read models.
+- `js/lenses/lens-read-model.js` — pure v10 selection/read models.
+- `js/lenses/lens-service.js` — runtime bridge from shared store to read models.
+- `js/lenses/` — visible lens UI and lens-specific domain/presentation helpers.
 - `js/config/` — canonical configuration and compatibility maps.
 - `js/connectors/` — connector capability and endpoint identity.
 - `js/phase3.js` / `js/phase4.js` — existing cross-route interaction authorities; do not create duplicate gesture/save/navigation systems without a deliberate replacement plan.
@@ -84,6 +85,7 @@ The validation command must remain dependency-light and should cover:
 - visible Watchlist fixtures;
 - People & Organizations fixtures;
 - shared mobile-shell structural validation;
+- production-resource and repository-root placement checks;
 - repository accessibility/contract checks that can be tested without a browser.
 
 Do not claim browser/device acceptance merely because this command passes.
