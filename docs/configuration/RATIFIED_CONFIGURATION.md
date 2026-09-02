@@ -15,9 +15,9 @@ Status meanings:
 
 ---
 
-# 1. Watchlist
+## 1. Watchlist
 
-## 1.1 Priority topics — 5
+### 1.1 Priority topics — 5
 
 1. AI Adoption & Future of Work
 2. AI in Education & Learning
@@ -25,7 +25,7 @@ Status meanings:
 4. Prompt / Harness / Workflow Engineering
 5. RAG, Retrieval & Knowledge Systems
 
-## 1.2 Active topics — 7
+### 1.2 Active topics — 7
 
 1. AI Literacy & Fluency
 2. AI Productivity & Workflow Redesign
@@ -35,7 +35,7 @@ Status meanings:
 6. Open Models & Open vs. Closed AI
 7. AI Regulation, Policy & Governance
 
-## 1.3 Parked topics
+### 1.3 Parked topics
 
 - AI-Powered Coding & Software Development
 - AI Evaluation, Benchmarking & LLM-as-a-Judge
@@ -48,9 +48,9 @@ Status meanings:
 
 Parked topics remain available to Questions, Search, and Research.
 
-## 1.4 Priority-topic facets
+### 1.4 Priority-topic facets
 
-### AI Adoption & Future of Work
+#### AI Adoption & Future of Work
 
 **Core**
 - Enterprise AI adoption
@@ -66,7 +66,7 @@ Parked topics remain available to Questions, Search, and Research.
 - Employment, displacement & labor economics
 - Human judgment / human-AI collaboration
 
-### AI in Education & Learning
+#### AI in Education & Learning
 
 **Core**
 - AI in teaching & learning
@@ -84,7 +84,7 @@ Parked topics remain available to Questions, Search, and Research.
 **Parked facet**
 - AI tutors / personalized learning
 
-### Creative AI & AI-Assisted Writing
+#### Creative AI & AI-Assisted Writing
 
 **Core**
 - AI-assisted writing & editing
@@ -102,7 +102,7 @@ Parked topics remain available to Questions, Search, and Research.
 - AI video / generative media
 - Copyright / ethics specifically affecting creators
 
-### Prompt / Harness / Workflow Engineering
+#### Prompt / Harness / Workflow Engineering
 
 **Core**
 - Prompt design / prompting techniques
@@ -120,7 +120,7 @@ Parked topics remain available to Questions, Search, and Research.
 **Parked facet**
 - Multi-agent workflows
 
-### RAG, Retrieval & Knowledge Systems
+#### RAG, Retrieval & Knowledge Systems
 
 **Core**
 - Grounding / source attribution
@@ -138,7 +138,7 @@ Parked topics remain available to Questions, Search, and Research.
 **Parked facet**
 - Semantic / vector search
 
-## 1.5 Additional concepts treated as facets, not new top-level Watchlists
+### 1.5 Additional concepts treated as facets, not new top-level Watchlists
 
 - Experimental Media & Generative Creative Tools
 - Learning Design, Assessment & Formative Feedback Systems
@@ -146,13 +146,13 @@ Parked topics remain available to Questions, Search, and Research.
 
 These live under the existing Priority topics, with cross-tagging where relevant.
 
-## 1.6 Watchlist discovery behavior
+### 1.6 Watchlist discovery behavior
 
 **Hybrid:** broad discovery, but Focus surfaces only strong matches.
 
 ---
 
-# 2. Focus promotion principles established during Watchlist intake
+## 2. Focus promotion principles established during Watchlist intake
 
 Focus rewards usefulness and evidentiary value rather than novelty or popularity.
 
@@ -168,9 +168,9 @@ Promotion signals include:
 
 ---
 
-# 3. People
+## 3. People
 
-## 3.1 Priority people — 7
+### 3.1 Priority people — 7
 
 | Person | Priority ingestion |
 |---|---|
@@ -182,7 +182,7 @@ Promotion signals include:
 | Benedict Evans | Original work, Social |
 | Dario Amodei | Original work, Appearances; filter general press mentions |
 
-## 3.2 Active people — 12
+### 3.2 Active people — 12
 
 - Andrew Ng
 - Rachel Woods
@@ -197,7 +197,7 @@ Promotion signals include:
 - Lance Eaton
 - Lilian Weng
 
-## 3.3 Parked people
+### 3.3 Parked people
 
 - Kamil Banc
 - Nufar Gaspar
@@ -213,7 +213,7 @@ Promotion signals include:
 
 The last three were normalized out of Active monitoring to preserve the 12-person Active ceiling; organization/publication monitoring supplies much of their overlapping signal.
 
-## 3.4 Person story convergence
+### 3.4 Person story convergence
 
 When multiple Priority people independently say substantially the same thing:
 
@@ -225,9 +225,9 @@ Relationship rule:
 
 ---
 
-# 4. Organizations & Institutions
+## 4. Organizations & Institutions
 
-## 4.1 Priority organizations — 5
+### 4.1 Priority organizations — 5
 
 | Organization | Activity monitoring |
 |---|---|
@@ -237,7 +237,7 @@ Relationship rule:
 | EDUCAUSE | Research, Governance/policy, Official announcements |
 | Stanford HAI | Research only |
 
-## 4.2 Active organizations — 8
+### 4.2 Active organizations — 8
 
 - Microsoft
 - Hugging Face
@@ -248,7 +248,7 @@ Relationship rule:
 - U.S. Department of Education
 - Instructure (Canvas)
 
-## 4.3 Parked organizations
+### 4.3 Parked organizations
 
 - Google DeepMind
 - Ai2 / Allen Institute for AI
@@ -258,15 +258,15 @@ Relationship rule:
 - UNESCO — AI & Education
 - Wharton Interactive
 
-## 4.4 Product overlap
+### 4.4 Product overlap
 
 A product update may appear in both Organization and Product lenses, but it is stored as **one canonical intelligence object**, not duplicated.
 
 ---
 
-# 5. Products & Platforms
+## 5. Products & Platforms
 
-## 5.1 Priority products — 6
+### 5.1 Priority products — 6
 
 | Product | Priority signals |
 |---|---|
@@ -277,7 +277,7 @@ A product update may appear in both Organization and Product lenses, but it is s
 | Google Labs / experimental AI tools | Features, Release notes |
 | Canvas / Instructure | Features, Integrations, Workflow/UI |
 
-## 5.2 Active products — 10
+### 5.2 Active products — 10
 
 - Microsoft 365 Copilot
 - Perplexity
@@ -290,7 +290,7 @@ A product update may appear in both Organization and Product lenses, but it is s
 - Midjourney
 - Google Workspace AI
 
-## 5.3 Parked products/platforms
+### 5.3 Parked products/platforms
 
 - OpenAI Codex
 - Microsoft Copilot Studio
@@ -305,18 +305,18 @@ A product update may appear in both Organization and Product lenses, but it is s
 - Microsoft SharePoint + Copilot
 - Microsoft Teams / M365 AI integrations
 
-## 5.4 Child capabilities / non-slot entities
+### 5.4 Child capabilities / non-slot entities
 
 - `Claude → Claude Skills`
 - `ChatGPT → Custom GPTs`
 
 These are tracked as children of the monitored parent rather than consuming Active product slots.
 
-## 5.5 Research-oriented tool normalization
+### 5.5 Research-oriented tool normalization
 
 - STORM → Research / Questions workflow, not continuous Product monitoring.
 
-## 5.6 Product-change rules
+### 5.6 Product-change rules
 
 - Report **meaningful workflow-affecting changes only**.
 - Product families use parent → sub-product relationships.
@@ -324,9 +324,9 @@ These are tracked as children of the monitored parent rather than consuming Acti
 
 ---
 
-# 6. Publications
+## 6. Publications
 
-## 6.1 Core publications — 6
+### 6.1 Core publications — 6
 
 | Publication | Behavior |
 |---|---|
@@ -337,7 +337,7 @@ These are tracked as children of the monitored parent rather than consuming Acti
 | The Chronicle of Higher Education | Topic match only |
 | Write With AI | Topic match only |
 
-## 6.2 Active publications
+### 6.2 Active publications
 
 - WIRED
 - The Information
@@ -347,7 +347,7 @@ These are tracked as children of the monitored parent rather than consuming Acti
 - Platformer
 - EdSurge
 
-## 6.3 Parked publications
+### 6.3 Parked publications
 
 - The Verge
 - Inside Higher Ed
@@ -355,13 +355,13 @@ These are tracked as children of the monitored parent rather than consuming Acti
 - Daily Dose of Data Science
 - The AI Rabbit Hole
 
-## 6.4 Publication/source normalization
+### 6.4 Publication/source normalization
 
 - AI Daily Brief newsletter → endpoint of the AI Daily Brief Media property.
 - Google Workspace Blog / The Keyword → official Google organization/product endpoint rather than an independent Publication monitoring slot.
 - Person-authored newsletters/blogs such as One Useful Thing, Exponential View, AI Snake Oil, or Simon Willison's blog should attach to their canonical Person entities when the primary reason for following them is the person.
 
-## 6.5 Publication rules
+### 6.5 Publication rules
 
 - RSS, email, and web-discovered copies resolve to one canonical article.
 - Prefer the primary source as cluster anchor; attach publication coverage to the same story cluster.
@@ -369,9 +369,9 @@ These are tracked as children of the monitored parent rather than consuming Acti
 
 ---
 
-# 7. Media
+## 7. Media
 
-## 7.1 Core Media properties — 5
+### 7.1 Core Media properties — 5
 
 | Media property | Trigger |
 |---|---|
@@ -381,7 +381,7 @@ These are tracked as children of the monitored parent rather than consuming Acti
 | Hard Fork | Topic match |
 | Practical AI | Topic match |
 
-## 7.2 Active Media properties — 8
+### 7.2 Active Media properties — 8
 
 Active Media defaults to Topic-or-Entity matching unless otherwise configured.
 
@@ -394,7 +394,7 @@ Active Media defaults to Topic-or-Entity matching unless otherwise configured.
 - Designed for Learning
 - You can with AI
 
-## 7.3 Parked Media
+### 7.3 Parked Media
 
 - No Priors
 - Dwarkesh Podcast
@@ -403,7 +403,7 @@ Active Media defaults to Topic-or-Entity matching unless otherwise configured.
 - The Gradient Podcast
 - Tech Brew Ride Home
 
-## 7.4 Media normalization
+### 7.4 Media normalization
 
 - Exponential View → Azeem Azhar Person endpoint rather than a Media slot.
 - Priority-person guest appearances are pulled into Media automatically even when the host show is not followed.
@@ -413,22 +413,22 @@ Active Media defaults to Topic-or-Entity matching unless otherwise configured.
 
 ---
 
-# 8. YouTube / Video
+## 8. YouTube / Video
 
-## 8.1 Core independent YouTube-first sources — 3
+### 8.1 Core independent YouTube-first sources — 3
 
 - AI Explained
 - Jeff Su
 - Curious Refuge
 
-## 8.2 Active independent YouTube-first sources — 4
+### 8.2 Active independent YouTube-first sources — 4
 
 - Matt Wolfe
 - Skill Leap AI
 - Writing Secrets
 - Sharbel A.
 
-## 8.3 Existing-entity YouTube endpoints
+### 8.3 Existing-entity YouTube endpoints
 
 Do not consume separate Media slots:
 
@@ -438,7 +438,7 @@ Do not consume separate Media slots:
 - The Neuron → Active Publication endpoint
 - Every → Core Publication endpoint
 
-## 8.4 Video behavior
+### 8.4 Video behavior
 
 - Independent channels: SMART ingestion.
 - Index metadata immediately.
@@ -448,9 +448,9 @@ Do not consume separate Media slots:
 
 ---
 
-# 9. Research
+## 9. Research
 
-## 9.1 Core Research domains — 5
+### 9.1 Core Research domains — 5
 
 1. AI adoption & workplace productivity
 2. AI in education / learning outcomes
@@ -458,19 +458,19 @@ Do not consume separate Media slots:
 4. RAG, grounding & retrieval
 5. Creative AI / writing quality
 
-## 9.2 Active Research domains — 4
+### 9.2 Active Research domains — 4
 
 - Future of work / labor economics
 - Assessment, grading & formative feedback
 - Human-AI collaboration / judgment
 - Context, memory & agent systems
 
-## 9.3 Parked Research domains
+### 9.3 Parked Research domains
 
 - AI governance / regulation
 - General frontier-model research
 
-## 9.4 Preferred evidence types
+### 9.4 Preferred evidence types
 
 - Peer-reviewed studies
 - Working papers / preprints
@@ -489,7 +489,7 @@ Not preferred by default:
 
 These may still surface when otherwise relevant.
 
-## 9.5 Approved Research sources
+### 9.5 Approved Research sources
 
 **Use**
 - arXiv
@@ -509,12 +509,12 @@ These may still surface when otherwise relevant.
 - OpenAI research
 - Hugging Face papers/models
 
-## 9.6 Research source normalization
+### 9.6 Research source normalization
 
 - NBER Economics of AI Working Group → child/filter under NBER.
 - Consensus / Elicit → literature-discovery connectors for Questions, not evidence sources in themselves.
 
-## 9.7 Research Focus-promotion signals
+### 9.7 Research Focus-promotion signals
 
 - Core Research domain match
 - Core Watchlist facet match
@@ -529,7 +529,7 @@ Not sufficient:
 - citation/popularity alone
 - newness alone
 
-## 9.8 Research card defaults
+### 9.8 Research card defaults
 
 Show:
 
@@ -547,16 +547,16 @@ Do not require original abstract as a default visible field.
 
 ---
 
-# 10. Communities
+## 10. Communities
 
-## 10.1 Core Communities — 4
+### 10.1 Core Communities — 4
 
 - r/PromptEngineering
 - r/notebooklm
 - r/WritingWithAI
 - Instructure / Canvas Community
 
-### Explicit Core signal rules supplied
+#### Explicit Core signal rules supplied
 
 - r/PromptEngineering → Practical firsthand evidence + High-quality discussion
 - r/notebooklm → Practical firsthand evidence + Priority entity/product relevance
@@ -564,7 +564,7 @@ Do not require original abstract as a default visible field.
 
 **Implementation note:** a specific ingestion code for `r/WritingWithAI` was not explicitly selected during intake. Do not invent one silently; resolve before or during the Community implementation PR. General Community Focus rules below still apply.
 
-## 10.2 Active Communities — 6
+### 10.2 Active Communities — 6
 
 - r/ClaudeAI
 - r/AIEducation
@@ -575,7 +575,7 @@ Do not require original abstract as a default visible field.
 
 **Verification note:** community existence, current names/casing, activity, and feed availability for the last four added communities must be verified before they are encoded as live connectors. Preserve intent if a literal name requires correction.
 
-## 10.3 Parked Communities
+### 10.3 Parked Communities
 
 - r/ChatGPT
 - r/LocalLLaMA
@@ -587,7 +587,7 @@ Do not require original abstract as a default visible field.
 - r/webtoons
 - generic selected writing/author communities
 
-## 10.4 Community Focus preferences
+### 10.4 Community Focus preferences
 
 Favor:
 
@@ -608,16 +608,16 @@ Unconfirmed product changes:
 
 ---
 
-# 11. Events & Learning
+## 11. Events & Learning
 
-## 11.1 Opportunity types
+### 11.1 Opportunity types
 
-### Discover proactively
+#### Discover proactively
 
 - Hands-on workshops / labs
 - Short courses / bootcamps
 
-### Discover only if highly relevant
+#### Discover only if highly relevant
 
 - Webinars / virtual talks
 - Conferences
@@ -629,30 +629,30 @@ Unconfirmed product changes:
 - Community meetups / discussion events
 - Calls for papers / proposals / presentations
 
-### Ignore by default
+#### Ignore by default
 
 - Certifications / credentials
 
-## 11.2 Core Event/Learning domains
+### 11.2 Core Event/Learning domains
 
 - Enterprise AI adoption & workforce enablement
 - AI in teaching & learning
 - Prompting & AI workflow design
 - AI-assisted writing & creative workflows
 
-## 11.3 Active Event/Learning domains
+### 11.3 Active Event/Learning domains
 
 - Instructional design / assessment
 - RAG / knowledge management / research workflows
 - AI agents for knowledge workers
 - Multimodal / visual creation
 
-## 11.4 Parked Event/Learning domains
+### 11.4 Parked Event/Learning domains
 
 - AI policy / governance
 - General AI/product education
 
-## 11.5 Priority providers — 5
+### 11.5 Priority providers — 5
 
 - Microsoft AI / Copilot learning
 - Google AI / Workspace learning
@@ -660,7 +660,7 @@ Unconfirmed product changes:
 - KPMG AI learning/events
 - Every / AI & I workshops or learning
 
-## 11.6 Active providers
+### 11.6 Active providers
 
 - OpenAI events/learning
 - Stanford HAI
@@ -668,20 +668,20 @@ Unconfirmed product changes:
 - Harvard / HBR learning events
 - Outskill / similar practitioner training
 
-## 11.7 Parked providers
+### 11.7 Parked providers
 
 - EDUCAUSE
 - Instructure / Canvas training & events
 - Section
 
-## 11.8 Event endpoints attached to existing entities
+### 11.8 Event endpoints attached to existing entities
 
 - AI Daily Brief → event/learning endpoint of Media property
 - Nufar Gaspar → event endpoint of Person entity
 - Azeem Azhar → event endpoint of Person entity
 - The Neuron → event endpoint of Publication entity
 
-## 11.9 Opportunity scoring signals
+### 11.9 Opportunity scoring signals
 
 Use:
 
@@ -702,7 +702,7 @@ Do not reward by default:
 - credential/certificate
 - popularity/attendance
 
-## 11.10 Time-budget preferences
+### 11.10 Time-budget preferences
 
 - Focus threshold: **only exceptional opportunities the user would realistically register for**
 - Weekday webinar preference: **≤60 minutes**
@@ -711,7 +711,7 @@ Do not reward by default:
 
 These are ranking preferences, not absolute exclusions.
 
-## 11.11 Lifecycle and calendar
+### 11.11 Lifecycle and calendar
 
 - If recording/transcript/materials become available, convert them into reusable Media/Library material.
 - Allow Save, Add to Calendar, and Remind me.
@@ -719,9 +719,9 @@ These are ranking preferences, not absolute exclusions.
 
 ---
 
-# 12. Library
+## 12. Library
 
-## 12.1 Include in Library
+### 12.1 Include in Library
 
 - Readwise highlights
 - Books / book metadata
@@ -729,14 +729,14 @@ These are ranking preferences, not absolute exclusions.
 - Event recordings/materials
 - Selected saved web pages **only after deliberate promotion/triage**
 
-## 12.2 Keep separate from Library by default
+### 12.2 Keep separate from Library by default
 
 - Articles merely because they were read
 - Research papers/PDFs merely because they were encountered
 
 They may be deliberately incorporated later.
 
-## 12.3 Exclude from Library by default
+### 12.3 Exclude from Library by default
 
 - own notes
 - published writing
@@ -745,7 +745,7 @@ They may be deliberately incorporated later.
 
 These may exist in Personal/private storage but are not automatically part of the factual/external Library corpus.
 
-## 12.4 Library capabilities — all enabled
+### 12.4 Library capabilities — all enabled
 
 - full-text search
 - Watchlist topic matching
@@ -760,7 +760,7 @@ These may exist in Personal/private storage but are not automatically part of th
 
 ---
 
-# 13. Saved ⭐
+## 13. Saved ⭐
 
 - Star means durable intentional capture.
 - The Saved state may support read-later, importance, future Questions, and later Library promotion, but saving itself does **not** claim the item was learned.
@@ -770,7 +770,7 @@ These may exist in Personal/private storage but are not automatically part of th
 
 ---
 
-# 14. Bookmarks
+## 14. Bookmarks
 
 Bookmarks serve all three roles:
 
@@ -790,9 +790,9 @@ No ranking weight was granted to passive/frequent bookmark use.
 
 ---
 
-# 15. Personal
+## 15. Personal
 
-## 15.1 Allowed Personal inputs
+### 15.1 Allowed Personal inputs
 
 - web page URL
 - RSS / Atom feed URL
@@ -805,11 +805,11 @@ No ranking weight was granted to passive/frequent bookmark use.
 - custom search/query
 - plain text / pasted note
 
-## 15.2 Classification behavior
+### 15.2 Classification behavior
 
 **Intelligence Hub suggests the appropriate entity/lens and the user approves.**
 
-## 15.3 Privacy boundary
+### 15.3 Privacy boundary
 
 Private/personal content may participate in:
 
@@ -827,7 +827,7 @@ Private provenance must always remain clearly marked.
 
 ---
 
-# 16. Retention
+## 16. Retention
 
 General unsaved feed history: **90 days**.
 
@@ -835,9 +835,9 @@ If an item matters long-term, it should be Saved, incorporated into Library, ret
 
 ---
 
-# 17. Questions
+## 17. Questions
 
-## 17.1 Supported Question modes — all enabled
+### 17.1 Supported Question modes — all enabled
 
 - One-time question
 - Deep research question
@@ -848,11 +848,11 @@ If an item matters long-term, it should be Saved, incorporated into Library, ret
 - Trend question
 - Source discovery
 
-## 17.2 Plan-first execution
+### 17.2 Plan-first execution
 
 The system may internally interpret/decompose a substantial Question and propose facets, sources, terms, exclusions, and subquestions, but **the user approves the research plan before execution**.
 
-## 17.3 Default information spaces
+### 17.3 Default information spaces
 
 Search by default:
 
@@ -872,7 +872,7 @@ Optional per Question:
 - Bookmarks
 - Personal/private sources
 
-## 17.4 Evidence hierarchy
+### 17.4 Evidence hierarchy
 
 1. Primary research / original study
 2. Official primary source / original document
@@ -881,7 +881,7 @@ Optional per Question:
 5. Expert analysis/commentary
 6. AI-generated summary/synthesis
 
-## 17.5 Research standards — all mandatory
+### 17.5 Research standards — all mandatory
 
 - cite every material factual claim
 - prefer primary sources where available
@@ -894,7 +894,7 @@ Optional per Question:
 - never silently blend private sources with public evidence
 - state when evidence is insufficient for confidence
 
-## 17.6 Default available output formats
+### 17.6 Default available output formats
 
 - Research brief
 - Evidence table
@@ -906,7 +906,7 @@ Optional per Question:
 
 Quick chat-style `Direct answer` and `Executive summary` were not selected as default Question-output modes.
 
-## 17.7 Saved Question state — retain all
+### 17.7 Saved Question state — retain all
 
 - Original question
 - Refined research question
@@ -918,7 +918,7 @@ Quick chat-style `Direct answer` and `Executive summary` were not selected as de
 - Personal notes
 - Changes since previous run
 
-## 17.8 Monitored Question triggers
+### 17.8 Monitored Question triggers
 
 Update when:
 
@@ -931,24 +931,24 @@ Do not update merely because any matching item appears.
 
 Update frequency: **user chooses per Question**.
 
-## 17.9 Question/Watchlist relationship
+### 17.9 Question/Watchlist relationship
 
 - A Question may be promoted to a Watchlist.
 - A Watchlist should be able to launch an `Ask a Question about this` investigation.
 
-## 17.10 Follow-up questions
+### 17.10 Follow-up questions
 
 Suggest follow-up Questions only when a genuine unresolved issue exists.
 
-## 17.11 Monitored Question ceiling
+### 17.11 Monitored Question ceiling
 
 Maximum **5** active monitored Questions at once.
 
 ---
 
-# 18. Focus
+## 18. Focus
 
-## 18.1 Allowed Focus objects
+### 18.1 Allowed Focus objects
 
 - Individual high-value article/item
 - Research paper/report
@@ -965,7 +965,7 @@ Excluded:
 
 - routine Saved ⭐ reminders
 
-## 18.2 Promotion weights
+### 18.2 Promotion weights
 
 | Signal | Weight |
 |---|---:|
@@ -984,7 +984,7 @@ Excluded:
 | High popularity/engagement | 0 |
 | Very recent/new | 1 |
 
-## 18.3 Hard Focus eligibility rules
+### 18.3 Hard Focus eligibility rules
 
 May bypass the normal **eligibility** threshold:
 
@@ -1002,7 +1002,7 @@ Not sufficient by themselves:
 
 Hard eligibility does not guarantee top-eight placement.
 
-## 18.4 Focus structure
+### 18.4 Focus structure
 
 Hybrid:
 
@@ -1012,12 +1012,12 @@ Hybrid:
 4. Questions
 5. Coming Up
 
-## 18.5 Attention budget
+### 18.5 Attention budget
 
 - Worth Your Attention: **maximum 8**
 - total Focus objects before `Show more`: **15**
 
-## 18.6 Freshness
+### 18.6 Freshness
 
 - `<24h` → Normal
 - `1–3 days` → Normal
@@ -1025,11 +1025,11 @@ Hybrid:
 - `8–30 days` → only if unusually relevant
 - `>30 days` → Library/Question resurfacing only
 
-## 18.7 Diversity protection
+### 18.7 Diversity protection
 
 Merge closely related items into story clusters first. Apply caps if clustering is insufficient.
 
-## 18.8 Story-cluster display — show all
+### 18.8 Story-cluster display — show all
 
 - What happened
 - Why it matters to me
@@ -1044,7 +1044,7 @@ Merge closely related items into story clusters first. Apply caps if clustering 
 - Related Watchlists/entities
 - Related Library material
 
-## 18.9 Signal patterns
+### 18.9 Signal patterns
 
 Create Signals from:
 
@@ -1062,16 +1062,16 @@ Signal maturity:
 
 **Weak signal → Emerging → Established → Reversing**
 
-## 18.10 Explainability and evidence labels
+### 18.10 Explainability and evidence labels
 
 - `Why am I seeing this?` visible on every Focus card.
 - Evidence labels visible: Primary source, Research, Independent reporting, Analysis, Opinion, Practitioner report, Community report — unverified, AI synthesis.
 
-## 18.11 AI summary
+### 18.11 AI summary
 
 Default: concise **What happened / Why it matters**.
 
-## 18.12 Interaction signals used for ranking
+### 18.12 Interaction signals used for ranking
 
 Use explicit actions:
 
@@ -1087,7 +1087,7 @@ Do not use by default:
 - ignore/scroll past
 - time spent reading
 
-## 18.13 Negative/feedback controls — all enabled
+### 18.13 Negative/feedback controls — all enabled
 
 - Less like this
 - More like this
@@ -1098,23 +1098,23 @@ Do not use by default:
 - Hide story
 - Explain ranking
 
-## 18.14 Interruptions
+### 18.14 Interruptions
 
 **Nothing by default — Focus is pull, not push.**
 
 Explicit monitored Questions/reminders may notify according to their own settings.
 
-## 18.15 Refresh rhythm
+### 18.15 Refresh rhythm
 
 **Continuous ingestion, but Focus changes only when something materially outranks what is already there.**
 
-## 18.16 North-star success test
+### 18.16 North-star success test
 
 > **Focus is working if I can open Intelligence Hub for 10 minutes and know precisely how emerging evidence, structural shifts, or product realities change the underlying assumptions of my ongoing consulting, writing, or instructional projects.**
 
 ---
 
-# 19. Open implementation-verification items
+## 19. Open implementation-verification items
 
 The architecture and intent are ratified. The following should be resolved during implementation without altering intent:
 

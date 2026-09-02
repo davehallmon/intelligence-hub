@@ -4,6 +4,7 @@ This changelog is a high-level orientation layer over the repository's detailed 
 
 ## Unreleased — v10 visible-lens migration
 
+- V10-M09A.1 — moved v8–v9 release documentation into indexed history, removed unreachable `tabs.js`, added JavaScript reachability/configuration-surface validation, and established branch/contribution hygiene.
 - PR #35 — added **V10-M09 Products & Platforms** as a visible lens over the shared canonical store/runtime lens service, with deterministic meaningful-change filtering, child Product inheritance, shared mobile controls, retry routing, and Saved behavior.
 - Repository handoff remediation reframed root documentation around the PierView.io personal-intelligence product direction while preserving Intelligence Hub runtime compatibility naming.
 - Added canonical present-state and agent/developer handoff documents.
@@ -42,4 +43,4 @@ This changelog is a high-level orientation layer over the repository's detailed 
 
 ## Historical note
 
-Earlier root `README-v*.md` files document prior product stages. They remain historical evidence during migration and are not the present-state authority; use `README.md` and `STATUS.md` first.
+Earlier release documents are indexed under [`docs/history/`](docs/history/README.md). They remain historical evidence during migration and are not the present-state authority; use `README.md` and `STATUS.md` first.

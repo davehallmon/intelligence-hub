@@ -9,6 +9,7 @@
 | `STATUS.md` | Present implementation state, completed milestones, verification state, next milestone |
 | `AGENTS.md` | Contributor/LLM operating rules, invariants, validation and PR discipline |
 | `README.md` | Project orientation and current product/runtime overview |
+| `CONTRIBUTING.md` | Human contribution, branch-lifecycle and PR workflow |
 
 ## 2. Target product authorities
 
@@ -31,6 +32,7 @@
 | `js/config/evidence-types.js` | Evidence and verification vocabulary |
 | `js/config/lenses.js` | Canonical lens registry |
 | `js/config/legacy-map.js` | Deterministic compatibility mapping from pre-v10 identities/tags |
+| `js/config/index.js` | Public v10 configuration export surface; validated even before the live runtime consumes the barrel directly |
 | `js/connectors/catalog.js` | Connector capabilities and canonical source endpoints |
 | `js/connectors/live-source-map.js` | Mapping from current live feed configuration to canonical endpoints |
 | `js/intelligence-object.js` | v10 relationship, evidence, provenance and canonicalization enrichment |
@@ -48,8 +50,11 @@
 | `js/watchlist-mobile.js` | Watchlist mobile integration seam into the shared interaction shell |
 | `js/people-organizations-ui.js` | Visible People & Organizations lens over the shared read model |
 | `js/entity-source-coverage.js` | Explicit monitored-entity source coverage inventory |
+| `js/products-platforms-ui.js` | Visible Products & Platforms lens over the shared read model |
+| `js/product-change-classifier.js` | Deterministic meaningful Product-change presentation classification |
 | `watchlist.css`, `watchlist-mobile.css` | Current visible Watchlist styling |
 | `people-organizations.css` | Current visible People & Organizations styling |
+| `products-platforms.css` | Current visible Products & Platforms styling |
 
 ## 5. Cross-route interaction authorities
 
@@ -100,18 +105,20 @@ They should migrate or be consolidated only when V10-M18 Legacy Cleanup has expl
 
 ## 8. Historical documentation
 
-- `README-v8.md`
-- `README-v8.1.md`
-- `README-v8.5.md`
-- `README-v9.md`
-- `docs/implementation/*`
+- `docs/history/README.md` — index for superseded product/release documentation;
+- `docs/history/releases/v8.md`;
+- `docs/history/releases/v8.1.md`;
+- `docs/history/releases/v8.5.md`;
+- `docs/history/releases/v9.md`;
+- `docs/implementation/README.md` — stable milestone mapping for transaction evidence;
+- `docs/implementation/*` — historical implementation audits.
 
-These are valuable historical evidence. They are **not present-state authorities**. The versioned root READMEs may move into `docs/history/` during the final legacy/documentation cleanup once references are verified.
+These are valuable historical evidence. They are **not present-state authorities**. Historical documents belong in indexed history rather than the repository root.
 
 ## 9. Validation
 
 - `package.json` defines the canonical development-time validation command.
-- `scripts/validate.mjs` runs syntax and acceptance/structural checks.
+- `scripts/validate.mjs` runs syntax, entry-point reachability, public configuration-surface, acceptance and structural checks.
 - `js/config/validate-foundation.js` validates canonical configuration references and scarce-tier counts.
 - `js/tests/` contains phase/milestone acceptance fixtures.
 - `.github/workflows/validate.yml` runs the same validation on pull requests and `main`.
@@ -127,4 +134,11 @@ A file's age or location is not sufficient reason to remove it. During migration
 3. historical evidence;
 4. proven redundant legacy.
 
-Only category 4 is eligible for deletion without replacement work.
+Apply the classifications as follows:
+
+- canonical target authorities stay in current ownership locations and are extended deliberately;
+- active compatibility/runtime authorities stay until replacement parity and regression evidence exist;
+- historical evidence moves to an indexed history location;
+- proven redundant legacy source is deleted from the current tree and remains recoverable through Git history.
+
+Only category 4 is eligible for deletion without replacement work. `tabs.js` was removed under this rule after production and validation dependency checks confirmed that `js/navigation.js` had superseded it and no entry point referenced it.

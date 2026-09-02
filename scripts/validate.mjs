@@ -3,6 +3,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import * as configuration from "../js/config/index.js";
 import { validateFoundation } from "../js/config/validate-foundation.js";
 import { validateNormalizationV10 } from "../js/tests/validate-normalization-v10.js";
 import { validateConnectorsV10 } from "../js/tests/validate-connectors-v10.js";
@@ -31,6 +32,17 @@ function sourceFiles(dir) {
   return results;
 }
 
+function filesMatching(dir, pattern) {
+  const results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if ([".git", "node_modules"].includes(entry.name)) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) results.push(...filesMatching(full, pattern));
+    else if (pattern.test(entry.name)) results.push(full);
+  }
+  return results;
+}
+
 function syntaxCheck() {
   const files = sourceFiles(root).sort();
   for (const file of files) {
@@ -43,6 +55,124 @@ function syntaxCheck() {
     }
   }
   console.log(`Syntax validation passed for ${files.length} JavaScript files.`);
+}
+
+function localReference(fromFile, specifier) {
+  if (!specifier || /^(?:[a-z]+:|\/\/|#)/i.test(specifier)) return null;
+  if (!specifier.startsWith(".") && !specifier.startsWith("/")) return null;
+
+  const cleanSpecifier = specifier.replace(/[?#].*$/, "");
+  const base = specifier.startsWith("/") ? root : path.dirname(fromFile);
+  return path.resolve(base, cleanSpecifier.replace(/^\//, ""));
+}
+
+function javascriptReferences(file) {
+  const source = fs.readFileSync(file, "utf8");
+  const specifiers = new Set();
+  const patterns = [
+    /\b(?:import|export)\s+(?:[^"'`;]*?\s+from\s+)?["']([^"']+)["']/g,
+    /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g
+  ];
+
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) specifiers.add(match[1]);
+  }
+
+  return [...specifiers]
+    .map(specifier => localReference(file, specifier))
+    .filter(Boolean);
+}
+
+function dependencyGraph(entries) {
+  const visited = new Set();
+  const pending = [...entries];
+
+  while (pending.length) {
+    const file = pending.pop();
+    assert(fs.existsSync(file), `Local JavaScript reference does not resolve: ${relative(file)}`);
+    if (visited.has(file)) continue;
+    visited.add(file);
+
+    if (/\.(?:js|mjs)$/.test(file)) pending.push(...javascriptReferences(file));
+  }
+
+  return visited;
+}
+
+function repositoryReachabilityChecks() {
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const htmlScripts = [...html.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["'][^>]*>/gi)]
+    .map(match => match[1])
+    .filter(specifier => !/^(?:[a-z]+:|\/\/|#)/i.test(specifier))
+    .map(specifier => path.resolve(root, specifier.replace(/[?#].*$/, "").replace(/^\//, "")))
+    .filter(Boolean);
+
+  assert(htmlScripts.length > 0, "index.html must expose at least one local JavaScript entry point.");
+
+  const productionGraph = dependencyGraph(htmlScripts);
+  const validationGraph = dependencyGraph([path.join(root, "scripts/validate.mjs")]);
+  const reachable = new Set([...productionGraph, ...validationGraph]);
+  const orphaned = sourceFiles(root)
+    .filter(file => !reachable.has(file))
+    .map(relative)
+    .sort();
+
+  assert(
+    orphaned.length === 0,
+    `JavaScript files are unreachable from production or validation entry points: ${orphaned.join(", ")}`
+  );
+
+  const expectedConfigurationExports = [
+    "ENTITY_TYPES",
+    "ENTITY_REGISTRY",
+    "WATCHLIST_TOPICS",
+    "PERSON_INGESTION_PREFERENCES",
+    "EVIDENCE_TYPES",
+    "LENS_REGISTRY",
+    "LEGACY_PROFILE_TO_ENTITY",
+    "validateFoundation"
+  ];
+  const missingExports = expectedConfigurationExports.filter(name => !(name in configuration));
+  assert(
+    missingExports.length === 0,
+    `js/config/index.js is missing public exports: ${missingExports.join(", ")}`
+  );
+
+  console.log(
+    `Repository reachability passed (${productionGraph.size} production, ${validationGraph.size} validation files).`
+  );
+}
+
+function markdownReferenceChecks() {
+  const broken = [];
+  const markdownFiles = filesMatching(root, /\.md$/).sort();
+
+  for (const file of markdownFiles) {
+    const source = fs.readFileSync(file, "utf8");
+    const links = source.matchAll(/!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)/g);
+
+    for (const match of links) {
+      const reference = match[1].replace(/^<|>$/g, "");
+      if (/^(?:[a-z]+:|\/\/|#)/i.test(reference)) continue;
+
+      const target = reference.split("#", 1)[0];
+      if (!target) continue;
+
+      let decodedTarget;
+      try {
+        decodedTarget = decodeURIComponent(target);
+      } catch {
+        broken.push(`${relative(file)} -> ${reference} (invalid URI encoding)`);
+        continue;
+      }
+
+      const resolved = path.resolve(path.dirname(file), decodedTarget);
+      if (!fs.existsSync(resolved)) broken.push(`${relative(file)} -> ${reference}`);
+    }
+  }
+
+  assert(broken.length === 0, `Broken local Markdown references: ${broken.join(", ")}`);
+  console.log(`Markdown reference validation passed for ${markdownFiles.length} files.`);
 }
 
 function runResultSuite(name, validator) {
@@ -80,6 +210,8 @@ function repositoryContractChecks() {
 }
 
 syntaxCheck();
+repositoryReachabilityChecks();
+markdownReferenceChecks();
 runResultSuite("Foundation validation", validateFoundation);
 runResultSuite("Normalization validation", validateNormalizationV10);
 runResultSuite("Connector validation", validateConnectorsV10);

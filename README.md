@@ -84,6 +84,7 @@ The current v9.x UI/runtime compatibility rules remain governed by [`TECHNICAL_S
 | `docs/architecture/` | Product/information architecture and migration authority |
 | `docs/configuration/` | Ratified product configuration |
 | `docs/implementation/` | Historical implementation/audit records for completed migration work |
+| `docs/history/` | Indexed superseded release and product documentation |
 | root legacy CSS/JS/data files | Intentional compatibility layer retained until replacement parity is proven |
 
 For a more explicit current/legacy authority map, see [`docs/architecture/REPOSITORY_MAP.md`](docs/architecture/REPOSITORY_MAP.md).
@@ -98,7 +99,7 @@ Node is used **only for development-time validation**, not as a production depen
 npm run validate
 ```
 
-The validation command syntax-checks JavaScript and runs the repository's v10 acceptance/structural fixtures. Pull requests also run the same validation in GitHub Actions.
+The validation command syntax-checks JavaScript, verifies that local JavaScript is reachable from a production or validation entry point, checks the canonical configuration export surface, and runs the repository's v10 acceptance/structural fixtures. Pull requests also run the same validation in GitHub Actions.
 
 Browser/device acceptance remains necessary for interaction changes, especially mobile gestures, responsive navigation, and remote-feed transport behavior.
 
@@ -125,4 +126,4 @@ GitHub Pages publishes from the `main` branch and repository root. A successful 
 
 ## Current status
 
-**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone is **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.
+**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. **V10-M09A — Repository Structure Normalization** is the active pre-M10 remediation concern. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone remains **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.

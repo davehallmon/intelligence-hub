@@ -14,6 +14,8 @@ Read these files before changing code:
 6. `TECHNICAL_SPEC.md` — current UI/runtime compatibility requirements.
 7. Relevant `docs/implementation/*` audit files for the specific concern being changed.
 
+Human contributors should also read `CONTRIBUTING.md` for the short-lived branch and pull-request workflow.
+
 Historical PR descriptions and phase audits are evidence of what was true when written. They are not a substitute for `STATUS.md`.
 
 ## Stable milestone rule
@@ -101,6 +103,8 @@ Interaction or rendering PRs should explicitly test relevant states after GitHub
 If the execution environment cannot perform those checks, say so in the PR and leave a concrete manual checklist.
 
 ## Pull-request discipline
+
+Use one short-lived branch per architectural concern. Prefer `<type>/<stable-id>-<concern>` in lowercase kebab-case, merge through a pull request, and delete the head branch after merge. Do not introduce a long-lived development or release branch without an explicit repository decision.
 
 Each implementation PR should include:
 
