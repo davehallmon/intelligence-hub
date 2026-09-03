@@ -2,11 +2,21 @@ import { spawnSync } from "node:child_process";
 
 const result = spawnSync(
   process.platform === "win32" ? "npx.cmd" : "npx",
-  ["playwright", "test", "tests/browser/negative-control.browser.test.js", "--project=desktop-chromium"],
+  [
+    "playwright",
+    "test",
+    "tests/browser/negative-control.browser.test.js",
+    "--project=desktop-chromium",
+    "--retries=0"
+  ],
   {
     encoding: "utf8",
     stdio: "pipe",
-    env: { ...process.env, PIERVIEW_NEGATIVE_CONTROL: "1" }
+    env: {
+      ...process.env,
+      PIERVIEW_NEGATIVE_CONTROL: "1",
+      PIERVIEW_BROWSER_EVIDENCE_FILE: "test-results/browser-negative-control-evidence.json"
+    }
   }
 );
 

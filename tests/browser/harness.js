@@ -1,10 +1,35 @@
-import { expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
 import {
   MALICIOUS_ITEM,
   PRIVATE_FEED_SENTINEL,
   PRODUCT_ITEMS,
   rssFixture
 } from "./feed-fixtures.js";
+
+export const test = base.extend({
+  applicationErrorGuard: [async ({ page }, use) => {
+    const applicationErrors = [];
+    const allowedConsolePatterns = [];
+    page.on("console", message => {
+      if (message.type() === "error") applicationErrors.push({ kind: "console", text: message.text() });
+    });
+    page.on("pageerror", error => {
+      applicationErrors.push({ kind: "pageerror", text: error.message });
+    });
+
+    await use({
+      allowConsole(pattern) {
+        allowedConsolePatterns.push(pattern);
+      }
+    });
+
+    const unexpected = applicationErrors.filter(error =>
+      error.kind === "pageerror"
+      || !allowedConsolePatterns.some(pattern => pattern.test(error.text))
+    );
+    expect(unexpected, "unexpected console errors or uncaught page errors").toEqual([]);
+  }, { auto: true }]
+});
 
 export async function installDeterministicNetwork(page, initialScenario = "populated") {
   let scenario = initialScenario;
@@ -80,12 +105,4 @@ export async function openApplicationRoute(page, route) {
   await expect.poll(
     () => page.evaluate(() => Boolean(window.intelligenceHubV10))
   ).toBe(true);
-}
-
-export async function assertNoApplicationConsoleErrors(page) {
-  const applicationErrors = [];
-  page.on("console", message => {
-    if (message.type() === "error") applicationErrors.push(message.text());
-  });
-  return () => expect(applicationErrors, "application console errors").toEqual([]);
 }

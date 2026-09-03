@@ -86,7 +86,15 @@ export function initNavigation({ onPrimaryChange } = {}) {
 
   document.body.classList.add("tabs-enabled");
 
-  let { primary: activePrimary, secondary: activeLaunchpad } = parseHash();
+  const initialRoute = parseHash();
+  let activePrimary = initialRoute.primary;
+  // Keep the subordinate Launchpad state valid even when the current route is
+  // another primary lens. Keyboard selection can enter Launchpad directly
+  // after a reload, before any Launchpad hash has supplied a secondary route.
+  let activeLaunchpad =
+    normalizeLaunchpad(initialRoute.secondary)
+    || normalizeLaunchpad(localStorage.getItem("intelligenceHubView"))
+    || "destinations";
 
   function setCategoryOpen(category, open) {
     const button = category.querySelector(".category-button");

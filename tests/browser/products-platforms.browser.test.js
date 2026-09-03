@@ -1,12 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
-import { test, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { PRIVATE_FEED_SENTINEL } from "./feed-fixtures.js";
 import {
-  assertNoApplicationConsoleErrors,
   installDeterministicNetwork,
   openApplicationRoute,
-  openProductLens
+  openProductLens,
+  test
 } from "./harness.js";
 
 const GEMINI_TITLE = "Introducing Gemini 2.5: a new reasoning model release";
@@ -31,7 +31,6 @@ async function selectPrimaryTab(page, key, name) {
 
 test("BROWSER-01 production-shaped Product trace reaches one shared rendered object", async ({ page }) => {
   await installDeterministicNetwork(page);
-  const assertNoConsoleErrors = await assertNoApplicationConsoleErrors(page);
   await openProductLens(page);
 
   const feed = page.locator("#productsPlatformsFeed");
@@ -65,7 +64,6 @@ test("BROWSER-01 production-shaped Product trace reaches one shared rendered obj
   expect(trace.samePeopleReference).toBe(true);
   expect(trace.canonicalItems).toBeGreaterThan(0);
   expect(trace.sourceMemberships).toBeGreaterThanOrEqual(trace.canonicalItems);
-  assertNoConsoleErrors();
 });
 
 test("BROWSER-02 ambiguous near miss is rejected while generic matches remain inspectable", async ({ page }) => {
@@ -110,7 +108,9 @@ test("BROWSER-04 loading transitions to ready and clears busy semantics", async 
   await expect(productFeedText(page, GEMINI_TITLE)).toBeVisible();
 });
 
-test("BROWSER-05 total transport failure renders error and retry recovers", async ({ page }) => {
+test("BROWSER-05 total transport failure renders error and retry recovers", async ({ page, applicationErrorGuard }) => {
+  applicationErrorGuard.allowConsole(/^Failed to load resource: the server responded with a status of 503/);
+  applicationErrorGuard.allowConsole(/^Unable to load Products & Platforms: Error: All configured public sources are unavailable\./);
   const network = await installDeterministicNetwork(page, "error");
   await page.goto("/#products-platforms");
 
@@ -128,7 +128,9 @@ test("BROWSER-05 total transport failure renders error and retry recovers", asyn
 test("BROWSER-06 route history, reload, and keyboard tab semantics remain coherent", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop keyboard-history case");
   await installDeterministicNetwork(page, "empty");
-  await openApplicationRoute(page, "myfeed");
+  // Begin on the no-fetch Launchpad route so this navigation contract remains
+  // independent of My Feed's asynchronous multi-source startup fan-out.
+  await openApplicationRoute(page, "launchpad/destinations");
   await selectPrimaryTab(page, "products-platforms", "Products & Platforms");
   await expect(page).toHaveURL(/#products-platforms$/);
   await selectPrimaryTab(page, "news", "News");
@@ -172,7 +174,8 @@ test("BROWSER-07 Saved state persists across reload without passive ranking muta
   expect(after).toEqual(before);
 });
 
-test("BROWSER-08 private bridge failure remains direct-only and redacted from UI", async ({ page }) => {
+test("BROWSER-08 private bridge failure remains direct-only and redacted from UI", async ({ page, applicationErrorGuard }) => {
+  applicationErrorGuard.allowConsole(/^Failed to load resource: net::ERR_FAILED$/);
   const network = await installDeterministicNetwork(page, "empty");
   await page.addInitScript(({ key, value }) => {
     localStorage.setItem(key, JSON.stringify({
@@ -221,7 +224,9 @@ test("BROWSER-10 Product lens has no detectable WCAG A/AA violations", async ({ 
 test("BROWSER-11 mobile navigation and shared Product controls remain usable", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("mobile"), "Mobile-only shared-shell case");
   await installDeterministicNetwork(page, "empty");
-  await openApplicationRoute(page, "myfeed");
+  // Exercise the shared mobile shell from a stable no-fetch route; live My Feed
+  // readiness remains a separate post-deployment acceptance boundary.
+  await openApplicationRoute(page, "launchpad/destinations");
 
   const menu = page.locator("#menu-toggle");
   await expect(menu).toBeVisible();
