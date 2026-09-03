@@ -1,6 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 const CI = Boolean(process.env.CI);
+const evidenceOutput = process.env.PIERVIEW_BROWSER_EVIDENCE_FILE || "test-results/browser-evidence.json";
 
 export default defineConfig({
   testDir: "./tests/browser",
@@ -17,11 +18,11 @@ export default defineConfig({
   outputDir: "test-results/artifacts",
   reporter: [
     ["line"],
-    ["./tests/browser/evidence-reporter.js", { outputFile: "test-results/browser-evidence.json" }]
+    ["./tests/browser/evidence-reporter.js", { outputFile: evidenceOutput }]
   ],
   metadata: {
     fixtureVersion: "pre-v10-m10-browser-fixtures-v3",
-    harnessVersion: "pre-v10-m10-browser-harness-v4"
+    harnessVersion: "pre-v10-m10-browser-harness-v5"
   },
   use: {
     baseURL: "http://127.0.0.1:4173",

@@ -33,7 +33,7 @@ No Product identity, monitoring tier, source endpoint, ranking weight, or Focus 
 - `@playwright/test`: `1.62.1`, exact development dependency
 - `@axe-core/playwright`: `4.13.0`, exact development dependency
 - Browser engine: pinned Chromium revision installed by Playwright
-- Harness version: `pre-v10-m10-browser-harness-v4`
+- Harness version: `pre-v10-m10-browser-harness-v5`
 - Fixture version: `pre-v10-m10-browser-fixtures-v3`
 - Fixture file SHA-256: `41a0d2903abfeb297992015c050f3d5405346c819fa9c939abc3be8e87aee99e`
 
@@ -68,7 +68,7 @@ npm run test:browser:negative-control
 
 `npm run verify` composes repository validation and deterministic browser acceptance. GitHub Actions keeps `validate` and `browser` as separate jobs so browser failure remains visible and can be configured as a required check.
 
-The custom reporter writes `test-results/browser-evidence.json` with repository SHA, fixture/harness versions, Playwright/browser identity, case results, retry count, duration, final status, and sanitized failure summaries. An automatic per-test guard rejects every uncaught page exception and every undeclared console error. The two deliberate transport-failure cases declare only their expected 503 or direct-abort console signatures; any other error still fails the case. CI preserves the report and failure-only trace/screenshot/video artifacts for 30 days.
+The custom reporter writes positive acceptance to `test-results/browser-evidence.json` with repository SHA, fixture/harness versions, Playwright/browser identity, case results, retry count, duration, final status, and sanitized failure summaries. The deliberate false assertion writes separately to `test-results/browser-negative-control-evidence.json`, so it cannot overwrite evidence of the positive matrix; retries are disabled for that intentionally failing case. An automatic per-test guard rejects every uncaught page exception and every undeclared console error. The two deliberate transport-failure cases declare only their expected 503 or direct-abort console signatures; any other error still fails the case. CI preserves both reports and failure-only trace/screenshot/video artifacts for 30 days.
 
 ## Verification boundary
 
