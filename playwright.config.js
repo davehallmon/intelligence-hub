@@ -21,8 +21,8 @@ export default defineConfig({
     ["./tests/browser/evidence-reporter.js", { outputFile: evidenceOutput }]
   ],
   metadata: {
-    fixtureVersion: "pre-v10-m10-browser-fixtures-v3",
-    harnessVersion: "pre-v10-m10-browser-harness-v6"
+    fixtureVersion: "pre-v10-m10-browser-fixtures-v4",
+    harnessVersion: "pre-v10-m10-browser-harness-v7"
   },
   use: {
     baseURL: "http://127.0.0.1:4173",
