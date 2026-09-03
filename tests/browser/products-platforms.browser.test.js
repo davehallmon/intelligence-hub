@@ -1,12 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
-import { test, expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 import { PRIVATE_FEED_SENTINEL } from "./feed-fixtures.js";
 import {
-  assertNoApplicationConsoleErrors,
   installDeterministicNetwork,
   openApplicationRoute,
-  openProductLens
+  openProductLens,
+  test
 } from "./harness.js";
 
 const GEMINI_TITLE = "Introducing Gemini 2.5: a new reasoning model release";
@@ -31,7 +31,6 @@ async function selectPrimaryTab(page, key, name) {
 
 test("BROWSER-01 production-shaped Product trace reaches one shared rendered object", async ({ page }) => {
   await installDeterministicNetwork(page);
-  const assertNoConsoleErrors = await assertNoApplicationConsoleErrors(page);
   await openProductLens(page);
 
   const feed = page.locator("#productsPlatformsFeed");
@@ -65,7 +64,6 @@ test("BROWSER-01 production-shaped Product trace reaches one shared rendered obj
   expect(trace.samePeopleReference).toBe(true);
   expect(trace.canonicalItems).toBeGreaterThan(0);
   expect(trace.sourceMemberships).toBeGreaterThanOrEqual(trace.canonicalItems);
-  assertNoConsoleErrors();
 });
 
 test("BROWSER-02 ambiguous near miss is rejected while generic matches remain inspectable", async ({ page }) => {
