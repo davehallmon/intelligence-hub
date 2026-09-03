@@ -9,15 +9,25 @@ import {
 export const test = base.extend({
   applicationErrorGuard: [async ({ page }, use) => {
     const applicationErrors = [];
+    const allowedConsolePatterns = [];
     page.on("console", message => {
-      if (message.type() === "error") applicationErrors.push(`console: ${message.text()}`);
+      if (message.type() === "error") applicationErrors.push({ kind: "console", text: message.text() });
     });
     page.on("pageerror", error => {
-      applicationErrors.push(`pageerror: ${error.message}`);
+      applicationErrors.push({ kind: "pageerror", text: error.message });
     });
 
-    await use();
-    expect(applicationErrors, "application console errors or uncaught page errors").toEqual([]);
+    await use({
+      allowConsole(pattern) {
+        allowedConsolePatterns.push(pattern);
+      }
+    });
+
+    const unexpected = applicationErrors.filter(error =>
+      error.kind === "pageerror"
+      || !allowedConsolePatterns.some(pattern => pattern.test(error.text))
+    );
+    expect(unexpected, "unexpected console errors or uncaught page errors").toEqual([]);
   }, { auto: true }]
 });
 

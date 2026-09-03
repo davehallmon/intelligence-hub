@@ -108,7 +108,9 @@ test("BROWSER-04 loading transitions to ready and clears busy semantics", async 
   await expect(productFeedText(page, GEMINI_TITLE)).toBeVisible();
 });
 
-test("BROWSER-05 total transport failure renders error and retry recovers", async ({ page }) => {
+test("BROWSER-05 total transport failure renders error and retry recovers", async ({ page, applicationErrorGuard }) => {
+  applicationErrorGuard.allowConsole(/^Failed to load resource: the server responded with a status of 503/);
+  applicationErrorGuard.allowConsole(/^Unable to load Products & Platforms: Error: All configured public sources are unavailable\./);
   const network = await installDeterministicNetwork(page, "error");
   await page.goto("/#products-platforms");
 
@@ -172,7 +174,8 @@ test("BROWSER-07 Saved state persists across reload without passive ranking muta
   expect(after).toEqual(before);
 });
 
-test("BROWSER-08 private bridge failure remains direct-only and redacted from UI", async ({ page }) => {
+test("BROWSER-08 private bridge failure remains direct-only and redacted from UI", async ({ page, applicationErrorGuard }) => {
+  applicationErrorGuard.allowConsole(/^Failed to load resource: net::ERR_FAILED$/);
   const network = await installDeterministicNetwork(page, "empty");
   await page.addInitScript(({ key, value }) => {
     localStorage.setItem(key, JSON.stringify({
