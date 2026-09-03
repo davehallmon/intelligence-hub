@@ -4,7 +4,7 @@
 import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
 import { entitiesByType, getEntity } from "../config/entities.js";
 import { classifyProductChange } from "./product-change-classifier.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
+import { createRichCard, renderEmpty, renderError, renderLoading, setStatus } from "../renderers.js";
 
 const MONITORED_STATES = new Set([
   MONITORING_STATES.PRIORITY,
@@ -234,7 +234,12 @@ function renderResult(allResult, productFilteredResult, filterValue = "", signal
   }
 
   const container = document.getElementById("productsPlatformsFeed");
-  container?.replaceChildren();
+  if (container) {
+    container.replaceChildren();
+    container.dataset.state = "ready";
+    container.removeAttribute("aria-busy");
+    container.removeAttribute("aria-label");
+  }
   visibleEntries.forEach(entry => {
     const card = createRichCard(entry.item, {
       className: "feed-card product-lens-card",
@@ -312,10 +317,13 @@ export function initProductsPlatformsUI({ queryLens, loadSources } = {}) {
 
     const task = (async () => {
       try {
-        await loadSources({ force });
+        const sourceSummary = await loadSources({ force });
+        if (sourceSummary?.itemCount === 0 && sourceSummary?.hasHealthySource === false) {
+          throw new Error("All configured public sources are unavailable. Retry after connectivity or source access recovers.");
+        }
         return renderCurrent();
       } catch (error) {
-        renderEmpty("productsPlatformsFeed", error?.message || "Unable to load Products & Platforms intelligence.");
+        renderError("productsPlatformsFeed", error);
         setStatus("productsPlatformsStatus", error?.message || "Unable to load Products & Platforms intelligence.", "error");
         throw error;
       }

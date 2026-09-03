@@ -80,7 +80,7 @@ The current v9.x UI/runtime compatibility rules remain governed by [`TECHNICAL_S
 | `js/item-store.js` | Shared session-scoped canonical item store |
 | `js/lenses/` | Shared lens selection/service plus visible lens UI and lens-specific helpers |
 | `css/lenses/` | Visible v10 lens styling |
-| `tests/` | Node-only acceptance fixtures and structural validators |
+| `tests/` | Node acceptance fixtures, structural validators, and deterministic browser cases |
 | `docs/architecture/` | Product/information architecture and migration authority |
 | `docs/configuration/` | Ratified product configuration |
 | `docs/implementation/` | Historical implementation/audit records for completed migration work |
@@ -100,6 +100,16 @@ npm run validate
 ```
 
 The validation command syntax-checks JavaScript, verifies entry-point reachability and production resources, enforces the repository-root file contract, checks local Markdown references and the canonical configuration export surface, and runs the repository's v10 acceptance/structural fixtures. Pull requests also run the same validation in GitHub Actions.
+
+Interaction and rendering changes also run the pinned browser suite:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
+
+The browser suite serves the real static application, intercepts changing third-party feeds with versioned deterministic fixtures, and records SHA-specific machine-readable evidence. It is a development-time dependency only; production remains static HTML/CSS/JavaScript.
 
 Browser/device acceptance remains necessary for interaction changes, especially mobile gestures, responsive navigation, and remote-feed transport behavior.
 
@@ -126,4 +136,4 @@ GitHub Pages publishes from the `main` branch and repository root. A successful 
 
 ## Current status
 
-**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. **V10-M09A — Repository Structure Normalization** is implementation-complete in PRs #37–38; Issue #36 retains the settings-level branch cleanup and deployed smoke-test follow-through. Continue from [`STATUS.md`](STATUS.md); the next stable product milestone is **V10-M10 — Publications & Media migration**. Do not infer current work from a bare historical phase number.
+**V10-M09 — Products & Platforms visible migration** is the latest implemented v10 product milestone. **V10-M09A — Repository Structure Normalization** is implementation-complete in PRs #37–38; Issue #36 retains settings-level branch cleanup and deployed smoke-test follow-through. **V10-M10 — Publications & Media remains paused by the pre-V10-M10 readiness gate.** Continue from [`STATUS.md`](STATUS.md), and do not infer current work from a bare historical phase number.

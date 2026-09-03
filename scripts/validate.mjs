@@ -39,6 +39,7 @@ const ROOT_FILE_ALLOWLIST = new Set([
   "my-feed.css",
   "package-lock.json",
   "package.json",
+  "playwright.config.js",
   "social-source-policy.css",
   "styles.css",
   "tabs.css"
@@ -147,7 +148,14 @@ function repositoryReachabilityChecks() {
   assert(htmlScripts.length > 0, "index.html must expose at least one local JavaScript entry point.");
 
   const productionGraph = dependencyGraph(htmlScripts);
-  const validationGraph = dependencyGraph([path.join(root, "scripts/validate.mjs")]);
+  const browserValidationEntries = sourceFiles(path.join(root, "tests/browser"));
+  const validationGraph = dependencyGraph([
+    path.join(root, "scripts/validate.mjs"),
+    path.join(root, "playwright.config.js"),
+    path.join(root, "scripts/serve-static.mjs"),
+    path.join(root, "scripts/verify-browser-negative-control.mjs"),
+    ...browserValidationEntries
+  ]);
   const reachable = new Set([...productionGraph, ...validationGraph]);
   const orphaned = sourceFiles(root)
     .filter(file => !reachable.has(file))
@@ -209,7 +217,7 @@ function productionResourceChecks(html, productionGraph) {
 
 function rootFileContractChecks() {
   const unexpected = fs.readdirSync(root, { withFileTypes: true })
-    .filter(entry => entry.isFile() && !ROOT_FILE_ALLOWLIST.has(entry.name))
+    .filter(entry => entry.isFile() && entry.name !== ".git" && !ROOT_FILE_ALLOWLIST.has(entry.name))
     .map(entry => entry.name)
     .sort();
 

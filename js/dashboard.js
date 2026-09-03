@@ -17,9 +17,22 @@ initMyFeedUI();
 
 async function loadLensSources({ force = false } = {}) {
   if (force) feeds.invalidate("myfeed");
-  return Promise.allSettled(
+  const settled = await Promise.allSettled(
     MY_FEED_SOURCE_TABS.map(tab => feeds.load(tab, { force }))
   );
+
+  const outcomes = settled.map((result, index) => {
+    const tab = MY_FEED_SOURCE_TABS[index];
+    const items = result.status === "fulfilled" && Array.isArray(result.value) ? result.value : [];
+    const uiState = document.getElementById(`${tab}Status`)?.dataset.state || "";
+    return Object.freeze({ tab, status: result.status, itemCount: items.length, uiState });
+  });
+
+  return Object.freeze({
+    outcomes: Object.freeze(outcomes),
+    itemCount: outcomes.reduce((total, outcome) => total + outcome.itemCount, 0),
+    hasHealthySource: outcomes.some(outcome => outcome.itemCount > 0 || outcome.uiState === "ok")
+  });
 }
 
 const watchlist = initWatchlistUI({
