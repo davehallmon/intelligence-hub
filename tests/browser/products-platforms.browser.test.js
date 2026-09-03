@@ -12,6 +12,20 @@ const GEMINI_TITLE = "Introducing Gemini 2.5: a new reasoning model release";
 const GENERIC_TITLE = "Researchers compare ChatGPT and students on writing tasks";
 const NEAR_MISS_TITLE = "How to observe the Gemini constellation this autumn";
 
+function productFeedText(page, text) {
+  return page.locator("#productsPlatformsFeed").getByText(text, { exact: true });
+}
+
+async function selectPrimaryTab(page, name) {
+  const tab = page.getByRole("tab", { name, exact: true });
+  await expect(tab).toBeVisible();
+  await tab.scrollIntoViewIfNeeded();
+  // The application changes an in-page read model and never performs a
+  // document navigation. A DOM click keeps this assertion independent of
+  // feed requests that may still be settling in other, hidden panels.
+  await tab.evaluate(button => button.click());
+}
+
 test("BROWSER-01 production-shaped Product trace reaches one shared rendered object", async ({ page }) => {
   await installDeterministicNetwork(page);
   const assertNoConsoleErrors = await assertNoApplicationConsoleErrors(page);
@@ -55,10 +69,10 @@ test("BROWSER-02 ambiguous near miss is rejected while generic matches remain in
   await installDeterministicNetwork(page);
   await openProductLens(page);
 
-  await expect(page.getByText(GENERIC_TITLE, { exact: true })).toHaveCount(0);
+  await expect(productFeedText(page, GENERIC_TITLE)).toHaveCount(0);
   await page.getByLabel("Signal").selectOption("all");
-  await expect(page.getByText(GENERIC_TITLE, { exact: true })).toBeVisible();
-  await expect(page.getByText(NEAR_MISS_TITLE, { exact: true })).toHaveCount(0);
+  await expect(productFeedText(page, GENERIC_TITLE)).toBeVisible();
+  await expect(productFeedText(page, NEAR_MISS_TITLE)).toHaveCount(0);
 
   const rejected = await page.evaluate(title => {
     const snapshot = window.intelligenceHubV10.snapshot();
@@ -90,7 +104,7 @@ test("BROWSER-04 loading transitions to ready and clears busy semantics", async 
   await expect(page.locator("#productsPlatformsFeed")).toHaveAttribute("aria-busy", "true");
   await expect(page.locator("#productsPlatformsFeed")).toHaveAttribute("data-state", "ready", { timeout: 15_000 });
   await expect(page.locator("#productsPlatformsFeed")).not.toHaveAttribute("aria-busy", "true");
-  await expect(page.getByText(GEMINI_TITLE, { exact: true })).toBeVisible();
+  await expect(productFeedText(page, GEMINI_TITLE)).toBeVisible();
 });
 
 test("BROWSER-05 total transport failure renders error and retry recovers", async ({ page }) => {
@@ -105,16 +119,16 @@ test("BROWSER-05 total transport failure renders error and retry recovers", asyn
   network.setScenario("populated");
   await feed.getByRole("button", { name: "Retry" }).click();
   await expect(feed).toHaveAttribute("data-state", "ready", { timeout: 15_000 });
-  await expect(page.getByText(GEMINI_TITLE, { exact: true })).toBeVisible();
+  await expect(productFeedText(page, GEMINI_TITLE)).toBeVisible();
 });
 
 test("BROWSER-06 route history, reload, and keyboard tab semantics remain coherent", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop keyboard-history case");
   await installDeterministicNetwork(page, "empty");
   await page.goto("/#myfeed");
-  await page.getByRole("tab", { name: "Products & Platforms" }).click();
+  await selectPrimaryTab(page, "Products & Platforms");
   await expect(page).toHaveURL(/#products-platforms$/);
-  await page.getByRole("tab", { name: "News" }).click();
+  await selectPrimaryTab(page, "News");
   await expect(page).toHaveURL(/#news$/);
 
   await page.goBack();
@@ -136,8 +150,9 @@ test("BROWSER-07 Saved state persists across reload without passive ranking muta
 
   const card = page.locator("#productsPlatformsFeed article").filter({ hasText: GEMINI_TITLE }).first();
   const star = card.getByRole("button", { name: "Save for later" });
+  await expect(star).toBeVisible();
   await star.click();
-  await expect(star).toHaveAttribute("aria-pressed", "true");
+  await expect(card.getByRole("button", { name: "Unstar saved item" })).toHaveAttribute("aria-pressed", "true");
 
   const before = await page.evaluate(() => ({
     saved: localStorage.getItem("intelligenceHub.savedItems.v2"),
@@ -206,7 +221,7 @@ test("BROWSER-11 mobile navigation and shared Product controls remain usable", a
   await page.goto("/#myfeed");
 
   await page.getByRole("button", { name: "Open navigation" }).click();
-  await page.getByRole("tab", { name: "Products & Platforms" }).click();
+  await selectPrimaryTab(page, "Products & Platforms");
   await expect(page.locator("body")).toHaveAttribute("data-primary-view", "products-platforms");
   await expect(page.getByRole("button", { name: "Open navigation" })).toHaveAttribute("aria-expanded", "false");
   await expect(page.locator("#context-controls-filters #productsPlatformsFilter")).toBeVisible();

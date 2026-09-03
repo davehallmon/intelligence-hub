@@ -105,7 +105,7 @@
 }
 
 .product-match-label {
-  color: #69798f;
+  color: #94a3b8;
   font-size: .56rem;
   font-weight: 850;
   letter-spacing: .08em;
@@ -141,6 +141,10 @@
 
 .product-lens-card {
   border-color: rgba(45, 212, 191, .12);
+}
+
+.product-lens-card .feed-meta {
+  color: #94a3b8;
 }
 
 @media (max-width: 900px) {
