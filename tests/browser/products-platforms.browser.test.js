@@ -239,3 +239,28 @@ test("BROWSER-11 mobile navigation and shared Product controls remain usable", a
   await expect(page.locator("#context-controls-filters #productsPlatformsSignalFilter")).toBeVisible();
   await expect(page.locator("#productsPlatformsRefresh")).toBeHidden();
 });
+
+test("BROWSER-12 populated shared lenses clear settled loading semantics", async ({ page }, testInfo) => {
+  await installDeterministicNetwork(page);
+  await openProductLens(page);
+
+  const lenses = [
+    { key: "watchlist", name: "Watchlist", containers: ["#watchlistFeed"] },
+    { key: "people-organizations", name: "People & Organizations", containers: ["#peopleOrganizationsFeed"] },
+    { key: "myfeed", name: "My Feed", containers: ["#myFeedAttention", "#myFeedFeed"] }
+  ];
+
+  for (const lens of lenses) {
+    if (testInfo.project.name.startsWith("mobile")) {
+      await page.getByRole("button", { name: "Open navigation" }).click();
+    }
+    await selectPrimaryTab(page, lens.key, lens.name);
+    await expect(page.locator("body")).toHaveAttribute("data-primary-view", lens.key);
+    for (const selector of lens.containers) {
+      const container = page.locator(selector);
+      await expect(container).toHaveAttribute("data-state", "ready");
+      await expect(container).not.toHaveAttribute("aria-busy", "true");
+      await expect(container.locator("article").first()).toBeVisible();
+    }
+  }
+});

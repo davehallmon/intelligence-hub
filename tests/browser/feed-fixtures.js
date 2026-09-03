@@ -1,4 +1,4 @@
-export const FIXTURE_VERSION = "pre-v10-m10-browser-fixtures-v3";
+export const FIXTURE_VERSION = "pre-v10-m10-browser-fixtures-v4";
 export const PRIVATE_FEED_SENTINEL = "https://private.fixture.invalid/social.xml?token=private-sentinel";
 
 export const PRODUCT_ITEMS = Object.freeze([
@@ -9,7 +9,7 @@ export const PRODUCT_ITEMS = Object.freeze([
     publishedAt: "2099-09-01T12:00:00Z",
     source: "Google DeepMind",
     sourceUrl: "https://deepmind.google/",
-    summary: "Gemini adds an updated reasoning model and workflow controls."
+    summary: "Gemini adds an updated reasoning model and workflow controls for enterprise AI adoption."
   }),
   Object.freeze({
     id: "fixture-chatgpt-generic",

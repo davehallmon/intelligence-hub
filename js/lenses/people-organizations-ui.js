@@ -3,7 +3,7 @@
 
 import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
 import { getEntity } from "../config/entities.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
+import { createRichCard, renderEmpty, renderLoading, renderReady, setStatus } from "../renderers.js";
 import {
   coverageLabel,
   monitoredEntitySourceCoverage,
@@ -263,8 +263,7 @@ function renderResult(allResult, filteredResult, filterValue = "") {
     return filteredResult;
   }
 
-  const container = document.getElementById("peopleOrganizationsFeed");
-  container?.replaceChildren();
+  const container = renderReady("peopleOrganizationsFeed");
   entries.forEach(entry => {
     const card = createRichCard(entry.item, {
       className: "feed-card entity-lens-card",

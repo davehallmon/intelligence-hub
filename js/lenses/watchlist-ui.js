@@ -3,7 +3,7 @@
 
 import { MONITORING_STATES } from "../config/entity-types.js";
 import { WATCHLIST_TOPICS, getWatchlistTopic } from "../config/topic-taxonomy.js";
-import { createRichCard, renderEmpty, renderLoading, setStatus } from "../renderers.js";
+import { createRichCard, renderEmpty, renderLoading, renderReady, setStatus } from "../renderers.js";
 
 const CONTINUOUS_STATES = new Set([
   MONITORING_STATES.PRIORITY,
@@ -208,8 +208,7 @@ function renderResult(allResult, filteredResult, activeTopicId = "") {
     return filteredResult;
   }
 
-  const container = document.getElementById("watchlistFeed");
-  container?.replaceChildren();
+  const container = renderReady("watchlistFeed");
   entries.forEach(entry => {
     const card = createRichCard(entry.item, {
       className: "feed-card watchlist-card",

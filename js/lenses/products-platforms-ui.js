@@ -4,7 +4,7 @@
 import { ENTITY_TYPES, MONITORING_STATES } from "../config/entity-types.js";
 import { entitiesByType, getEntity } from "../config/entities.js";
 import { classifyProductChange } from "./product-change-classifier.js";
-import { createRichCard, renderEmpty, renderError, renderLoading, setStatus } from "../renderers.js";
+import { createRichCard, renderEmpty, renderError, renderLoading, renderReady, setStatus } from "../renderers.js";
 
 const MONITORED_STATES = new Set([
   MONITORING_STATES.PRIORITY,
@@ -233,13 +233,7 @@ function renderResult(allResult, productFilteredResult, filterValue = "", signal
     return productFilteredResult;
   }
 
-  const container = document.getElementById("productsPlatformsFeed");
-  if (container) {
-    container.replaceChildren();
-    container.dataset.state = "ready";
-    container.removeAttribute("aria-busy");
-    container.removeAttribute("aria-label");
-  }
+  const container = renderReady("productsPlatformsFeed");
   visibleEntries.forEach(entry => {
     const card = createRichCard(entry.item, {
       className: "feed-card product-lens-card",
