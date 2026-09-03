@@ -22,7 +22,7 @@ export default defineConfig({
   ],
   metadata: {
     fixtureVersion: "pre-v10-m10-browser-fixtures-v3",
-    harnessVersion: "pre-v10-m10-browser-harness-v5"
+    harnessVersion: "pre-v10-m10-browser-harness-v6"
   },
   use: {
     baseURL: "http://127.0.0.1:4173",

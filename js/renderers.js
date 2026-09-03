@@ -76,6 +76,12 @@ export function renderLoading(containerId, message = "Loading…") {
   container.append(grid);
 }
 
+export function renderReady(containerId) {
+  const container = document.getElementById(containerId);
+  clear(container, "ready");
+  return container;
+}
+
 function createStateMessage({ kind = "empty", title, message, icon = "inbox", retryTab = "" }) {
   const node = document.createElement("div");
   node.className = `state-message state-message--${kind}`;

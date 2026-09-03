@@ -1,5 +1,5 @@
 import { getProfile } from "./profiles.js";
-import { createRichCard } from "./renderers.js";
+import { createRichCard, renderReady } from "./renderers.js";
 import { MY_FEED_LIMITS, MY_FEED_WEIGHTS } from "./my-feed-config.js";
 
 function validDate(value) {
@@ -175,9 +175,8 @@ function contentLabel(type) {
 }
 
 function renderSection(containerId, items, { attention = false } = {}) {
-  const container = document.getElementById(containerId);
+  const container = renderReady(containerId);
   if (!container) return;
-  container.replaceChildren();
   items.forEach((item, index) => {
     const heroClass = attention && index === 0 ? " card--hero" : "";
     const card = createRichCard(item, {

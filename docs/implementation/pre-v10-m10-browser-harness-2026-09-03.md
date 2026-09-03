@@ -20,6 +20,8 @@ The suite serves `index.html` and the production modules from a local static ser
 
 The initial deployed read-only smoke exposed a state-integrity defect: Product cards could be visible while `#productsPlatformsFeed` still retained `data-state="loading"`, `aria-busy="true"`, and its loading label. The correction explicitly transitions the rendered populated state to `ready` and clears stale busy semantics.
 
+A post-merge live smoke then exposed the same stale loading semantics in populated My Feed, Watchlist, and People & Organizations containers. The shared renderer now owns the settled-ready transition for all four populated lenses, rather than leaving each lens to duplicate that state cleanup.
+
 The package also makes three narrow runtime corrections required for replayable acceptance:
 
 - route selections use browser history entries so back/forward navigation restores prior lenses while initial hash normalization remains replace-only;
@@ -33,7 +35,7 @@ No Product identity, monitoring tier, source endpoint, ranking weight, or Focus 
 - `@playwright/test`: `1.62.1`, exact development dependency
 - `@axe-core/playwright`: `4.13.0`, exact development dependency
 - Browser engine: pinned Chromium revision installed by Playwright
-- Harness version: `pre-v10-m10-browser-harness-v5`
+- Harness version: `pre-v10-m10-browser-harness-v6`
 - Fixture version: `pre-v10-m10-browser-fixtures-v3`
 - Fixture file SHA-256: `41a0d2903abfeb297992015c050f3d5405346c819fa9c939abc3be8e87aee99e`
 
@@ -54,6 +56,7 @@ Real tokens, private URLs, and private content are prohibited from fixtures and 
 | BROWSER-09 | Retrieved script/event-handler markup remains non-executable. |
 | BROWSER-10 | The visible Product panel receives an automated WCAG A/AA scan. |
 | BROWSER-11 | Mobile drawer navigation and the shared Product bottom-control handoff remain usable. |
+| BROWSER-12 | Populated My Feed, Watchlist, People & Organizations, and Product containers settle to ready and clear busy semantics. |
 | NEG-01 | An intentionally false browser assertion must produce a non-zero Playwright result; missing test/browser execution is inconclusive rather than a pass. |
 
 ## Commands and evidence
