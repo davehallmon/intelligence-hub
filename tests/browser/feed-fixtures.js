@@ -1,4 +1,4 @@
-export const FIXTURE_VERSION = "pre-v10-m10-browser-fixtures-v2";
+export const FIXTURE_VERSION = "pre-v10-m10-browser-fixtures-v3";
 export const PRIVATE_FEED_SENTINEL = "https://private.fixture.invalid/social.xml?token=private-sentinel";
 
 export const PRODUCT_ITEMS = Object.freeze([
@@ -42,7 +42,7 @@ export const PRODUCT_ITEMS = Object.freeze([
 
 export const MALICIOUS_ITEM = Object.freeze({
   id: "fixture-malicious-content",
-  title: "Gemini 2.5 releases a safety documentation update",
+  title: "Gemini AI model releases a safety documentation update",
   url: "https://fixtures.example/malicious-content",
   publishedAt: "2099-09-01T08:00:00Z",
   source: "Fixture Security Lab",

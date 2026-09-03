@@ -16,9 +16,11 @@ function productFeedText(page, text) {
   return page.locator("#productsPlatformsFeed").getByText(text, { exact: true });
 }
 
-async function selectPrimaryTab(page, name) {
-  const tab = page.getByRole("tab", { name, exact: true });
+async function selectPrimaryTab(page, key, name) {
+  const tab = page.locator(`[data-primary-tab="${key}"]`);
   await expect(tab).toBeVisible();
+  await expect(tab).toHaveAttribute("role", "tab");
+  await expect(tab).toHaveAttribute("aria-label", name);
   await tab.scrollIntoViewIfNeeded();
   // The application changes an in-page read model and never performs a
   // document navigation. A DOM click keeps this assertion independent of
@@ -126,9 +128,9 @@ test("BROWSER-06 route history, reload, and keyboard tab semantics remain cohere
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop keyboard-history case");
   await installDeterministicNetwork(page, "empty");
   await page.goto("/#myfeed");
-  await selectPrimaryTab(page, "Products & Platforms");
+  await selectPrimaryTab(page, "products-platforms", "Products & Platforms");
   await expect(page).toHaveURL(/#products-platforms$/);
-  await selectPrimaryTab(page, "News");
+  await selectPrimaryTab(page, "news", "News");
   await expect(page).toHaveURL(/#news$/);
 
   await page.goBack();
@@ -220,8 +222,11 @@ test("BROWSER-11 mobile navigation and shared Product controls remain usable", a
   await installDeterministicNetwork(page, "empty");
   await page.goto("/#myfeed");
 
-  await page.getByRole("button", { name: "Open navigation" }).click();
-  await selectPrimaryTab(page, "Products & Platforms");
+  const menu = page.locator("#menu-toggle");
+  await expect(menu).toBeVisible();
+  await expect(menu).toHaveAttribute("aria-label", "Open navigation");
+  await menu.click();
+  await selectPrimaryTab(page, "products-platforms", "Products & Platforms");
   await expect(page.locator("body")).toHaveAttribute("data-primary-view", "products-platforms");
   await expect(page.getByRole("button", { name: "Open navigation" })).toHaveAttribute("aria-expanded", "false");
   await expect(page.locator("#context-controls-filters #productsPlatformsFilter")).toBeVisible();

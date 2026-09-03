@@ -6,21 +6,18 @@ import {
   rssFixture
 } from "./feed-fixtures.js";
 
-const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
-
 export async function installDeterministicNetwork(page, initialScenario = "populated") {
   let scenario = initialScenario;
   const requests = [];
 
-  await page.route("**/*", async route => {
+  // Intercept only the external trust boundary. Let the local static server
+  // deliver application modules and styles directly; re-continuing every local
+  // asset creates avoidable route pressure and can leave navigation waiting on
+  // an unrelated same-origin response.
+  await page.route(/^https:\/\//, async route => {
     const request = route.request();
     const url = new URL(request.url());
     requests.push({ url: request.url(), method: request.method(), resourceType: request.resourceType() });
-
-    if (LOCAL_HOSTS.has(url.hostname)) {
-      await route.continue();
-      return;
-    }
 
     if (url.hostname === "unpkg.com") {
       await route.fulfill({

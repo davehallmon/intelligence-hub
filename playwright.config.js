@@ -20,7 +20,7 @@ export default defineConfig({
     ["./tests/browser/evidence-reporter.js", { outputFile: "test-results/browser-evidence.json" }]
   ],
   metadata: {
-    fixtureVersion: "pre-v10-m10-browser-fixtures-v2",
+    fixtureVersion: "pre-v10-m10-browser-fixtures-v3",
     harnessVersion: "pre-v10-m10-browser-harness-v1"
   },
   use: {

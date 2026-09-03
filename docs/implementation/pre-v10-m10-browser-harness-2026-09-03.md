@@ -32,8 +32,8 @@ No Product identity, monitoring tier, source endpoint, ranking weight, or Focus 
 - `@playwright/test`: `1.62.1`, exact development dependency
 - `@axe-core/playwright`: `4.13.0`, exact development dependency
 - Browser engine: pinned Chromium revision installed by Playwright
-- Fixture version: `pre-v10-m10-browser-fixtures-v2`
-- Fixture file SHA-256: `b41395037fc8fdbb6c5704d180dcbcfd42354d3381c5880a72c55ab387c03ff9`
+- Fixture version: `pre-v10-m10-browser-fixtures-v3`
+- Fixture file SHA-256: `41a0d2903abfeb297992015c050f3d5405346c819fa9c939abc3be8e87aee99e`
 
 Real tokens, private URLs, and private content are prohibited from fixtures and persisted artifacts.
 
