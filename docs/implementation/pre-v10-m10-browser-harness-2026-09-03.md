@@ -32,6 +32,7 @@ No Product identity, monitoring tier, source endpoint, ranking weight, or Focus 
 - `@playwright/test`: `1.62.1`, exact development dependency
 - `@axe-core/playwright`: `4.13.0`, exact development dependency
 - Browser engine: pinned Chromium revision installed by Playwright
+- Harness version: `pre-v10-m10-browser-harness-v2`
 - Fixture version: `pre-v10-m10-browser-fixtures-v3`
 - Fixture file SHA-256: `41a0d2903abfeb297992015c050f3d5405346c819fa9c939abc3be8e87aee99e`
 
@@ -70,6 +71,6 @@ The custom reporter writes `test-results/browser-evidence.json` with repository 
 
 ## Verification boundary
 
-This harness can prove deterministic Chromium behavior. It cannot substitute for Issue #30's physical iPhone acceptance, real third-party transport availability, or a post-merge read-only check of the exact deployed SHA. Those remain separate evidence items.
+This harness can prove deterministic Chromium behavior. The route-history and mobile-navigation cases intentionally start from the no-fetch Launchpad route so shared-shell navigation is tested independently of My Feed's asynchronous source fan-out. It cannot substitute for Issue #30's physical iPhone acceptance, real third-party transport availability, My Feed live-readiness evidence, or a post-merge read-only check of the exact deployed SHA. Those remain separate evidence items under the live acceptance boundary.
 
 The local execution environment could install the pinned Node packages but could not download the Playwright Chromium archive from the browser CDN. Therefore local source validation and test discovery are recorded separately; candidate browser execution must be established by GitHub Actions before merge. A green source validator alone is not completion.

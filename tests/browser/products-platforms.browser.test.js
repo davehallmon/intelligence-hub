@@ -128,7 +128,9 @@ test("BROWSER-05 total transport failure renders error and retry recovers", asyn
 test("BROWSER-06 route history, reload, and keyboard tab semantics remain coherent", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop keyboard-history case");
   await installDeterministicNetwork(page, "empty");
-  await openApplicationRoute(page, "myfeed");
+  // Begin on the no-fetch Launchpad route so this navigation contract remains
+  // independent of My Feed's asynchronous multi-source startup fan-out.
+  await openApplicationRoute(page, "launchpad/destinations");
   await selectPrimaryTab(page, "products-platforms", "Products & Platforms");
   await expect(page).toHaveURL(/#products-platforms$/);
   await selectPrimaryTab(page, "news", "News");
@@ -221,7 +223,9 @@ test("BROWSER-10 Product lens has no detectable WCAG A/AA violations", async ({ 
 test("BROWSER-11 mobile navigation and shared Product controls remain usable", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("mobile"), "Mobile-only shared-shell case");
   await installDeterministicNetwork(page, "empty");
-  await openApplicationRoute(page, "myfeed");
+  // Exercise the shared mobile shell from a stable no-fetch route; live My Feed
+  // readiness remains a separate post-deployment acceptance boundary.
+  await openApplicationRoute(page, "launchpad/destinations");
 
   const menu = page.locator("#menu-toggle");
   await expect(menu).toBeVisible();
