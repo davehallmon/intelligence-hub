@@ -28,7 +28,7 @@ Every pull request should identify:
 9. unresolved risks;
 10. confirmation that unrelated lenses were not changed.
 
-Run `npm run validate` before requesting merge. A passing source validator does not substitute for browser/device acceptance when rendering, interaction, responsive behavior, or remote-feed transport changes.
+Run `npm run validate` before requesting merge. For rendering, interaction, responsive, persistence, or transport changes, also run `npm run test:browser`; GitHub Actions executes the pinned Chromium suite and preserves its evidence report. A passing source validator does not substitute for browser/device acceptance, and deterministic fixtures do not substitute for explicitly required physical-device or live-network evidence.
 
 ## Compatibility boundary
 

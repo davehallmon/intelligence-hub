@@ -1,13 +1,14 @@
 # PierView.io / Intelligence Hub — Current State
 
 **Status authority:** Current implementation/handoff state  
-**Last reconciled:** 2026-09-02
+**Last reconciled:** 2026-09-03
 **Repository:** `davehallmon/intelligence-hub`  
 **V10-M09 implementation base:** `e7e97ea02222a2618b3d2288999be7149eb68785` (merge of PR #29)  
 **Latest implementation evidence:** PR #35 — V10-M09 Products & Platforms
 **Latest repository-structure evidence:** PR #38 — V10-M09A.2 forward directory normalization
 **Current execution gate:** Issue #40 — Pre-V10-M10 Readiness Gate (**V10-M10 paused**)
 **Latest Product-attribution correction:** PR #42 — shared-path deterministic Product attribution
+**Current gate-remediation candidate:** `test/pre-v10-m10-browser-harness` — deterministic browser acceptance and browser-discovered V10-M09 state corrections
 
 This file is the **present-tense status authority** for development handoff. Architecture documents define the target product; implementation audits and PRs describe historical transactions. When a historical audit says a follow-up is still pending but this file records that a later PR completed it, this file governs current status.
 
@@ -95,6 +96,7 @@ Use the stable milestone IDs below rather than bare phase numbers. The canonical
 - Dedicated V10-M09 fixtures verify the ratified 6/10 Product counts, child inheritance, Parked boundaries, meaningful-change classification, generic-mention filtering, all-match preservation, non-mutating newest-first sorting, and shared navigation/mobile/Saved/retry wiring.
 - PR #38 GitHub Actions run `33611154736` passed after the path-only normalization. Its repository contract checks cover JavaScript reachability, configuration exports, local Markdown references, production resource resolution, and the root-file allowlist in addition to all existing product fixtures.
 - PR #42 adds production-path Product attribution fixtures for the observed Google DeepMind/Gemini case, owner-only rejection, common-language near misses, child inheritance, Parked explicit query, meaningful-filter separation, and exact cross-lens object reuse. This is code-level evidence only until GitHub CI and the browser gate are recorded.
+- The pre-V10-M10 browser candidate adds pinned Playwright/Chromium acceptance, deterministic intercepted feed fixtures, SHA/versioned evidence reporting, and a deliberate false-success control. Its first live smoke found that populated Product cards retained stale loading/`aria-busy` semantics; the candidate corrects and tests that transition, browser history continuity, and total-failure Retry behavior.
 
 ### Manual acceptance still required
 
@@ -142,7 +144,7 @@ Once the gate opens, the ratified V10-M10 direction remains unchanged:
 6. **Mockup binaries** — `assets/mockups/README.md` indexes the design references, but the image binaries are not currently stored in the repository.
 7. **Repository license** — no license is currently declared. Do not invent one without an explicit owner decision.
 8. **Legacy compatibility files** — intentionally retained until migrated replacements prove parity; cleanup belongs to V10-M18.
-9. **Production/browser CI** — repository validation can test source structure and pure modules, but remote CORS behavior, touch gestures, and responsive visual acceptance still require browser/device verification.
+9. **Production/browser CI** — a deterministic browser job is under gate-remediation review; it is not accepted evidence until the candidate CI passes and the exact merged deployment receives a read-only smoke. Remote CORS behavior and physical touch/device acceptance remain separate.
 10. **Repository hygiene follow-through** — PRs #37–38 completed historical-document archival, dead-file removal, and forward directory normalization. Issue #36 remains open for settings-level merged-branch cleanup and deployed smoke evidence.
 
 ## Authority order for handoff

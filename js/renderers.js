@@ -131,7 +131,10 @@ function retryTabFor(containerId) {
     videoFeed: "video",
     booksFeed: "books",
     myFeedAttention: "myfeed",
-    myFeedFeed: "myfeed"
+    myFeedFeed: "myfeed",
+    watchlistFeed: "watchlist",
+    peopleOrganizationsFeed: "people-organizations",
+    productsPlatformsFeed: "products-platforms"
   })[containerId] || "";
 }
 

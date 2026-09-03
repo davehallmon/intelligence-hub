@@ -16,6 +16,8 @@ Historical implementation phase numbers diverged from the stable v10 milestone s
 | V10-M08 — People & Organizations visible migration | [`PHASE8_PEOPLE_ORGANIZATIONS_AUDIT.md`](PHASE8_PEOPLE_ORGANIZATIONS_AUDIT.md), [`PHASE8_FOLLOWUP_RESOLUTION.md`](PHASE8_FOLLOWUP_RESOLUTION.md), [`V10_MOBILE_SHELL_INTEGRATION_AUDIT.md`](V10_MOBILE_SHELL_INTEGRATION_AUDIT.md) |
 | V10-M09 — Products & Platforms visible migration | [`V10_M09_PRODUCTS_PLATFORMS_AUDIT.md`](V10_M09_PRODUCTS_PLATFORMS_AUDIT.md), [`v10-m09-product-attribution-correction-2026-09-02.md`](v10-m09-product-attribution-correction-2026-09-02.md) |
 
+Cross-milestone precondition evidence: [`pre-v10-m10-browser-harness-2026-09-03.md`](pre-v10-m10-browser-harness-2026-09-03.md) records the deterministic browser harness and its V10-M09 runtime corrections. It remains subordinate to the gate and present-state authority.
+
 See [`V10_MILESTONE_MAP.md`](../architecture/V10_MILESTONE_MAP.md) for the canonical ordinal reconciliation. New evidence files should use lowercase kebab-case and the stable milestone ID, for example `v10-m10-publications-media-audit.md`.
 
 ## Current precondition gate

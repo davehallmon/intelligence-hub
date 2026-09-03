@@ -160,12 +160,14 @@ export function initNavigation({ onPrimaryChange } = {}) {
       : `#${activePrimary}`;
   }
 
-  function syncHash() {
+  function syncHash(mode = "replace") {
     const next = routeString();
-    if (location.hash !== next) history.replaceState(null, "", next);
+    if (location.hash === next || mode === "none") return;
+    if (mode === "push") history.pushState(null, "", next);
+    else history.replaceState(null, "", next);
   }
 
-  function applyPrimary({ notify = true } = {}) {
+  function applyPrimary({ notify = true, historyMode = "replace" } = {}) {
     document.body.dataset.primaryView = activePrimary;
 
     primaryPanels.forEach(panel => {
@@ -187,7 +189,7 @@ export function initNavigation({ onPrimaryChange } = {}) {
 
     localStorage.setItem("intelligenceHubNavVersion", NAV_VERSION);
     localStorage.setItem("intelligenceHubPrimaryTab", activePrimary);
-    syncHash();
+    syncHash(historyMode);
     if (notify) onPrimaryChange?.(activePrimary);
   }
 
@@ -195,7 +197,7 @@ export function initNavigation({ onPrimaryChange } = {}) {
     const normalized = normalizePrimary(tab);
     if (!normalized) return;
     activePrimary = normalized;
-    applyPrimary();
+    applyPrimary({ historyMode: "push" });
     if (focus) primaryTabs.find(button => button.dataset.primaryTab === activePrimary)?.focus();
   }
 
@@ -205,7 +207,7 @@ export function initNavigation({ onPrimaryChange } = {}) {
     activeLaunchpad = normalized;
     localStorage.setItem("intelligenceHubView", activeLaunchpad);
     applyLaunchpadView();
-    syncHash();
+    syncHash("push");
     if (focus) launchpadTabs.find(button => button.dataset.view === activeLaunchpad)?.focus();
   }
 
@@ -263,7 +265,7 @@ export function initNavigation({ onPrimaryChange } = {}) {
     const route = parseHash();
     activePrimary = route.primary;
     if (route.secondary) activeLaunchpad = route.secondary;
-    applyPrimary();
+    applyPrimary({ historyMode: "none" });
   });
 
   launchpadTabs.forEach(tab => {
