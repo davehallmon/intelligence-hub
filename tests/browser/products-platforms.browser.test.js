@@ -5,6 +5,7 @@ import { PRIVATE_FEED_SENTINEL } from "./feed-fixtures.js";
 import {
   assertNoApplicationConsoleErrors,
   installDeterministicNetwork,
+  openApplicationRoute,
   openProductLens
 } from "./harness.js";
 
@@ -127,7 +128,7 @@ test("BROWSER-05 total transport failure renders error and retry recovers", asyn
 test("BROWSER-06 route history, reload, and keyboard tab semantics remain coherent", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "Desktop keyboard-history case");
   await installDeterministicNetwork(page, "empty");
-  await page.goto("/#myfeed");
+  await openApplicationRoute(page, "myfeed");
   await selectPrimaryTab(page, "products-platforms", "Products & Platforms");
   await expect(page).toHaveURL(/#products-platforms$/);
   await selectPrimaryTab(page, "news", "News");
@@ -135,7 +136,7 @@ test("BROWSER-06 route history, reload, and keyboard tab semantics remain cohere
 
   await page.goBack();
   await expect(page.locator("body")).toHaveAttribute("data-primary-view", "products-platforms");
-  await page.reload();
+  await page.reload({ waitUntil: "domcontentloaded" });
   await expect(page.getByRole("tab", { name: "Products & Platforms" })).toHaveAttribute("aria-selected", "true");
 
   const productTab = page.getByRole("tab", { name: "Products & Platforms" });
@@ -220,7 +221,7 @@ test("BROWSER-10 Product lens has no detectable WCAG A/AA violations", async ({ 
 test("BROWSER-11 mobile navigation and shared Product controls remain usable", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("mobile"), "Mobile-only shared-shell case");
   await installDeterministicNetwork(page, "empty");
-  await page.goto("/#myfeed");
+  await openApplicationRoute(page, "myfeed");
 
   const menu = page.locator("#menu-toggle");
   await expect(menu).toBeVisible();

@@ -68,11 +68,18 @@ export async function installDeterministicNetwork(page, initialScenario = "popul
 }
 
 export async function openProductLens(page) {
-  await page.goto("/#products-platforms");
+  await openApplicationRoute(page, "products-platforms");
   await expect(page.locator("body")).toHaveAttribute("data-primary-view", "products-platforms");
   await expect.poll(
     () => page.locator("#productsPlatformsFeed").getAttribute("data-state")
   ).toMatch(/^(?:ready|empty|error)$/);
+}
+
+export async function openApplicationRoute(page, route) {
+  await page.goto(`/#${route}`, { waitUntil: "domcontentloaded" });
+  await expect.poll(
+    () => page.evaluate(() => Boolean(window.intelligenceHubV10))
+  ).toBe(true);
 }
 
 export async function assertNoApplicationConsoleErrors(page) {
