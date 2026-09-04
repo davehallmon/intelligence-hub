@@ -130,6 +130,12 @@ For a cold-start developer or LLM, read in this order:
 
 The public repository intentionally does not store private feed URLs, API tokens, or user-identifying workspace configuration. Browser-local values use `localStorage`; private feeds are not sent through the public RSS proxy fallback.
 
+## License
+
+Copyright © 2026 Dave Hallmon.
+
+This project is licensed under the [MIT License](LICENSE). It may be used, copied, modified, merged, published, distributed, sublicensed, and sold subject to preservation of the copyright and license notice. The software is provided without warranty as described in the license.
+
 ## Deployment
 
 GitHub Pages publishes from the `main` branch and repository root. A successful Pages build proves static deployment, but does **not** by itself prove every browser-origin remote feed, CORS path, responsive layout, or touch interaction works correctly.
